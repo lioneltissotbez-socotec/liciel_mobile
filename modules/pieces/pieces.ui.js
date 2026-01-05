@@ -133,7 +133,13 @@ function pJustif(v){ currentPiece.justification=v; saveMission(); }
 function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
 function pPhoto(file){
   if(!file) return;
-  currentPiece.photos.push({name:file.name, blob:file});
+  currentPiece.photos.push({
+  name: file.name,
+  blob: file,
+  source: "piece",
+  localisation: `${currentPiece.batiment} – ${currentPiece.nom}`
+});
+
   saveMission(); editPiece(currentPiece.id);
 }
 
