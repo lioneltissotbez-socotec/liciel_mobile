@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>LICIEL – Saisie terrain</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="app-header">
+  <span id="header-title">Démarrage mission</span>
+</header>
+
+<main>
+
+  <section class="screen active" id="screen-start">
+    <h2>Nouvelle mission</h2>
+
+    <label>Numéro de dossier</label>
+    <input id="input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
+
+    <button class="primary" onclick="startMission()">Démarrer la mission</button>
+
+    <h3>Missions existantes</h3>
+    <div id="missions-list"></div>
+  </section>
+
+  <section class="screen" id="screen-pieces">
+    <p>Module Pièces – à venir</p>
+  </section>
+
+</main>
+
+<footer id="app-footer">
+  <button onclick="go('start')">🏠</button>
+  <button onclick="go('pieces')">🚪</button>
+</footer>
+
+<script src="core/store.js"></script>
+<script src="core/db.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
