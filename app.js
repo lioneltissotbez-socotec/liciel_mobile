@@ -4,29 +4,32 @@ function go(screen) {
 }
 
 function render() {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  // Active / désactive les écrans
+  document.querySelectorAll(".screen")
+    .forEach(s => s.classList.remove("active"));
+
   const active = document.getElementById("screen-" + store.ui.screen);
   if (active) active.classList.add("active");
-if (store.ui.screen === "pieces") {
-  renderPiecesScreen();
-}
+
+  // Rendu spécifique par écran
+  if (store.ui.screen === "pieces" && typeof renderPiecesScreen === "function") {
+    renderPiecesScreen();
+  }
+
+  if (store.ui.screen === "photos" && typeof renderPhotosScreen === "function") {
+    renderPhotosScreen();
+  }
+
+  // Titre
   const titles = {
     start: "Démarrage mission",
-    pieces: "Pièces"
+    pieces: "Pièces",
+    photos: "Photos"
   };
 
-  document.getElementById("header-title").innerText = titles[store.ui.screen] || "";
+  document.getElementById("header-title").innerText =
+    titles[store.ui.screen] || "";
 }
-
-if (store.ui.screen === "photos") {
-  renderPhotosScreen();
-}
-
-const titles = {
-  start: "Démarrage mission",
-  pieces: "Pièces",
-  photos: "Photos"
-};
 
 async function startMission() {
   const numero = document.getElementById("input-dossier").value.trim();
@@ -60,7 +63,11 @@ async function renderMissionList() {
   c.innerHTML = "";
 
   list.forEach(m => {
-    c.innerHTML += `<button class="secondary" onclick="resumeMission('${m.numeroDossier}')">${m.numeroDossier}</button>`;
+    c.innerHTML += `
+      <button class="secondary" onclick="resumeMission('${m.numeroDossier}')">
+        ${m.numeroDossier}
+      </button>
+    `;
   });
 }
 
@@ -71,7 +78,7 @@ async function resumeMission(numero) {
 
 async function init() {
   await openDB();
-  renderMissionList();
+  await renderMissionList();
   render();
 }
 
