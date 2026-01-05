@@ -7,7 +7,9 @@ function render() {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   const active = document.getElementById("screen-" + store.ui.screen);
   if (active) active.classList.add("active");
-
+if (store.ui.screen === "pieces") {
+  renderPiecesScreen();
+}
   const titles = {
     start: "Démarrage mission",
     pieces: "Pièces"
