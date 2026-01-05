@@ -18,6 +18,16 @@ if (store.ui.screen === "pieces") {
   document.getElementById("header-title").innerText = titles[store.ui.screen] || "";
 }
 
+if (store.ui.screen === "photos") {
+  renderPhotosScreen();
+}
+
+const titles = {
+  start: "Démarrage mission",
+  pieces: "Pièces",
+  photos: "Photos"
+};
+
 async function startMission() {
   const numero = document.getElementById("input-dossier").value.trim();
   if (!numero) {
