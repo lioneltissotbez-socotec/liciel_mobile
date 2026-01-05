@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <title>LICIEL – Saisie terrain</title>
+
+  <!-- Styles globaux -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Styles modules -->
   <link rel="stylesheet" href="modules/pieces/pieces.css">
+  <link rel="stylesheet" href="modules/photos/photos.css">
 </head>
+
 <body>
 
 <header id="app-header">
@@ -15,6 +21,7 @@
 
 <main>
 
+  <!-- Écran démarrage -->
   <section class="screen active" id="screen-start">
     <h2>Nouvelle mission</h2>
 
@@ -27,10 +34,11 @@
     <div id="missions-list"></div>
   </section>
 
-  <section class="screen" id="screen-pieces">
-  <section class="screen" id="screen-photos">
+  <!-- Écran pièces -->
+  <section class="screen" id="screen-pieces"></section>
 
-  </section>
+  <!-- Écran photos -->
+  <section class="screen" id="screen-photos"></section>
 
 </main>
 
@@ -40,17 +48,17 @@
   <button onclick="go('photos')">📷</button>
 </footer>
 
+<!-- Core -->
 <script src="core/store.js"></script>
 <script src="core/db.js"></script>
 
-<script src="app.js"></script>
-
+<!-- Modules -->
 <script src="modules/pieces/pieces.model.js"></script>
 <script src="modules/pieces/pieces.ui.js"></script>
-
-<link rel="stylesheet" href="modules/photos/photos.css">
-
 <script src="modules/photos/photos.ui.js"></script>
+
+<!-- App (TOUJOURS EN DERNIER) -->
+<script src="app.js"></script>
 
 </body>
 </html>
