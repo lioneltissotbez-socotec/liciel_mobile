@@ -110,7 +110,7 @@ function editPiece(id) {
     <input type="file" accept="image/*" capture="environment" onchange="pPhoto(this.files[0])">
 
     <div class="photos">
-  ${p.photos.map(ph => `
+  ${(p.photos || []).map(ph => `
     <div class="photo-row">
       <span>${ph.name}</span>
       <button onclick="replacePhoto('${ph.id}')">🖊</button>
@@ -135,15 +135,19 @@ function pJustif(v){ currentPiece.justification=v; saveMission(); }
 function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
 function pPhoto(file){
   if(!file) return;
-  currentPiece.photos.push({
-  id: crypto.randomUUID(),
-  name: file.name,
-  blob: file,
-  source: "piece",
-  localisation: `${currentPiece.batiment} – ${currentPiece.nom}`
-});
 
-  saveMission(); editPiece(currentPiece.id);
+  currentPiece.photos = currentPiece.photos || [];
+
+  currentPiece.photos.push({
+    id: crypto.randomUUID(),
+    name: file.name,
+    blob: file,
+    source: "piece",
+    localisation: `${currentPiece.batiment} – ${currentPiece.nom}`
+  });
+
+  saveMission();
+  editPiece(currentPiece.id);
 }
 
 function addAnotherPiece(){
