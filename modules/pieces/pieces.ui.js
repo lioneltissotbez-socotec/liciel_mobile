@@ -109,7 +109,15 @@ function editPiece(id) {
     <label>Photo</label>
     <input type="file" accept="image/*" capture="environment" onchange="pPhoto(this.files[0])">
 
-    <div class="photos">${p.photos.map(ph => `<span>${ph.name}</span>`).join("")}</div>
+    <div class="photos">
+  ${p.photos.map(ph => `
+    <div class="photo-row">
+      <span>${ph.name}</span>
+      <button onclick="replacePhoto('${ph.id}')">🖊</button>
+      <button onclick="deletePhoto('${ph.id}')">🗑</button>
+    </div>
+  `).join("")}
+</div>
 
     <button class="primary" onclick="addAnotherPiece()">➕ Ajouter une pièce</button>
     <button class="secondary" onclick="renderPiecesScreen()">✅ Finaliser</button>
@@ -127,7 +135,14 @@ function pJustif(v){ currentPiece.justification=v; saveMission(); }
 function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
 function pPhoto(file){
   if(!file) return;
-  currentPiece.photos.push({name:file.name, blob:file});
+  currentPiece.photos.push({
+  id: crypto.randomUUID(),
+  name: file.name,
+  blob: file,
+  source: "piece",
+  localisation: `${currentPiece.batiment} – ${currentPiece.nom}`
+});
+
   saveMission(); editPiece(currentPiece.id);
 }
 
@@ -171,4 +186,34 @@ function selectFromList(type, value){
 
 function closeOverlay(){
   document.querySelector(".overlay")?.remove();
+}
+function replacePhoto(photoId) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.capture = "environment";
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const ph = currentPiece.photos.find(p => p.id === photoId);
+    if (!ph) return;
+
+    ph.name = file.name;
+    ph.blob = file;
+
+    saveMission();
+    editPiece(currentPiece.id);
+  };
+
+  input.click();
+}
+
+function deletePhoto(photoId) {
+  if (!confirm("Supprimer cette photo ?")) return;
+
+  currentPiece.photos = currentPiece.photos.filter(p => p.id !== photoId);
+  saveMission();
+  editPiece(currentPiece.id);
 }
