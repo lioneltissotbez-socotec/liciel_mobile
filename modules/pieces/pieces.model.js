@@ -1,8 +1,8 @@
 
-function createPiece() {
+function createPiece(defaultBatiment = "") {
   return {
     id: crypto.randomUUID(),
-    batiment: "",
+    batiment: defaultBatiment,
     nom: "",
     visite: true,
     justification: "",

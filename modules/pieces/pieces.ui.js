@@ -13,8 +13,8 @@ function renderPiecesScreen() {
       <div class="card" onclick="editPiece('${p.id}')">
         <strong>${p.batiment || "?"} – ${p.nom || "Nouvelle pièce"}</strong>
         <div class="card-icons">
-          ${p.photos.length ? "📷" : ""}
           ${!p.visite ? "<span class='warn'>⚠️</span>" : ""}
+          ${p.photos.length ? "<span class='photo'>📷</span>" : ""}
         </div>
       </div>
     `).join("")}
@@ -22,7 +22,11 @@ function renderPiecesScreen() {
 }
 
 function addPiece() {
-  const p = createPiece();
+  const lastBat = store.mission.pieces.length
+    ? store.mission.pieces[store.mission.pieces.length - 1].batiment
+    : "";
+
+  const p = createPiece(lastBat);
   store.mission.pieces.push(p);
   saveMission();
   editPiece(p.id);
@@ -89,7 +93,7 @@ function pPhoto(file){
 }
 
 function addAnotherPiece(){
-  const p = createPiece();
+  const p = createPiece(currentPiece.batiment);
   store.mission.pieces.push(p);
   saveMission();
   editPiece(p.id);
