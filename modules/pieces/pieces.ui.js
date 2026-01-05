@@ -82,9 +82,15 @@ function editPiece(id) {
 
     <label>Pièce</label>
     <div class="input-row">
-      <input value="${p.nom}" oninput="pNom(this.value)">
-      <button class="icon" onclick="openList('piece')">📋</button>
-    </div>
+  <input
+    class="input-full"
+    value="${p.nom}"
+    oninput="pNom(this.value)"
+    placeholder="Nom de la pièce"
+  >
+  <button class="icon" onclick="openList('piece')">📋</button>
+</div>
+
 
     <label>Visite</label>
     <select onchange="pVisite(this.value)">
