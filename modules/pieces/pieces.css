@@ -1,0 +1,27 @@
+.card {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.warn {
+  color: #b91c1c;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+textarea, input, select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.photos span {
+  display: inline-block;
+  background: #e5e7eb;
+  padding: 6px;
+  border-radius: 6px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
