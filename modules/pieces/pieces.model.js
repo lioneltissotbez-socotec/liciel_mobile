@@ -1,3 +1,4 @@
+
 function createPiece(defaultBatiment = "") {
   return {
     id: crypto.randomUUID(),

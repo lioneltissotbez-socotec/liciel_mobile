@@ -1,3 +1,4 @@
+
 function renderPiecesScreen() {
   const screen = document.getElementById("screen-pieces");
 
@@ -6,24 +7,56 @@ function renderPiecesScreen() {
     return;
   }
 
-  screen.innerHTML = `
-    <button class="primary" onclick="addPiece()">➕ Ajouter une pièce</button>
+  // Sécurité UI
+  store.ui = store.ui || {};
+  store.ui.piecesOpen = store.ui.piecesOpen || {};
 
-    ${store.mission.pieces.map(p => `
-      <div class="card" onclick="editPiece('${p.id}')">
-        <div>
-          <strong>${p.batiment || "?"}</strong><br>
-          ${p.nom || "Nouvelle pièce"}
-        </div>
+  // Regroupement par bâtiment
+  const byBatiment = {};
+  store.mission.pieces.forEach(p => {
+    const b = (p.batiment || "Bâtiment non renseigné").trim();
+    if (!byBatiment[b]) byBatiment[b] = [];
+    byBatiment[b].push(p);
+  });
 
-        <div class="card-icons">
-          ${!p.visite ? "<span class='warn'>⚠️</span>" : ""}
-          ${p.photos.length ? "<span class='photo'>📷</span>" : ""}
-        </div>
+  let html = `<button class="primary" onclick="addPiece()">➕ Ajouter une pièce</button>`;
+
+  Object.keys(byBatiment).forEach(batiment => {
+    const pieces = byBatiment[batiment];
+    const open = store.ui.piecesOpen[batiment] === true;
+
+    html += `
+      <div class="batiment-header" onclick="toggleBatiment('${encodeURIComponent(batiment)}')">
+        <span>${open ? "▾" : "▸"} ${batiment}</span>
+        <span class="count">(${pieces.length})</span>
       </div>
-    `).join("")}
-  `;
+    `;
+
+    if (open) {
+      pieces.forEach(p => {
+        html += `
+          <div class="card piece-card" onclick="editPiece('${p.id}')">
+            <div class="piece-text">${p.nom || "Nouvelle pièce"}</div>
+            <div class="card-icons">
+              ${!p.visite ? "<span class='warn'>⚠️</span>" : ""}
+              ${p.photos && p.photos.length ? "<span>📷</span>" : ""}
+            </div>
+          </div>
+        `;
+      });
+    }
+  });
+
+  screen.innerHTML = html;
 }
+
+function toggleBatiment(encodedBatiment) {
+  const batiment = decodeURIComponent(encodedBatiment);
+  store.ui.piecesOpen[batiment] = !store.ui.piecesOpen[batiment];
+  renderPiecesScreen();
+}
+
+/* ====== fonctions existantes (édition / ajout) ====== */
 
 function addPiece() {
   const lastBatiment =
@@ -45,19 +78,11 @@ function editPiece(id) {
 
   screen.innerHTML = `
     <label>Bâtiment</label>
-    <input
-      value="${p.batiment}"
-      oninput="pBat(this.value)"
-      placeholder="Nom du bâtiment"
-    >
+    <input value="${p.batiment}" oninput="pBat(this.value)">
 
     <label>Pièce</label>
     <div class="input-row">
-      <input
-        value="${p.nom}"
-        oninput="pNom(this.value)"
-        placeholder="Nom de la pièce"
-      >
+      <input value="${p.nom}" oninput="pNom(this.value)">
       <button class="icon" onclick="openList('piece')">📋</button>
     </div>
 
@@ -70,110 +95,55 @@ function editPiece(id) {
     ${!p.visite ? `
       <label>Justification</label>
       <div class="input-row">
-        <textarea
-          oninput="pJustif(this.value)"
-          placeholder="Justification"
-        >${p.justification}</textarea>
+        <textarea oninput="pJustif(this.value)">${p.justification}</textarea>
         <button class="icon" onclick="openList('justification')">📋</button>
       </div>
 
       <label>Moyens à mettre en œuvre</label>
       <div class="input-row">
-        <textarea
-          oninput="pMoyens(this.value)"
-          placeholder="Moyens à mettre en œuvre"
-        >${p.moyens}</textarea>
+        <textarea oninput="pMoyens(this.value)">${p.moyens}</textarea>
         <button class="icon" onclick="openList('moyens')">📋</button>
       </div>
     ` : ""}
 
     <label>Photo</label>
-    <input
-      type="file"
-      accept="image/*"
-      capture="environment"
-      onchange="pPhoto(this.files[0])"
-    >
+    <input type="file" accept="image/*" capture="environment" onchange="pPhoto(this.files[0])">
 
-    <div class="photos">
-      ${p.photos.map(ph => `<span>${ph.name}</span>`).join("")}
-    </div>
+    <div class="photos">${p.photos.map(ph => `<span>${ph.name}</span>`).join("")}</div>
 
     <button class="primary" onclick="addAnotherPiece()">➕ Ajouter une pièce</button>
     <button class="secondary" onclick="renderPiecesScreen()">✅ Finaliser</button>
   `;
 }
 
-/* ===== setters ===== */
-
-function pBat(v) {
-  currentPiece.batiment = v;
-  saveMission();
-}
-
-function pNom(v) {
-  currentPiece.nom = v;
-  saveMission();
-}
-
-function pVisite(v) {
+function pBat(v){ currentPiece.batiment=v; saveMission(); }
+function pNom(v){ currentPiece.nom=v; saveMission(); }
+function pVisite(v){
   currentPiece.visite = v === "oui";
-  if (currentPiece.visite) {
-    currentPiece.justification = "";
-    currentPiece.moyens = "";
-  }
-  saveMission();
-  editPiece(currentPiece.id);
+  if(currentPiece.visite){ currentPiece.justification=""; currentPiece.moyens=""; }
+  saveMission(); editPiece(currentPiece.id);
+}
+function pJustif(v){ currentPiece.justification=v; saveMission(); }
+function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
+function pPhoto(file){
+  if(!file) return;
+  currentPiece.photos.push({name:file.name, blob:file});
+  saveMission(); editPiece(currentPiece.id);
 }
 
-function pJustif(v) {
-  currentPiece.justification = v;
-  saveMission();
-}
-
-function pMoyens(v) {
-  currentPiece.moyens = v;
-  saveMission();
-}
-
-function pPhoto(file) {
-  if (!file) return;
-  currentPiece.photos.push({ name: file.name, blob: file });
-  saveMission();
-  editPiece(currentPiece.id);
-}
-
-function addAnotherPiece() {
+function addAnotherPiece(){
   const p = createPiece(currentPiece.batiment);
   store.mission.pieces.push(p);
   saveMission();
   editPiece(p.id);
 }
 
-/* ===== listes (provisoires) ===== */
+/* listes provisoires */
+window.LIST_PIECES = ["Salon","Chambre","Cuisine","Salle de bain","WC"];
+window.LIST_JUSTIFICATIONS = ["Accès impossible","Refus occupant","Zone encombrée"];
+window.LIST_MOYENS = ["Démontage","Dépose localisée","Destruction"];
 
-window.LIST_PIECES = [
-  "Entrée", "Séjour", "Salon", "Cuisine",
-  "Chambre", "Salle de bain", "WC", "Dégagement"
-];
-
-window.LIST_JUSTIFICATIONS = [
-  "Accès impossible",
-  "Refus de l’occupant",
-  "Zone encombrée",
-  "Risque sécurité"
-];
-
-window.LIST_MOYENS = [
-  "Dépose localisée",
-  "Démontage",
-  "Destruction partielle",
-  "Mise à nu"
-];
-
-/* ===== overlay listes ===== */
-
-function openList(type) {
+function openList(type){
   const lists = {
     piece: LIST_PIECES,
     justification: LIST_JUSTIFICATIONS,
@@ -182,24 +152,23 @@ function openList(type) {
 
   const overlay = document.createElement("div");
   overlay.className = "overlay";
-
   overlay.innerHTML = `
     <div class="overlay-content">
-      ${lists[type].map(v =>
-        `<button onclick="selectFromList('${type}', '${v}')">${v}</button>`
-      ).join("")}
+      ${lists[type].map(v => `<button onclick="selectFromList('${type}','${v}')">${v}</button>`).join("")}
       <button class="secondary" onclick="closeOverlay()">Annuler</button>
-    </div>
-  `;
-
+    </div>`;
   document.body.appendChild(overlay);
 }
 
-function selectFromList(type, value) {
-  if (type === "piece") currentPiece.nom = value;
-  if (type === "justification") currentPiece.justification = value;
-  if (type === "moyens") currentPiece.moyens = value;
-
+function selectFromList(type, value){
+  if(type==="piece") currentPiece.nom=value;
+  if(type==="justification") currentPiece.justification=value;
+  if(type==="moyens") currentPiece.moyens=value;
   saveMission();
   closeOverlay();
-  edi
+  editPiece(currentPiece.id);
+}
+
+function closeOverlay(){
+  document.querySelector(".overlay")?.remove();
+}

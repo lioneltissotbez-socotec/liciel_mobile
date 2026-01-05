@@ -1,85 +1,82 @@
+
 .card {
-  background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  position: relative;
+  background:#fff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:10px;
+  position:relative;
 }
 
 .card-icons {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  display: flex;
-  gap: 6px;
-  font-size: 18px;
+  position:absolute;
+  right:12px;
+  top:12px;
+  display:flex;
+  gap:6px;
+  font-size:18px;
 }
 
-.warn {
-  color: #b91c1c;
+.warn { color:#b91c1c; }
+
+.batiment-header {
+  margin-top:14px;
+  padding:10px;
+  background:#f3f4f6;
+  border-radius:8px;
+  font-weight:600;
+  display:flex;
+  justify-content:space-between;
+  cursor:pointer;
 }
+
+.batiment-header .count { opacity:.6; }
+
+.piece-card { margin-left:12px; }
+
+.piece-text { font-size:15px; }
 
 .input-row {
-  display: flex;
-  gap: 6px;
+  display:flex;
+  gap:6px;
 }
 
 .input-row input,
-.input-row textarea {
-  flex: 1;
-}
-
-.input-row .icon {
-  width: 44px;
-  font-size: 18px;
-}
+.input-row textarea { flex:1; }
 
 label {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 4px;
-  font-weight: 600;
+  display:block;
+  margin-top:14px;
+  margin-bottom:4px;
 }
 
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
+input, textarea, select {
+  width:100%;
+  padding:10px;
 }
-
-.photos span {
-  background: #e5e7eb;
-  padding: 6px;
-  border-radius: 6px;
-  margin-right: 6px;
-  display: inline-block;
-  font-size: 14px;
-}
-
-/* ===== overlay ===== */
 
 .overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
 }
 
 .overlay-content {
-  background: white;
-  padding: 16px;
-  width: 90%;
-  max-height: 80%;
-  overflow-y: auto;
-  border-radius: 12px;
+  background:#fff;
+  padding:16px;
+  width:90%;
+  max-height:80%;
+  overflow:auto;
+  border-radius:12px;
 }
 
-.overlay-content button {
-  width: 100%;
-  margin-bottom: 8px;
+.photos span {
+  background:#e5e7eb;
+  padding:6px;
+  border-radius:6px;
+  margin-right:6px;
+  display:inline-block;
 }
