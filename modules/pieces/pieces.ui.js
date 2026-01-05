@@ -1,3 +1,4 @@
+
 function renderPiecesScreen() {
   const screen = document.getElementById("screen-pieces");
 
@@ -8,33 +9,39 @@ function renderPiecesScreen() {
 
   screen.innerHTML = `
     <button class="primary" onclick="addPiece()">+ Ajouter une pièce</button>
-
     ${store.mission.pieces.map(p => `
       <div class="card" onclick="editPiece('${p.id}')">
         <strong>${p.batiment || "?"} – ${p.nom || "Nouvelle pièce"}</strong>
-        ${!p.visite ? "<span class='warn'>Non visitée</span>" : ""}
+        <div class="card-icons">
+          ${p.photos.length ? "📷" : ""}
+          ${!p.visite ? "<span class='warn'>⚠️</span>" : ""}
+        </div>
       </div>
     `).join("")}
   `;
 }
 
 function addPiece() {
-  const piece = createPiece();
-  store.mission.pieces.push(piece);
+  const p = createPiece();
+  store.mission.pieces.push(p);
   saveMission();
-  editPiece(piece.id);
+  editPiece(p.id);
 }
 
 function editPiece(id) {
   const p = store.mission.pieces.find(x => x.id === id);
-  const screen = document.getElementById("screen-pieces");
+  window.currentPiece = p;
 
+  const screen = document.getElementById("screen-pieces");
   screen.innerHTML = `
     <label>Bâtiment</label>
-    <input value="${p.batiment}" oninput="pBatiment(this.value)">
+    <input value="${p.batiment}" oninput="pBat(this.value)">
 
     <label>Pièce</label>
-    <input value="${p.nom}" oninput="pNom(this.value)">
+    <div class="input-row">
+      <input value="${p.nom}" oninput="pNom(this.value)">
+      <button class="icon" onclick="openList('piece')">📋</button>
+    </div>
 
     <label>Visite</label>
     <select onchange="pVisite(this.value)">
@@ -44,59 +51,80 @@ function editPiece(id) {
 
     ${!p.visite ? `
       <label>Justification</label>
-      <textarea oninput="pJustif(this.value)">${p.justification}</textarea>
+      <div class="input-row">
+        <textarea oninput="pJustif(this.value)">${p.justification}</textarea>
+        <button class="icon" onclick="openList('justification')">📋</button>
+      </div>
 
       <label>Moyens à mettre en œuvre</label>
-      <textarea oninput="pMoyens(this.value)">${p.moyens}</textarea>
+      <div class="input-row">
+        <textarea oninput="pMoyens(this.value)">${p.moyens}</textarea>
+        <button class="icon" onclick="openList('moyens')">📋</button>
+      </div>
     ` : ""}
 
-    <label>Photos</label>
-    <input type="file" accept="image/*" capture="environment"
-           onchange="pPhoto(this.files[0])">
+    <label>Photo</label>
+    <input type="file" accept="image/*" capture="environment" onchange="pPhoto(this.files[0])">
 
-    <div class="photos">
-      ${p.photos.map(ph => `<span>${ph.name}</span>`).join("")}
-    </div>
+    <div class="photos">${p.photos.map(ph => `<span>${ph.name}</span>`).join("")}</div>
 
-    <button class="secondary" onclick="renderPiecesScreen()">⬅ Retour</button>
+    <button class="primary" onclick="addAnotherPiece()">➕ Ajouter une pièce</button>
+    <button class="secondary" onclick="renderPiecesScreen()">✅ Finaliser</button>
   `;
-
-  window.currentPiece = p;
 }
 
-/* champs */
+function pBat(v){ currentPiece.batiment=v; saveMission(); }
+function pNom(v){ currentPiece.nom=v; saveMission(); }
+function pVisite(v){
+  currentPiece.visite = v === "oui";
+  if(currentPiece.visite){ currentPiece.justification=""; currentPiece.moyens=""; }
+  saveMission(); editPiece(currentPiece.id);
+}
+function pJustif(v){ currentPiece.justification=v; saveMission(); }
+function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
+function pPhoto(file){
+  if(!file) return;
+  currentPiece.photos.push({name:file.name, blob:file});
+  saveMission(); editPiece(currentPiece.id);
+}
 
-function pBatiment(v) {
-  currentPiece.batiment = v;
+function addAnotherPiece(){
+  const p = createPiece();
+  store.mission.pieces.push(p);
   saveMission();
+  editPiece(p.id);
 }
-function pNom(v) {
-  currentPiece.nom = v;
-  saveMission();
+
+window.LIST_PIECES = ["Salon","Chambre","Cuisine","Salle de bain","WC"];
+window.LIST_JUSTIFICATIONS = ["Accès impossible","Refus occupant","Zone encombrée"];
+window.LIST_MOYENS = ["Démontage","Dépose localisée","Destruction"];
+
+function openList(type){
+  const lists = {
+    piece: LIST_PIECES,
+    justification: LIST_JUSTIFICATIONS,
+    moyens: LIST_MOYENS
+  };
+
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `
+    <div class="overlay-content">
+      ${lists[type].map(v => `<button onclick="selectFromList('${type}','${v}')">${v}</button>`).join("")}
+      <button class="secondary" onclick="closeOverlay()">Annuler</button>
+    </div>`;
+  document.body.appendChild(overlay);
 }
-function pVisite(v) {
-  currentPiece.visite = (v === "oui");
-  if (currentPiece.visite) {
-    currentPiece.justification = "";
-    currentPiece.moyens = "";
-  }
+
+function selectFromList(type, value){
+  if(type==="piece") currentPiece.nom=value;
+  if(type==="justification") currentPiece.justification=value;
+  if(type==="moyens") currentPiece.moyens=value;
   saveMission();
+  closeOverlay();
   editPiece(currentPiece.id);
 }
-function pJustif(v) {
-  currentPiece.justification = v;
-  saveMission();
-}
-function pMoyens(v) {
-  currentPiece.moyens = v;
-  saveMission();
-}
-function pPhoto(file) {
-  if (!file) return;
-  currentPiece.photos.push({
-    name: file.name,
-    blob: file
-  });
-  saveMission();
-  editPiece(currentPiece.id);
+
+function closeOverlay(){
+  document.querySelector(".overlay")?.remove();
 }

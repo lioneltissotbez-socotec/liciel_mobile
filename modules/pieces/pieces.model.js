@@ -1,3 +1,4 @@
+
 function createPiece() {
   return {
     id: crypto.randomUUID(),
@@ -6,6 +7,6 @@ function createPiece() {
     visite: true,
     justification: "",
     moyens: "",
-    photos: [] // { name, blob }
+    photos: []
   };
 }

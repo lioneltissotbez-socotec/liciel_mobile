@@ -1,27 +1,10 @@
-.card {
-  background: white;
-  padding: 12px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
 
-.warn {
-  color: #b91c1c;
-  font-size: 12px;
-  margin-left: 8px;
-}
-
-textarea, input, select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-}
-
-.photos span {
-  display: inline-block;
-  background: #e5e7eb;
-  padding: 6px;
-  border-radius: 6px;
-  margin-right: 6px;
-  margin-bottom: 6px;
-}
+.card {background:white;padding:12px;border-radius:10px;margin-bottom:10px;}
+.warn{color:#b91c1c;margin-left:6px;}
+.card-icons{float:right;}
+.input-row{display:flex;gap:6px;}
+.input-row input,.input-row textarea{flex:1;}
+.input-row .icon{width:44px;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;}
+.overlay-content{background:white;padding:16px;width:90%;max-height:80%;overflow:auto;border-radius:12px;}
+.photos span{background:#e5e7eb;padding:6px;border-radius:6px;margin-right:6px;display:inline-block;}
