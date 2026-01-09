@@ -110,20 +110,18 @@ function editPiece(id) {
 
     <div class="photos">
   ${(p.photos || []).map(ph => `
-    <div class="photo-row">
-      <img
-        src="${URL.createObjectURL(ph.blob)}"
-        class="photo-thumb"
-        onclick="openPhotoPreview('${ph.id}')"
-      >
-      <div class="photo-info">
-        <span>${ph.name}</span>
-        <div class="photo-actions">
-          <button onclick="replacePhoto('${ph.id}')">🖊</button>
-          <button onclick="deletePhoto('${ph.id}')">🗑</button>
-        </div>
-      </div>
-    </div>
+<div class="photo-row">
+  <img
+    src="${URL.createObjectURL(ph.blob)}"
+    class="photo-thumb photo-thumb-large"
+    onclick="openPhotoPreview('${ph.id}')"
+  >
+  <div class="photo-actions">
+    <button onclick="replacePhoto('${ph.id}')">🖊</button>
+    <button onclick="deletePhoto('${ph.id}')">🗑</button>
+  </div>
+</div>
+
   `).join("")}
 </div>
 
