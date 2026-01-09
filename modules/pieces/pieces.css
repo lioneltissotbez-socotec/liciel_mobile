@@ -95,17 +95,25 @@ input, textarea, select {
 }
 .photo-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
-.photo-thumb {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+/* 🔥 NOUVELLE TAILLE (x2) */
+.photo-thumb-large {
+  width: 112px;
+  height: 112px;
+}
+
+.photo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.photo-actions button {
+  font-size: 18px;
 }
 
 .photo-info {
@@ -115,7 +123,3 @@ input, textarea, select {
   align-items: center;
 }
 
-.photo-actions button {
-  margin-left: 6px;
-  font-size: 16px;
-}
