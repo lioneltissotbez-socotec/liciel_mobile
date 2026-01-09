@@ -93,11 +93,19 @@ input, textarea, select {
   margin-right:6px;
   display:inline-block;
 }
+.photos {
+  width: 100%;
+  max-width: 100%;
+}
+
 .photo-row {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* 🔥 NOUVELLE TAILLE (x2) */
@@ -106,10 +114,21 @@ input, textarea, select {
   height: 112px;
 }
 
+.photo-thumb {
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  flex-shrink: 0; /* 🔥 empêche l’image de forcer le layout */
+}
+
+/* actions à droite */
 .photo-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .photo-actions button {
