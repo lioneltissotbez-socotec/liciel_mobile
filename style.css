@@ -78,3 +78,29 @@ footer button {
   font-size: 18px;
   background: none;
 }
+.screen {
+  padding: 12px 14px; /* 🔥 aération globale */
+}
+
+.mission-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mission-row button.main {
+  flex: 1;
+  text-align: left;
+}
+
+.mission-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.mission-actions button {
+  width: 42px;
+  padding: 10px;
+  font-size: 16px;
+}
