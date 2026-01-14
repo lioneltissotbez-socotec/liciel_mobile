@@ -64,12 +64,21 @@ async function renderMissionList() {
 
   list.forEach(m => {
     c.innerHTML += `
-      <button class="secondary" onclick="resumeMission('${m.numeroDossier}')">
-        ${m.numeroDossier}
-      </button>
+      <div class="mission-row">
+        <button class="secondary main"
+          onclick="resumeMission('${m.numeroDossier}')">
+          ${m.numeroDossier}
+        </button>
+
+        <div class="mission-actions">
+          <button onclick="renameMission('${m.numeroDossier}')">✏️</button>
+          <button onclick="deleteMission('${m.numeroDossier}')">🗑</button>
+        </div>
+      </div>
     `;
   });
 }
+
 
 async function resumeMission(numero) {
   store.mission = await loadMission(numero);
