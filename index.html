@@ -11,6 +11,8 @@
   <!-- Styles modules -->
   <link rel="stylesheet" href="modules/pieces/pieces.css">
   <link rel="stylesheet" href="modules/photos/photos.css">
+  <link rel="stylesheet" href="modules/description/description.css">
+
 </head>
 
 <body>
@@ -37,6 +39,9 @@
   <!-- Écran pièces -->
   <section class="screen" id="screen-pieces"></section>
 
+  <!-- Écran description de pièce -->
+<section class="screen" id="screen-description"></section>
+
   <!-- Écran photos -->
   <section class="screen" id="screen-photos"></section>
 
@@ -49,16 +54,38 @@
 </footer>
 
 <!-- Core -->
+
+
 <script src="core/store.js"></script>
 <script src="core/db.js"></script>
+
+<!-- ZIP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- EXPORT -->
+<script src="modules/export/export.utils.js"></script>
+<script src="modules/export/export.pieces.js"></script>
+<script src="modules/export/export.photos.js"></script>
+<script src="modules/export/export.description.js"></script>
+<script src="modules/export/export.zip.js"></script>
 
 <!-- Modules -->
 <script src="modules/pieces/pieces.model.js"></script>
 <script src="modules/pieces/pieces.ui.js"></script>
+
+<script src="modules/description/description.ui.js"></script>
+
 <script src="modules/photos/photos.ui.js"></script>
+
+<!-- Dictionnaires -->
+<script src="core/dictionnaires.js"></script>
+<script src="core/dictionnaires_description.js"></script>
+
+<script src="core/plomb.rules.js"></script>
 
 <!-- App (TOUJOURS EN DERNIER) -->
 <script src="app.js"></script>
+
 
 </body>
 </html>

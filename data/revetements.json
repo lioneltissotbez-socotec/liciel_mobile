@@ -1,0 +1,32 @@
+{
+  "label": "Revêtement",
+  "version": "1.0",
+  "items": [
+    { "id": "aucun", "label": "Aucun" },
+    { "id": "brut", "label": "Brut" },
+    { "id": "carrelage", "label": "Carrelage" },
+    { "id": "crepi", "label": "Crépi" },
+    { "id": "faience", "label": "Faïence" },
+    { "id": "lambris_bois", "label": "Lambris bois" },
+    { "id": "lambris_metal", "label": "Lambris métallique" },
+    { "id": "lambris_pvc", "label": "Lambris PVC" },
+    { "id": "marbre", "label": "Marbre" },
+    { "id": "miroir", "label": "Miroir" },
+    { "id": "moquette", "label": "Moquette" },
+    { "id": "papier_peint", "label": "Papier peint" },
+    { "id": "peinture", "label": "Peinture" },
+    { "id": "peinture_faience", "label": "Peinture et faïence" },
+    { "id": "pierres", "label": "Pierres" },
+    { "id": "polystyrene", "label": "Polystyrène" },
+    { "id": "pvc", "label": "PVC" },
+    { "id": "resine", "label": "Résine" },
+    { "id": "revetement_lino", "label": "Revêtement plastique (lino)" },
+    { "id": "revetement_textile", "label": "Revêtement textile" },
+    { "id": "tapis", "label": "Tapis" },
+    { "id": "tapisserie", "label": "Tapisserie" },
+    { "id": "toile_verre", "label": "Toile de verre peinte" },
+    { "id": "tomettes", "label": "Tomettes" },
+    { "id": "vernis", "label": "Vernis" },
+    { "id": "vitrage", "label": "Vitrage" }
+  ]
+}
