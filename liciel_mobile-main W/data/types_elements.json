@@ -1,0 +1,63 @@
+{
+  "label": "Type d’élément",
+  "version": "1.0",
+  "items": [
+    { "id": "sol", "label": "Sol" },
+    { "id": "mur", "label": "Mur" },
+    { "id": "plafond", "label": "Plafond" },
+    { "id": "plinthe", "label": "Plinthe" },
+
+    { "id": "fenetre", "label": "Fenêtre" },
+    { "id": "porte", "label": "Porte" },
+    { "id": "embrasure_porte", "label": "Embrasure porte" },
+    { "id": "moulure_porte", "label": "Moulure porte" },
+    { "id": "embrasure_fenetre", "label": "Embrasure fenêtre" },
+    { "id": "moulure_fenetre", "label": "Moulure fenêtre" },
+    { "id": "allege", "label": "Allège" },
+    { "id": "soubassement_mur", "label": "Soubassement de mur" },
+
+    { "id": "volet", "label": "Volet" },
+    { "id": "huisserie_porte", "label": "Huisserie porte" },
+    { "id": "huisserie_fenetre", "label": "Huisserie fenêtre" },
+    { "id": "linteau_porte", "label": "Linteau porte" },
+    { "id": "linteau_fenetre", "label": "Linteau fenêtre" },
+
+    { "id": "moulure_plafond", "label": "Moulure plafond" },
+
+    { "id": "charpente", "label": "Charpente" },
+    { "id": "ferme", "label": "Ferme" },
+    { "id": "arbaletrier", "label": "Arbalétrier" },
+    { "id": "chantignolle", "label": "Chantignolle" },
+    { "id": "entrait", "label": "Entrait" },
+    { "id": "faux_entrait", "label": "Faux-entrait" },
+    { "id": "poincon", "label": "Poinçon" },
+    { "id": "contrefiche", "label": "Contrefiche" },
+    { "id": "panne_faitiere", "label": "Panne faîtière" },
+    { "id": "panne_intermediaire", "label": "Panne intermédiaire" },
+    { "id": "panne_sabliere", "label": "Panne sablière" },
+    { "id": "chevrons", "label": "Chevrons" },
+    { "id": "voligeage", "label": "Voligeage" },
+    { "id": "liteaunage", "label": "Liteaunage" },
+
+    { "id": "poteau", "label": "Poteau" },
+    { "id": "poutre", "label": "Poutre" },
+    { "id": "solivage", "label": "Solivage" },
+    { "id": "lambourdes", "label": "Lambourdes" },
+
+    { "id": "escalier", "label": "Escalier" },
+    { "id": "marche", "label": "Marche" },
+    { "id": "contre_marche", "label": "Contre-marche" },
+    { "id": "limon", "label": "Limon" },
+    { "id": "faux_limon", "label": "Faux-limon" },
+    { "id": "cremaillere", "label": "Crémaillère" },
+    { "id": "balustre", "label": "Balustre" },
+    { "id": "main_courante", "label": "Main-courante" },
+    { "id": "garde_corps", "label": "Garde-corps" },
+
+    { "id": "radiateur", "label": "Radiateur" },
+    { "id": "cheminee", "label": "Cheminée" },
+    { "id": "hotte_cheminee", "label": "Hotte cheminée" },
+    { "id": "jambage_cheminee", "label": "Jambage cheminée" },
+    { "id": "linteau_cheminee", "label": "Linteau cheminée" }
+  ]
+}

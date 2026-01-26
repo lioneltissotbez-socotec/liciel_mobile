@@ -1,0 +1,139 @@
+/* ===============================
+   LISTE DES UR
+================================ */
+
+.ur-list {
+  margin-top: 12px;
+}
+
+.ur-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ur-card .card-icons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.muted {
+  color: #777;
+  font-size: 14px;
+}
+
+.small {
+  font-size: 13px;
+  color: #555;
+}
+
+/* ===============================
+   LETTRES (A B C D…)
+================================ */
+
+.letters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.letters button {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f3f4f6;
+  font-size: 14px;
+}
+
+.letters button.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* ===============================
+   BOUTONS PLOMB (NM, 0, <0.3, <1)
+================================ */
+
+.plomb-actions.compact {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.plomb-actions.compact button {
+  flex: 1;
+  padding: 8px 6px;
+  font-size: 13px;
+}
+
+/* ===============================
+   LIGNES PLOMB (MESURE / INCERTITUDE / ETAT)
+================================ */
+
+/* grille principale */
+.plomb-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* inputs & select : HAUTEUR UNIFIÉE */
+.plomb-row input,
+.plomb-row select {
+  height: 42px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* incertitude + bouton random */
+.plomb-incertitude .input-row {
+  display: grid;
+  grid-template-columns: 1fr 42px;
+  gap: 6px;
+}
+
+/* bouton calcul incertitude */
+.plomb-incertitude button.icon {
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f3f4f6;
+  font-size: 16px;
+}
+
+/* état de dégradation */
+.plomb-degradation select {
+  width: 100%;
+}
+
+/* ===============================
+   SYNTHESE PLOMB
+================================ */
+
+.plomb-summary {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.plomb-summary.muted {
+  color: #6b7280;
+}
+
+.plomb-summary.ok {
+  color: #15803d;
+  font-weight: 500;
+}
+
+.plomb-summary.warn {
+  color: #b45309;
+  font-weight: 600;
+}
