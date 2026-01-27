@@ -335,9 +335,6 @@ function openPieceDescription(pieceId) {
 // ======================================================
 
 function openPieceList(type) {
-  console.log("=== DEBUG openPieceList ===");
-  console.log("1. Type reçu:", type);
-  
   const map = {
     piece: "pieces",
     batiment: "batiments",
@@ -346,38 +343,31 @@ function openPieceList(type) {
   };
 
   const dictKey = map[type];
-  console.log("2. DictKey mappé:", dictKey);
   
   if (!dictKey) {
-    console.error("❌ Type inconnu:", type);
     alert(`Type de liste inconnu : ${type}`);
     return;
   }
-
-  console.log("3. store.dict existe?", !!store.dict);
-  console.log("4. Clés disponibles dans store.dict:", store.dict ? Object.keys(store.dict) : "AUCUNE");
-  console.log("5. store.dict complet:", store.dict);
   
   const dict = store.dict?.[dictKey];
-  console.log("6. Dictionnaire trouvé pour", dictKey, ":", dict);
   
   if (!dict) {
-    console.error("❌ Dictionnaire introuvable pour la clé:", dictKey);
     alert(`Dictionnaire introuvable : ${dictKey}`);
     return;
   }
   
-  console.log("7. dict.items est un Array?", Array.isArray(dict.items));
-  console.log("8. Nombre d'items:", dict.items?.length);
-  console.log("9. Items:", dict.items);
-  
   if (!Array.isArray(dict.items) || !dict.items.length) {
-    console.error("❌ Items invalides ou vides");
     alert(`Liste indisponible : ${dictKey}`);
     return;
   }
 
-  console.log("✅ Affichage de l'overlay");
+  // MODE SPÉCIAL : Sélection multiple pour les pièces
+  if (type === "piece") {
+    openMultiPieceSelector(dict);
+    return;
+  }
+
+  // MODE NORMAL : Sélection simple pour les autres types
   closeOverlay();
 
   const overlay = document.createElement("div");
@@ -406,6 +396,311 @@ function escapeForHTML(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ======================================================
+// SÉLECTION MULTIPLE DE PIÈCES
+// ======================================================
+
+/**
+ * Affiche l'interface de sélection multiple de pièces
+ * Logique des compteurs :
+ * - État initial : vide (rien n'est affiché)
+ * - 1er clic sur + : affiche "0" = 1 pièce SANS index
+ * - 2ème clic sur + : affiche "1" = 1 pièce AVEC index "01"
+ * - 3ème clic sur + : affiche "2" = 2 pièces avec index "01", "02"
+ */
+function openMultiPieceSelector(dict) {
+  // Initialisation du compteur de pièces
+  window.pieceCounter = window.pieceCounter || {};
+  window.pieceListAlphabeticalSort = window.pieceListAlphabeticalSort || false;
+  
+  closeOverlay();
+
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  
+  const content = document.createElement("div");
+  content.className = "overlay-content multi-piece-selector";
+  
+  // En-tête avec titre et bouton de tri
+  const header = document.createElement("div");
+  header.style.display = "flex";
+  header.style.justifyContent = "space-between";
+  header.style.alignItems = "center";
+  header.style.marginBottom = "12px";
+  
+  const title = document.createElement("h3");
+  title.textContent = "Sélection des pièces";
+  title.style.margin = "0";
+  
+  const sortBtn = document.createElement("button");
+  sortBtn.className = "sort-btn";
+  sortBtn.innerHTML = window.pieceListAlphabeticalSort ? "🔤 A→Z" : "📋 Liste";
+  sortBtn.title = window.pieceListAlphabeticalSort ? "Ordre d'origine" : "Trier A→Z";
+  sortBtn.style.width = "auto";
+  sortBtn.style.padding = "8px 12px";
+  sortBtn.style.fontSize = "14px";
+  sortBtn.style.marginBottom = "0";
+  sortBtn.addEventListener("click", () => {
+    window.pieceListAlphabeticalSort = !window.pieceListAlphabeticalSort;
+    openMultiPieceSelector(dict);
+  });
+  
+  header.appendChild(title);
+  header.appendChild(sortBtn);
+  content.appendChild(header);
+  
+  // Instructions
+  const instructions = document.createElement("p");
+  instructions.className = "small muted";
+  instructions.innerHTML = `
+    • Premier <strong>+</strong> = 1 pièce sans index<br>
+    • Deuxième <strong>+</strong> = 1 pièce avec index (01)<br>
+    • Troisième <strong>+</strong> et plus = plusieurs pièces indexées
+  `;
+  content.appendChild(instructions);
+  
+  // Liste des pièces (triée ou non)
+  const listContainer = document.createElement("div");
+  listContainer.className = "multi-piece-list";
+  listContainer.id = "multi-piece-list";
+  
+  // Trier si demandé
+  let itemsToDisplay = [...dict.items];
+  if (window.pieceListAlphabeticalSort) {
+    itemsToDisplay.sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+  }
+  
+  itemsToDisplay.forEach(item => {
+    const count = window.pieceCounter[item.label];
+    const hasValue = count !== undefined && count !== null;
+    
+    const row = document.createElement("div");
+    row.className = "multi-piece-row";
+    row.dataset.piece = item.label;
+    if (hasValue && count >= 0) row.classList.add("selected");
+    
+    // Nom de la pièce
+    const nameDiv = document.createElement("div");
+    nameDiv.className = "multi-piece-name";
+    nameDiv.textContent = item.label;
+    
+    // Contrôles (boutons + et -)
+    const controlsDiv = document.createElement("div");
+    controlsDiv.className = "multi-piece-controls";
+    
+    const btnMinus = document.createElement("button");
+    btnMinus.className = "counter-btn";
+    btnMinus.textContent = "−";
+    btnMinus.addEventListener("click", () => decrementPiece(item.label));
+    
+    const counterSpan = document.createElement("span");
+    counterSpan.className = "counter-value";
+    counterSpan.id = `counter-${item.id}`;
+    // Afficher seulement si une valeur existe
+    counterSpan.textContent = hasValue ? count : "";
+    counterSpan.style.minWidth = "30px";
+    
+    const btnPlus = document.createElement("button");
+    btnPlus.className = "counter-btn";
+    btnPlus.textContent = "+";
+    btnPlus.addEventListener("click", () => incrementPiece(item.label));
+    
+    controlsDiv.appendChild(btnMinus);
+    controlsDiv.appendChild(counterSpan);
+    controlsDiv.appendChild(btnPlus);
+    
+    row.appendChild(nameDiv);
+    row.appendChild(controlsDiv);
+    listContainer.appendChild(row);
+  });
+  
+  content.appendChild(listContainer);
+  
+  // Résumé
+  const summary = document.createElement("div");
+  summary.className = "multi-piece-summary";
+  summary.id = "multi-piece-summary";
+  summary.innerHTML = `<strong>Total :</strong> <span id="total-pieces-count">0</span> pièce(s) à ajouter`;
+  content.appendChild(summary);
+  
+  // Boutons d'action
+  const btnAdd = document.createElement("button");
+  btnAdd.className = "primary";
+  btnAdd.textContent = "✅ Ajouter les pièces";
+  btnAdd.addEventListener("click", addMultiplePieces);
+  
+  const btnCancel = document.createElement("button");
+  btnCancel.className = "secondary";
+  btnCancel.textContent = "Annuler";
+  btnCancel.addEventListener("click", cancelMultiPieceSelection);
+  
+  content.appendChild(btnAdd);
+  content.appendChild(btnCancel);
+  
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+  
+  updateMultiPieceSummary();
+}
+
+/**
+ * Incrémente le compteur d'un type de pièce
+ * Logique : vide → 0 → 1 → 2 → ...
+ */
+function incrementPiece(pieceName) {
+  window.pieceCounter = window.pieceCounter || {};
+  
+  const current = window.pieceCounter[pieceName];
+  
+  if (current === undefined || current === null) {
+    // Premier clic : passer à 0
+    window.pieceCounter[pieceName] = 0;
+  } else {
+    // Clics suivants : incrémenter
+    window.pieceCounter[pieceName] = current + 1;
+  }
+  
+  updateMultiPieceDisplay(pieceName);
+  updateMultiPieceSummary();
+}
+
+/**
+ * Décrémente le compteur d'un type de pièce
+ * Logique : ... → 2 → 1 → 0 → vide
+ */
+function decrementPiece(pieceName) {
+  window.pieceCounter = window.pieceCounter || {};
+  
+  const current = window.pieceCounter[pieceName];
+  
+  if (current === undefined || current === null) {
+    // Rien à faire si déjà vide
+    return;
+  }
+  
+  if (current === 0) {
+    // Retour à l'état vide
+    delete window.pieceCounter[pieceName];
+  } else {
+    // Décrémenter
+    window.pieceCounter[pieceName] = current - 1;
+  }
+  
+  updateMultiPieceDisplay(pieceName);
+  updateMultiPieceSummary();
+}
+
+/**
+ * Met à jour l'affichage du compteur pour un type de pièce
+ */
+function updateMultiPieceDisplay(pieceName) {
+  const row = document.querySelector(`[data-piece="${pieceName}"]`);
+  if (!row) return;
+  
+  const counter = row.querySelector('.counter-value');
+  if (counter) {
+    const count = window.pieceCounter[pieceName];
+    const hasValue = count !== undefined && count !== null;
+    
+    // Afficher le compteur seulement s'il a une valeur
+    counter.textContent = hasValue ? count : "";
+    
+    // Mise en évidence visuelle si une valeur existe (même 0)
+    if (hasValue) {
+      row.classList.add('selected');
+    } else {
+      row.classList.remove('selected');
+    }
+  }
+}
+
+/**
+ * Met à jour le résumé du nombre total de pièces
+ */
+function updateMultiPieceSummary() {
+  const totalElement = document.getElementById('total-pieces-count');
+  if (!totalElement) return;
+  
+  let total = 0;
+  Object.entries(window.pieceCounter || {}).forEach(([name, count]) => {
+    if (count !== undefined && count !== null) {
+      // Chaque valeur représente le nombre de pièces
+      // 0 = 1 pièce sans index
+      // 1 = 1 pièce avec index
+      // 2 = 2 pièces avec index, etc.
+      if (count === 0) {
+        total += 1; // 1 pièce sans index
+      } else {
+        total += count; // N pièces avec index
+      }
+    }
+  });
+  
+  totalElement.textContent = total;
+}
+
+/**
+ * Ajoute toutes les pièces sélectionnées avec ou sans indexation
+ * Logique :
+ * - count === 0 : 1 pièce SANS index
+ * - count === 1 : 1 pièce AVEC index "01"
+ * - count >= 2 : N pièces avec index "01", "02", ...
+ */
+function addMultiplePieces() {
+  const p = getCurrentPiece();
+  if (!p) return;
+  
+  const batiment = p.batiment;
+  const pieceCounter = window.pieceCounter || {};
+  
+  let totalAdded = 0;
+  
+  // Pour chaque type de pièce avec un compteur défini
+  Object.entries(pieceCounter).forEach(([pieceName, count]) => {
+    if (count === undefined || count === null) return;
+    
+    if (count === 0) {
+      // count = 0 : 1 pièce SANS index
+      const newPiece = createPiece(batiment);
+      newPiece.nom = pieceName;
+      store.mission.pieces.push(newPiece);
+      totalAdded++;
+    } else {
+      // count >= 1 : N pièces AVEC index
+      for (let i = 1; i <= count; i++) {
+        const indexedName = `${pieceName} ${String(i).padStart(2, '0')}`;
+        const newPiece = createPiece(batiment);
+        newPiece.nom = indexedName;
+        store.mission.pieces.push(newPiece);
+        totalAdded++;
+      }
+    }
+  });
+  
+  // Réinitialiser le compteur
+  window.pieceCounter = {};
+  
+  // Sauvegarder et retourner à l'écran principal
+  saveMission();
+  closeOverlay();
+  renderPiecesScreen();
+  
+  // Message de confirmation (optionnel)
+  if (totalAdded > 0) {
+    console.log(`✅ ${totalAdded} pièce(s) ajoutée(s)`);
+  }
+}
+
+/**
+ * Annule la sélection multiple et ferme l'overlay
+ */
+function cancelMultiPieceSelection() {
+  window.pieceCounter = {};
+  closeOverlay();
+}
+
+// ======================================================
 
 function selectFromPieceList(type, value) {
   const p = getCurrentPiece();

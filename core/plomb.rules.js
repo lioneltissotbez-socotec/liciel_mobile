@@ -1,9 +1,20 @@
 // core/plomb.rules.js
 // Normalisation métier des données plomb selon le mode
 
-function randomBetween(min, max) {
-  return Math.round((min + Math.random() * (max - min)) * 100) / 100;
+/**
+ * Génère un nombre aléatoire entre min et max avec un nombre de décimales spécifié
+ * @param {number} min - Valeur minimale
+ * @param {number} max - Valeur maximale
+ * @param {number} decimals - Nombre de décimales (par défaut 2)
+ * @returns {number} Nombre aléatoire arrondi
+ */
+function randomBetween(min, max, decimals = 2) {
+  const v = Math.random() * (max - min) + min;
+  return Number(v.toFixed(decimals));
 }
+
+// Exposition globale pour utilisation dans d'autres modules
+window.randomBetween = randomBetween;
 
 function normalizePlomb(plomb, missionSettings) {
   if (!plomb || plomb.type !== "mesure") return plomb;

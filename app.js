@@ -56,7 +56,7 @@ async function startMission() {
     prelevements: [],
     photos: [],
 
-    // 🔴 PARAMÉTRAGE MÉTIER PL0MB
+    // 🔴 PARAMÉTRAGE MÉTIER PLOMB
     settings: {
       mode: "CREP", // valeur par défaut
 
@@ -71,6 +71,17 @@ async function startMission() {
           uncertaintyRatio: 0.10
         }
       }
+    },
+
+    // 🆕 MODULES ACTIFS
+    modules: {
+      plombTravaux: false,
+      amiante: false,
+      gaz: false,
+      electricite: false,
+      mesurages: false,
+      termites: false,
+      dpe: false
     }
   };
 }
@@ -88,12 +99,31 @@ async function renderMissionList() {
   c.innerHTML = "";
 
   list.forEach(m => {
+    // Vérifier si une photo de présentation existe
+    const hasPhoto = (m.photos || []).some(ph => ph.domaine === "mission");
+    const photoClass = hasPhoto ? "has-photo" : "";
+    
+    // Récupérer les modules actifs
+    const modules = m.modules || {};
+    const moduleIcons = [];
+    if (modules.plombTravaux) moduleIcons.push("🔨");
+    if (modules.amiante) moduleIcons.push("🧪");
+    if (modules.gaz) moduleIcons.push("🔥");
+    if (modules.electricite) moduleIcons.push("⚡");
+    if (modules.mesurages) moduleIcons.push("📏");
+    if (modules.termites) moduleIcons.push("🐛");
+    if (modules.dpe) moduleIcons.push("🏠");
+    
+    const moduleDisplay = moduleIcons.length > 0 
+      ? `<div class="mission-modules">${moduleIcons.join(" ")}</div>` 
+      : "";
+    
     c.innerHTML += `
       <div class="mission-row">
 
         <!-- 📦 EXPORT -->
         <button
-          class="secondary"
+          class="secondary export"
           title="Exporter la mission"
           onclick="exportMissionByNumero('${m.numeroDossier}')">
           📦
@@ -103,7 +133,10 @@ async function renderMissionList() {
         <button
           class="secondary main"
           onclick="resumeMission('${m.numeroDossier}')">
-          ${m.numeroDossier}
+          <div class="mission-info">
+            <div class="mission-numero">${m.numeroDossier}</div>
+            ${moduleDisplay}
+          </div>
         </button>
 
         <!-- ✏️ / 📷 / 🗑 -->
@@ -112,15 +145,16 @@ async function renderMissionList() {
         
   <!-- 📷 Photo principale -->
   <button
-    title="Photo de présentation du bien"
+    class="photo-btn ${photoClass}"
+    title="${hasPhoto ? 'Photo de présentation (✓)' : 'Ajouter une photo de présentation'}"
     onclick="addMissionPhoto('${m.numeroDossier}')">
     📷
   </button>
 
-  <!-- ✏️ Renommer -->
+  <!-- ✏️ Éditer -->
   <button
-    title="Renommer la mission"
-    onclick="renameMission('${m.numeroDossier}')">
+    title="Éditer la mission"
+    onclick="editMission('${m.numeroDossier}')">
     ✏️
   </button>
 
@@ -140,24 +174,258 @@ async function renderMissionList() {
 }
 
 
-async function renameMission(oldNumero) {
-  const newNumero = prompt(
-    "Nouveau numéro de dossier :",
-    oldNumero
-  );
-  if (!newNumero || newNumero === oldNumero) return;
+async function editMission(numero) {
+  const mission = await loadMission(numero);
+  if (!mission) return;
+  
+  // Initialiser les modules si nécessaire
+  if (!mission.modules) {
+    mission.modules = {
+      plombTravaux: false,
+      amiante: false,
+      gaz: false,
+      electricite: false,
+      mesurages: false,
+      termites: false,
+      dpe: false
+    };
+  }
+  
+  // Récupérer la photo de présentation
+  const presentationPhoto = (mission.photos || []).find(ph => ph.domaine === "mission");
+  
+  // Créer l'overlay
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  
+  const content = document.createElement("div");
+  content.className = "overlay-content mission-edit-modal";
+  
+  content.innerHTML = `
+    <h3>Édition de la mission</h3>
+    
+    <label>Numéro de dossier</label>
+    <input type="text" id="edit-numero" value="${mission.numeroDossier}" />
+    
+    ${presentationPhoto ? `
+      <div class="mission-photo-section">
+        <label>Photo de présentation</label>
+        <div class="mission-photo-container">
+          <img src="${URL.createObjectURL(presentationPhoto.blob)}" class="mission-photo-preview" />
+          <div class="mission-photo-actions">
+            <button class="icon-btn" onclick="replaceMissionPhotoInEdit('${numero}')" title="Remplacer la photo">
+              🖊️
+            </button>
+            <button class="icon-btn danger" onclick="deleteMissionPhotoInEdit('${numero}')" title="Supprimer la photo">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    ` : `
+      <div class="mission-photo-section">
+        <label>Photo de présentation</label>
+        <button class="secondary" onclick="addMissionPhotoInEdit('${numero}')" style="width: 100%;">
+          📷 Ajouter une photo de présentation
+        </button>
+      </div>
+    `}
+    
+    <h4 style="margin-top: 20px; margin-bottom: 10px;">Modules actifs</h4>
+    <div class="module-checkboxes">
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-plombTravaux" ${mission.modules.plombTravaux ? "checked" : ""} />
+        <span>🔨 Plomb avant travaux</span>
+      </label>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-amiante" ${mission.modules.amiante ? "checked" : ""} />
+        <span>🧪 Amiante</span>
+      </label>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-gaz" ${mission.modules.gaz ? "checked" : ""} />
+        <span>🔥 Gaz</span>
+      </label>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-electricite" ${mission.modules.electricite ? "checked" : ""} />
+        <span>⚡ Électricité</span>
+      </label>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-mesurages" ${mission.modules.mesurages ? "checked" : ""} />
+        <span>📏 Mesurages</span>
+      </label>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-termites" ${mission.modules.termites ? "checked" : ""} />
+        <span>🐛 Termites</span>
+      </label>
+      
+      <label class="checkbox-label">
+        <input type="checkbox" id="module-dpe" ${mission.modules.dpe ? "checked" : ""} />
+        <span>🏠 DPE</span>
+      </label>
+    </div>
+    
+    <button class="primary" onclick="saveMissionEdit('${numero}')">✅ Enregistrer</button>
+    <button class="secondary" onclick="closeOverlay()">Annuler</button>
+  `;
+  
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+}
 
+async function addMissionPhotoInEdit(numero) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.capture = "environment";
+  
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const mission = await loadMission(numero);
+    if (!mission) return;
+    
+    mission.photos = mission.photos || [];
+    
+    mission.photos.push({
+      id: crypto.randomUUID(),
+      name: file.name,
+      blob: file,
+      domaine: "mission",
+      clefComposant: null,
+      localisation: `Mission ${numero}`
+    });
+    
+    mission.derniereSauvegarde = new Date().toISOString();
+    const tx = db.transaction("missions", "readwrite");
+    tx.objectStore("missions").put(mission);
+    
+    await new Promise(resolve => {
+      tx.oncomplete = resolve;
+    });
+    
+    // Rafraîchir le modal
+    closeOverlay();
+    editMission(numero);
+  };
+  
+  input.click();
+}
+
+async function replaceMissionPhotoInEdit(numero) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.capture = "environment";
+  
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const mission = await loadMission(numero);
+    if (!mission) return;
+    
+    // Trouver et remplacer la photo
+    const photoIndex = mission.photos.findIndex(ph => ph.domaine === "mission");
+    if (photoIndex !== -1) {
+      mission.photos[photoIndex].name = file.name;
+      mission.photos[photoIndex].blob = file;
+    }
+    
+    mission.derniereSauvegarde = new Date().toISOString();
+    const tx = db.transaction("missions", "readwrite");
+    tx.objectStore("missions").put(mission);
+    
+    await new Promise(resolve => {
+      tx.oncomplete = resolve;
+    });
+    
+    // Rafraîchir le modal
+    closeOverlay();
+    editMission(numero);
+  };
+  
+  input.click();
+}
+
+async function deleteMissionPhotoInEdit(numero) {
+  if (!confirm("Supprimer la photo de présentation ?")) return;
+  
+  const mission = await loadMission(numero);
+  if (!mission) return;
+  
+  // Supprimer la photo
+  mission.photos = mission.photos.filter(ph => ph.domaine !== "mission");
+  
+  mission.derniereSauvegarde = new Date().toISOString();
+  const tx = db.transaction("missions", "readwrite");
+  tx.objectStore("missions").put(mission);
+  
+  await new Promise(resolve => {
+    tx.oncomplete = resolve;
+  });
+  
+  // Rafraîchir le modal et la liste
+  closeOverlay();
+  editMission(numero);
+  renderMissionList();
+}
+
+async function saveMissionEdit(oldNumero) {
   const mission = await loadMission(oldNumero);
   if (!mission) return;
+  
+  // Récupérer le nouveau numéro
+  const newNumero = document.getElementById("edit-numero").value.trim();
+  if (!newNumero) {
+    alert("Le numéro de dossier est obligatoire");
+    return;
+  }
+  
+  // Récupérer les modules cochés
+  mission.modules = {
+    plombTravaux: document.getElementById("module-plombTravaux").checked,
+    amiante: document.getElementById("module-amiante").checked,
+    gaz: document.getElementById("module-gaz").checked,
+    electricite: document.getElementById("module-electricite").checked,
+    mesurages: document.getElementById("module-mesurages").checked,
+    termites: document.getElementById("module-termites").checked,
+    dpe: document.getElementById("module-dpe").checked
+  };
+  
+  // Si le numéro a changé, gérer le renommage
+  if (newNumero !== oldNumero) {
+    // Supprimer l'ancienne mission
+    const txDelete = db.transaction("missions", "readwrite");
+    txDelete.objectStore("missions").delete(oldNumero);
+    await new Promise(resolve => {
+      txDelete.oncomplete = resolve;
+    });
+    
+    // Mettre à jour le numéro
+    mission.numeroDossier = newNumero;
+  }
+  
+  // Sauvegarder la mission (nouvelle ou mise à jour)
+  mission.derniereSauvegarde = new Date().toISOString();
+  const txSave = db.transaction("missions", "readwrite");
+  txSave.objectStore("missions").put(mission);
+  
+  await new Promise(resolve => {
+    txSave.oncomplete = resolve;
+  });
+  
+  closeOverlay();
+  renderMissionList();
+}
 
-  mission.numeroDossier = newNumero;
-
-  const tx = db.transaction("missions", "readwrite");
-  const storeOS = tx.objectStore("missions");
-  storeOS.delete(oldNumero);
-  storeOS.put(mission);
-
-  await renderMissionList();
+function closeOverlay() {
+  document.querySelector(".overlay")?.remove();
 }
 
 async function deleteMission(numero) {

@@ -2,8 +2,9 @@
 // export.description.js
 // Table_General_Desciption_Pieces (export Liciel)
 // - 1 item par localisation (A, B, G, P01, F03…)
-// - Compatible avec ur.localisation.items
-// - Remplit CREP (mesure + dégradation)
+// - Source: piece.descriptions[] -> ur.localisation.items + ur.plombByLoc
+// - CREP : mesure + dégradation
+// - Incertitude auto 10% -> Data_1 (sans UI)
 // ======================================================
 
 console.log("✅ export.description.js chargé");
@@ -11,21 +12,32 @@ console.log("✅ export.description.js chargé");
 (function () {
 
   // ===============================
-  // HELPERS LOCAUX
+  // HELPERS
   // ===============================
+
+  function getURLocalisationText(ur) {
+  const items = ur?.localisation?.items;
+  if (!Array.isArray(items) || items.length === 0) return "";
+  return items.join(", ");
+}
+
+function celfComposantForItem(urId, item) {
+  if (!urId) return "";
+  return item ? `${urId}_${item}` : urId;
+}
 
   function pad5(n) {
     return String(n).padStart(5, "0");
   }
 
+  // ⚠️ IMPORTANT : on n'échappe PAS l'apostrophe (') => pas de &apos;
   function escapeXML(str) {
     return (str ?? "")
       .toString()
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&apos;");
+      .replace(/"/g, "&quot;");
   }
 
   function prettyType(t) {
@@ -36,27 +48,29 @@ console.log("✅ export.description.js chargé");
 
   function formatMesure(m) {
     if (m === null || m === undefined) return "";
-    if (typeof m === "string") return m.trim();
+    if (typeof m === "string") return m.trim();       // "NM" ou "0,42"
     if (typeof m === "number") return String(m).replace(".", ",");
-    return String(m);
+    return String(m).trim();
   }
 
-  function formatIncertitude(v) {
-    if (v === null || v === undefined || v === "") return "";
-    if (typeof v === "string") return v.trim();
-    if (typeof v === "number") return String(v).replace(".", ",");
-    return String(v);
+  function parseMesureToNumber(m) {
+    if (m === null || m === undefined) return null;
+    if (typeof m === "number") return isFinite(m) ? m : null;
+
+    const s = String(m).trim();
+    if (!s) return null;
+    if (s.toUpperCase() === "NM") return null;
+
+    // "0,42" -> 0.42
+    const v = parseFloat(s.replace(",", "."));
+    return isFinite(v) ? v : null;
   }
 
-  // ===============================
-  // LOCALISATION (⚠️ MANQUANTE AVANT)
-  // ===============================
-
-  function getURLocalisationText(ur) {
-    if (!ur || !ur.localisation || !Array.isArray(ur.localisation.items)) {
-      return "";
-    }
-    return ur.localisation.items.join(", ");
+  function computeIncertitude10(mesureValue) {
+    const n = parseMesureToNumber(mesureValue);
+    if (n === null) return ""; // NM / invalide => vide
+    if (n === 0) return "0";
+    return String((n * 0.10).toFixed(2)).replace(".", ",");
   }
 
   function buildInfos(ur) {
@@ -71,15 +85,22 @@ console.log("✅ export.description.js chargé");
   }
 
   function celfComposantForItem(urId, item) {
-    if (!urId) return "";
-    return item ? `${urId}_${item}` : urId;
+    const base = (urId ?? "").toString().trim();
+    if (!base) return "";
+    return item ? `${base}_${item}` : base;
   }
 
-  // Où stocker l'incertitude
-  const INCERTITUDE_DEST = "DATA_1"; // recommandé
+  // Localisation texte exportée dans LiColonne_Localistion
+  // Ici on exporte la localisation de pièce + item, pour coller à l'esprit Liciel
+  function buildLocalisationPieceItem(piece, item) {
+    const locPiece = `${piece?.batiment || ""} - ${piece?.nom || ""}`.trim();
+    if (!locPiece && !item) return "";
+    if (!item) return locPiece;
+    return locPiece ? `${locPiece} - ${item}` : String(item);
+  }
 
   // ===============================
-  // EXPORT PRINCIPAL
+  // EXPORT
   // ===============================
 
   function exportDescriptionXML(mission) {
@@ -89,10 +110,6 @@ console.log("✅ export.description.js chargé");
     let idx = 0;
 
     (mission?.pieces || []).forEach(piece => {
-
-      const localisationPiece =
-        `${piece?.batiment || ""} - ${piece?.nom || ""}`.trim();
-
       (piece?.descriptions || []).forEach(ur => {
 
         const items = Array.isArray(ur?.localisation?.items)
@@ -101,46 +118,37 @@ console.log("✅ export.description.js chargé");
 
         const itemsToExport = items.length ? items : [null];
 
-        const mesure = formatMesure(ur?.plomb?.mesure);
-        const incert = formatIncertitude(ur?.plomb?.incertitude);
-        const degr = (ur?.plomb?.degradation ?? "").toString().trim();
-
         itemsToExport.forEach(item => {
-
           const idCelf = celfComposantForItem(ur?.id, item);
 
-          let crepDetails = "";
-          let data1 = "";
-          let data2 = "";
-          let data3 = "";
-          let data4 = "";
+          const entry = (ur?.plombByLoc && item && ur.plombByLoc[item])
+            ? ur.plombByLoc[item]
+            : null;
 
-          if (INCERTITUDE_DEST === "DETAILS") crepDetails = incert;
-          if (INCERTITUDE_DEST === "DATA_1") data1 = incert;
-          if (INCERTITUDE_DEST === "DATA_2") data2 = incert;
-          if (INCERTITUDE_DEST === "DATA_3") data3 = incert;
-          if (INCERTITUDE_DEST === "DATA_4") data4 = incert;
+          const mesureLoc = formatMesure(entry?.mesure);
+          const degrLoc = (entry?.degradation ?? "").toString().trim();
+const localisationPiece = `${piece?.batiment || ""} - ${piece?.nom || ""}`.trim();
+          const incertLoc = computeIncertitude10(entry?.mesure); // 10%
 
           xml += `  <LiItem_table_General_Desciption_Pieces>\n`;
           xml += `    <LiColonne_id_classement_champs>${pad5(idx++)}</LiColonne_id_classement_champs>\n`;
           xml += `    <LiColonne_CelfComposant>${escapeXML(idCelf)}</LiColonne_CelfComposant>\n`;
-          xml += `    <LiColonne_Localistion>${escapeXML(localisationPiece)}</LiColonne_Localistion>\n`;
+         xml += `    <LiColonne_Localistion>${escapeXML(localisationPiece)}</LiColonne_Localistion>\n`;
           xml += `    <LiColonne_Informations>${escapeXML(buildInfos(ur))}</LiColonne_Informations>\n`;
           xml += `    <LiColonne_Type>${escapeXML(buildTypeWithItem(ur?.type, item))}</LiColonne_Type>\n`;
 
-          // ===== CREP =====
-          xml += `    <LiColonne_CREP_degaradtion>${escapeXML(degr)}</LiColonne_CREP_degaradtion>\n`;
-          xml += `    <LiColonne_CREP_degaradtion_Details>${escapeXML(crepDetails)}</LiColonne_CREP_degaradtion_Details>\n`;
-          xml += `    <LiColonne_CREP_mesure>${escapeXML(mesure)}</LiColonne_CREP_mesure>\n`;
+          xml += `    <LiColonne_CREP_degaradtion>${escapeXML(degrLoc)}</LiColonne_CREP_degaradtion>\n`;
+          xml += `    <LiColonne_CREP_degaradtion_Details></LiColonne_CREP_degaradtion_Details>\n`;
+          xml += `    <LiColonne_CREP_mesure>${escapeXML(mesureLoc)}</LiColonne_CREP_mesure>\n`;
 
-          // ===== DONNÉES LIBRES =====
-          xml += `    <LiColonne_Data_1>${escapeXML(data1)}</LiColonne_Data_1>\n`;
-          xml += `    <LiColonne_Data_2>${escapeXML(data2)}</LiColonne_Data_2>\n`;
-          xml += `    <LiColonne_Data_3>${escapeXML(data3)}</LiColonne_Data_3>\n`;
-          xml += `    <LiColonne_Data_4>${escapeXML(data4)}</LiColonne_Data_4>\n`;
-
+          // Incertitude en Data_1 (si tu veux autre chose, dis-moi)
+          xml += `    <LiColonne_Data_1>${escapeXML(incertLoc)}</LiColonne_Data_1>\n`;
+          xml += `    <LiColonne_Data_2></LiColonne_Data_2>\n`;
+          xml += `    <LiColonne_Data_3></LiColonne_Data_3>\n`;
+          xml += `    <LiColonne_Data_4></LiColonne_Data_4>\n`;
           xml += `  </LiItem_table_General_Desciption_Pieces>\n`;
         });
+
       });
     });
 
@@ -148,7 +156,6 @@ console.log("✅ export.description.js chargé");
     return xml;
   }
 
-  // exposé global
   window.exportDescriptionXML = exportDescriptionXML;
 
 })();

@@ -55,6 +55,7 @@ main {
   width: 100%;
   min-height: calc(100vh - 110px); /* header + footer */
   padding: 12px 14px;             /* aération mobile */
+  padding-bottom: 80px;           /* 🔥 espace pour le footer fixe */
 }
 
 .screen.active {
@@ -233,5 +234,160 @@ footer button {
 .mission-photo-label {
   font-size: 14px;
   opacity: 0.8;
+}
+
+/* =========================================
+   MODULES ET PHOTO DE PRÉSENTATION
+   ========================================= */
+
+/* Bouton photo avec indicateur vert */
+.photo-btn.has-photo {
+  background: #d1fae5;
+  border: 2px solid #10b981;
+  color: #065f46;
+}
+
+.photo-btn.has-photo:hover {
+  background: #a7f3d0;
+}
+
+/* Affichage des modules actifs */
+.mission-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.mission-numero {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.mission-modules {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+/* Modal d'édition de mission */
+.mission-edit-modal {
+  max-width: 450px;
+}
+
+.mission-edit-modal h3 {
+  margin: 0 0 16px 0;
+}
+
+.mission-edit-modal h4 {
+  margin: 20px 0 10px 0;
+  font-size: 16px;
+  color: #374151;
+}
+
+.mission-edit-modal input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+/* Cases à cocher pour les modules */
+.module-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f9fafb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.checkbox-label:hover {
+  background: #f3f4f6;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checkbox-label span {
+  font-size: 15px;
+  user-select: none;
+}
+
+/* Photo de présentation dans le modal */
+.mission-photo-section {
+  margin: 16px 0 20px 0;
+}
+
+.mission-photo-container {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.mission-photo-preview {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+
+.mission-photo-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d1d5db;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.icon-btn:hover {
+  background: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn.danger {
+  color: #dc2626;
+}
+
+.icon-btn.danger:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
 }
 

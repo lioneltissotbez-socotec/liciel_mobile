@@ -163,3 +163,21 @@
   gap: 6px;
   font-size: 13px;
 }
+
+.plomb-loc-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.plomb-loc-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 160px;
+  gap: 8px;
+  align-items: center;
+}
+.plomb-loc-tag {
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 8px 6px;
+}
+.plomb-loc-input, .plomb-loc-select { height: 40px; }
+.plomb-empty { padding: 10px 0; }

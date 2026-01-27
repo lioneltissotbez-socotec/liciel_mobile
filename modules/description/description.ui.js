@@ -1,25 +1,21 @@
 console.log("✅ description.ui.js chargé");
+
 function renderPlombSummary(ur) {
-  const p = ur.plomb;
-  if (!p || p.mesure === null || p.mesure === "") return "";
+  if (!ur.plombByLoc || Object.keys(ur.plombByLoc).length === 0) return "";
 
-  // Cas non mesuré
-  if (p.mesure === "NM") {
-    return `<div class="plomb-summary muted">Plomb : Non mesuré</div>`;
-  }
+  const entries = Object.entries(ur.plombByLoc)
+    .map(([loc, v]) => {
+      if (!v || v.mesure === null || v.mesure === "") return null;
+      if (v.mesure === "NM") return `${loc} : NM`;
+      return `${loc} : ${v.mesure}${v.degradation ? " – " + v.degradation : ""}`;
+    })
+    .filter(Boolean);
 
-  // Cas mesure = 0
-  if (Number(p.mesure) === 0) {
-    return `<div class="plomb-summary ok">Plomb : 0 mg/cm²</div>`;
-  }
-
-  const mesure = p.mesure;
-  const incert = p.incertitude ? ` ± ${Number(p.incertitude).toFixed(2)}` : "";
-  const degr = p.degradation ? ` — ${p.degradation}` : "";
+  if (!entries.length) return "";
 
   return `
     <div class="plomb-summary warn">
-      Plomb : ${mesure}${incert} mg/cm²${degr}
+      Plomb : ${entries.join(" | ")}
     </div>
   `;
 }
@@ -136,27 +132,9 @@ function editUR(urId) {
 }
 
 function renderUREditForm(ur) {
-
-  // 🔁 Migration localisation (ancienne → nouvelle)
-if (!ur.localisation || !Array.isArray(ur.localisation.items)) {
-  const items = [];
-
-  if (Array.isArray(ur.lettres)) items.push(...ur.lettres);
-  if (Array.isArray(ur.numeros)) items.push(...ur.numeros);
-
-  ur.localisation = { items };
-  delete ur.lettres;
-  delete ur.numeros;
-
+  // Migration automatique de la structure UR (utilise core/migrations.js)
+  migrateURStructure(ur);
   saveMission();
-}
-
-  ur.plomb = ur.plomb || {
-  mode: null,
-  mesure: null,
-  incertitude: null,
-  degradation: null
-};
 
   const screen = document.getElementById("screen-description");
 
@@ -208,52 +186,57 @@ if (!ur.localisation || !Array.isArray(ur.localisation.items)) {
   <button class="icon" onclick="openDescList('revetements')">📋</button>
 </div>
 
-<h3>Mesure plomb</h3>
+<h3>Mesures plomb (par localisation)</h3>
 
 <div class="plomb-actions compact">
-  <button onclick="plombSetMode('NM')">NM</button>
-  <button onclick="plombSetMode('ZERO')">=0</button>
-  <button onclick="plombSetMode('LT_03')">&lt;0,3</button>
-  <button onclick="plombSetMode('LT_1')">&lt;1</button>
+  <button onclick="plombApplyModeToAll('NM')">NM</button>
+  <button onclick="plombApplyModeToAll('ZERO')">=0</button>
+  <button onclick="plombApplyModeToAll('LT_03')">&lt;0,3</button>
+  <button onclick="plombApplyModeToAll('LT_1')">&lt;1</button>
 </div>
 
-<label>Mesure plomb (mg/cm²)</label>
-<input
-  type="text"
-  value="${ur.plomb?.mesure ?? ""}"
-  oninput="plombSetMesure(this.value)"
-  placeholder="ex : 0,42 ou NM"
-/>
+<div class="small muted" style="margin-top:6px">
+  Saisis une valeur par localisation. Les boutons ci-dessus remplissent automatiquement chaque champ (modifiable ensuite).
+</div>
 
-<div class="plomb-row">
-  <div class="plomb-incertitude">
-    <label>Incertitude</label>
-    <div class="input-row">
-      <input
-        type="number"
-        step="0.01"
-        value="${ur.plomb?.incertitude ?? ""}"
-        oninput="plombSetIncertitude(this.value)"
-      >
-      <button
-        class="icon"
-        title="Calculer 10 %"
-        onclick="plombAutoIncertitude()">
-        🔄
-      </button>
-    </div>
+<div class="plomb-loc-list">
+  ${
+    (Array.isArray(ur.localisation?.items) ? ur.localisation.items : []).length === 0
+      ? `<div class="plomb-empty muted">Aucune localisation sélectionnée</div>`
+      : (ur.localisation.items).map(loc => {
+          const entry = ur.plombByLoc?.[loc] || { mesure: null, degradation: null };
+          const mesureVal = entry.mesure ?? "";
+          const degrVal = entry.degradation ?? "";
+          return `
+            <div class="plomb-loc-row">
+              <div class="plomb-loc-tag">${loc}</div>
+
+              <input
+                class="plomb-loc-input"
+                type="text"
+                value="${mesureVal}"
+                oninput="plombSetMesureForLoc('${loc}', this.value)"
+                placeholder="ex : 0,42 ou NM"
+              />
+
+              <select
+                class="plomb-loc-select"
+                onchange="plombSetDegradationForLoc('${loc}', this.value)"
+              >
+                <option value="" ${degrVal==="" ? "selected" : ""}>—</option>
+                <option ${degrVal==="Non visible" ? "selected" : ""}>Non visible</option>
+                <option ${degrVal==="Non dégradé" ? "selected" : ""}>Non dégradé</option>
+                <option ${degrVal==="Etat d'usage" ? "selected" : ""}>Etat d'usage</option>
+                <option ${degrVal==="Dégradé" ? "selected" : ""}>Dégradé</option>
+              </select>
+            </div>
+          `;
+        }).join("")
+  }
+</div>
+
   </div>
 
-  <div class="plomb-degradation">
-    <label>État de dégradation</label>
-    <select onchange="plombSetDegradation(this.value)">
-      <option value="">—</option>
-      <option ${ur.plomb?.degradation==="Non visible"?"selected":""}>Non visible</option>
-      <option ${ur.plomb?.degradation==="Non dégradé"?"selected":""}>Non dégradé</option>
-      <option ${ur.plomb?.degradation==="Etat d'usage"?"selected":""}>Etat d'usage</option>
-      <option ${ur.plomb?.degradation==="Dégradé"?"selected":""}>Dégradé</option>
-    </select>
-  </div>
 </div>
 
     <h3>Photos de l’élément</h3>
@@ -288,114 +271,6 @@ if (!ur.localisation || !Array.isArray(ur.localisation.items)) {
   `;
 }
 
-function plombSetMode(mode) {
-  const ur = getEditingUR();
-  if (!ur) return;
-
-  ur.plomb = ur.plomb || {};
-  ur.plomb.mode = mode;
-
-  // NON MESURÉ
-  if (mode === "NM") {
-    ur.plomb.mesure = "NM";
-    ur.plomb.incertitude = null;
-    ur.plomb.degradation = null;
-  }
-
-  // MESURE = 0
-  if (mode === "ZERO") {
-    ur.plomb.mesure = 0;
-    ur.plomb.incertitude = 0;
-    ur.plomb.degradation = null;
-  }
-
-  // < 0,3 mg/cm² → random 0,11 → 0,29
-  if (mode === "LT_03") {
-    const m = randomBetween(0.11, 0.29);
-    ur.plomb.mesure = m;
-    ur.plomb.incertitude = computeIncertitude(m);
-    ur.plomb.degradation = null;
-  }
-
-  // < 1 mg/cm² → random 0,31 → 0,99
-  if (mode === "LT_1") {
-    const m = randomBetween(0.31, 0.99);
-    ur.plomb.mesure = m;
-    ur.plomb.incertitude = computeIncertitude(m);
-    ur.plomb.degradation = null;
-  }
-
-  saveMission();
-  renderUREditForm(ur);
-}
-
-function plombSetMesure(v) {
-  const ur = getEditingUR();
-  if (!ur) return;
-
-  ur.plomb.mesure = v;
-  saveMission();
-}
-
-function plombSetIncertitude(v) {
-  const ur = getEditingUR();
-  if (!ur) return;
-
-  ur.plomb = ur.plomb || {};
-
-  if (v === "" || v === null || typeof v === "undefined") {
-    ur.plomb.incertitude = null;
-  } else {
-    ur.plomb.incertitude = Number(v);
-  }
-
-  saveMission();
-}
-
-function plombAutoIncertitude() {
-  const ur = getEditingUR();
-  if (!ur) return;
-
-  ur.plomb = ur.plomb || {};
-
-  // Si NM => pas d'incertitude
-  if (String(ur.plomb.mesure || "").toUpperCase() === "NM") {
-    ur.plomb.incertitude = null;
-    saveMission();
-    renderUREditForm(ur);
-    return;
-  }
-
-  // Convertit "0,42" -> 0.42
-  const raw = String(ur.plomb.mesure ?? "").trim().replace(",", ".");
-  const m = parseFloat(raw);
-
-  // Si non numérique => ne rien faire (ou tu peux mettre null)
-  if (!isFinite(m)) {
-    alert("Mesure invalide : saisis une valeur numérique (ex: 0,42) ou NM.");
-    return;
-  }
-
-  // Règle: incertitude = 10% de la mesure
-  const inc = m * 0.10;
-
-  // Arrondi (à ajuster si tu veux 2 décimales strictes)
-  ur.plomb.incertitude = Number(inc.toFixed(2));
-
-  saveMission();
-  renderUREditForm(ur);
-}
-
-// 🔥 Rend la fonction accessible depuis onclick=""
-window.plombAutoIncertitude = plombAutoIncertitude;
-
-function plombSetDegradation(v) {
-  const ur = getEditingUR();
-  if (!ur) return;
-
-  ur.plomb.degradation = v || null;
-  saveMission();
-}
 
 function getEditingUR() {
   const piece = getCurrentDescriptionPiece();
@@ -465,7 +340,7 @@ function addPhotoToUR(file) {
     blob: file,
     clefComposant: ur.id,
     domaine: "description",
-    localisation: `${ur.type} ${ur.lettres.join(",")}`
+    localisation: `${ur.type} ${(ur.localisation?.items || []).join(", ")}`
   };
 
   store.mission.photos.push(photo);
@@ -476,6 +351,7 @@ function addPhotoToUR(file) {
   saveMission();
   renderUREditForm(ur);
 }
+
 
 function replaceURPhoto(photoId) {
   const input = document.createElement("input");
@@ -604,40 +480,8 @@ function closeDescOverlay() {
   document.querySelector(".overlay")?.remove();
 }
 
-function randomFloat(min, max, decimals = 2) {
-  const v = Math.random() * (max - min) + min;
-  return Number(v.toFixed(decimals));
-}
-
-function plombComputeIncertitude() {
-  const ur = getEditingUR();
-  if (!ur || !ur.plomb) return;
-
-  const mesure = parseFloat(ur.plomb.mesure);
-
-  // Cas non calculables
-  if (isNaN(mesure) || mesure <= 0) {
-    alert("Mesure plomb invalide pour calculer l’incertitude");
-    return;
-  }
-
-  // Calcul 10 %
-  const incertitude = +(mesure * 0.10).toFixed(2);
-
-  ur.plomb.incertitude = incertitude;
-
-  saveMission();
-  renderUREditForm(ur);
-}
-
-function randomBetween(min, max) {
-  return +(Math.random() * (max - min) + min).toFixed(2);
-}
-
-function randomBetween(min, max, decimals = 2) {
-  const v = Math.random() * (max - min) + min;
-  return Number(v.toFixed(decimals));
-}
+// randomBetween est maintenant centralisée dans core/plomb.rules.js
+// et disponible via window.randomBetween
 
 function computeIncertitude(mesure) {
   if (typeof mesure !== "number") return null;
@@ -646,13 +490,27 @@ function computeIncertitude(mesure) {
 
 function toggleLocalisationItem(value) {
   const ur = getEditingUR();
-  if (!ur) return;
+  if (!ur || !ur.localisation) return;
 
-  const items = ur.localisation.items;
+  const currentItems = ur.localisation.items || [];
 
-  ur.localisation.items = items.includes(value)
-    ? items.filter(v => v !== value)
-    : [...items, value];
+  const newItems = currentItems.includes(value)
+    ? currentItems.filter(v => v !== value)
+    : [...currentItems, value];
+
+  ur.localisation.items = newItems;
+
+  ur.plombByLoc = ur.plombByLoc || {};
+
+  newItems.forEach(it => {
+    if (!ur.plombByLoc[it]) {
+      ur.plombByLoc[it] = { mesure: "", degradation: null };
+    }
+  });
+
+  Object.keys(ur.plombByLoc).forEach(k => {
+    if (!newItems.includes(k)) delete ur.plombByLoc[k];
+  });
 
   saveMission();
   renderUREditForm(ur);
@@ -714,15 +572,83 @@ function openLocalisationPlus() {
 
   document.body.appendChild(overlay);
 }
+
 function formatURLocalisation(ur) {
-  if (!ur.localisation || !Array.isArray(ur.localisation.items)) {
-    return "—";
-  }
-
-  if (ur.localisation.items.length === 0) {
-    return "—";
-  }
-
-  return ur.localisation.items.join(", ");
+  const items = ur?.localisation?.items;
+  if (!Array.isArray(items) || items.length === 0) return "—";
+  return items.join(", ");
 }
+
+function plombEnsureByLoc(ur) {
+  ur.plombByLoc = ur.plombByLoc && typeof ur.plombByLoc === "object" ? ur.plombByLoc : {};
+  const locs = Array.isArray(ur.localisation?.items) ? ur.localisation.items : [];
+  locs.forEach(loc => {
+    ur.plombByLoc[loc] = ur.plombByLoc[loc] || { mesure: null, degradation: null };
+  });
+  return locs;
+}
+
+function plombSetMesureForLoc(loc, value) {
+  const ur = getEditingUR();
+  if (!ur) return;
+
+  plombEnsureByLoc(ur);
+  ur.plombByLoc[loc] = ur.plombByLoc[loc] || { mesure: null, degradation: null };
+  ur.plombByLoc[loc].mesure = value;
+
+  saveMission();
+}
+
+function plombSetDegradationForLoc(loc, value) {
+  const ur = getEditingUR();
+  if (!ur) return;
+
+  plombEnsureByLoc(ur);
+  ur.plombByLoc[loc] = ur.plombByLoc[loc] || { mesure: null, degradation: null };
+  ur.plombByLoc[loc].degradation = value || null;
+
+  saveMission();
+}
+
+function plombApplyModeToAll(mode) {
+  const ur = getEditingUR();
+  if (!ur) return;
+
+  const locs = plombEnsureByLoc(ur);
+
+  locs.forEach(loc => {
+    const entry = ur.plombByLoc[loc] || { mesure: null, degradation: null };
+
+    if (mode === "NM") {
+      entry.mesure = "NM";
+      entry.degradation = null;
+    }
+
+    if (mode === "ZERO") {
+      entry.mesure = 0;
+      entry.degradation = null;
+    }
+
+    if (mode === "LT_03") {
+      entry.mesure = randomBetween(0.11, 0.29);
+      // Dégradation non obligatoire, mais si tu veux forcer vide :
+      // entry.degradation = null;
+    }
+
+    if (mode === "LT_1") {
+      entry.mesure = randomBetween(0.31, 0.99);
+      // entry.degradation = null;
+    }
+
+    ur.plombByLoc[loc] = entry;
+  });
+
+  saveMission();
+  renderUREditForm(ur);
+}
+
+// Pour onclick=""
+window.plombApplyModeToAll = plombApplyModeToAll;
+window.plombSetMesureForLoc = plombSetMesureForLoc;
+window.plombSetDegradationForLoc = plombSetDegradationForLoc;
 

@@ -3,1636 +3,355 @@
     "label": "Liste Batiment",
     "version": "1.0",
     "items": [
-      {
-        "id": "sous_sol",
-        "label": "Sous-Sol"
-      },
-      {
-        "id": "rez_de_chauss_e",
-        "label": "Rez de chaussée"
-      },
-      {
-        "id": "rez_de_jardin",
-        "label": "Rez de jardin"
-      },
-      {
-        "id": "1er_tage",
-        "label": "1er étage"
-      },
-      {
-        "id": "2_me_tage",
-        "label": "2ème étage"
-      },
-      {
-        "id": "3_me_tage",
-        "label": "3ème étage"
-      },
-      {
-        "id": "4_me_tage",
-        "label": "4ème étage"
-      },
-      {
-        "id": "5_me_tage",
-        "label": "5ème étage"
-      },
-      {
-        "id": "6_me_tage",
-        "label": "6ème étage"
-      },
-      {
-        "id": "combles",
-        "label": "Combles"
-      },
-      {
-        "id": "garage",
-        "label": "Garage"
-      },
-      {
-        "id": "vide_sanitaire",
-        "label": "Vide-sanitaire"
-      },
-      {
-        "id": "terrain",
-        "label": "Terrain"
-      },
-      {
-        "id": "jardin",
-        "label": "Jardin"
-      },
-      {
-        "id": "abri",
-        "label": "Abri"
-      },
-      {
-        "id": "hangar",
-        "label": "Hangar"
-      },
-      {
-        "id": "d_pendance",
-        "label": "Dépendance"
-      },
-      {
-        "id": "d_pendances",
-        "label": "Dépendances"
-      },
-      {
-        "id": "d_pendance_1",
-        "label": "Dépendance 1"
-      },
-      {
-        "id": "d_pendance_2",
-        "label": "Dépendance 2"
-      },
-      {
-        "id": "d_pendance_3",
-        "label": "Dépendance 3"
-      },
-      {
-        "id": "1_re_d_pendance",
-        "label": "1ère dépendance"
-      },
-      {
-        "id": "2_me_d_pendance",
-        "label": "2ème dépendance"
-      },
-      {
-        "id": "3_me_d_pendance",
-        "label": "3ème dépendance"
-      },
-      {
-        "id": "s_sol",
-        "label": "S-Sol"
-      },
-      {
-        "id": "rdc",
-        "label": "RdC"
-      },
-      {
-        "id": "rdj",
-        "label": "RdJ"
-      },
-      {
-        "id": "tage_1",
-        "label": "Étage 1"
-      },
-      {
-        "id": "tage_2",
-        "label": "Étage 2"
-      },
-      {
-        "id": "tage_3",
-        "label": "Étage 3"
-      },
-      {
-        "id": "tage_4",
-        "label": "Étage 4"
-      },
-      {
-        "id": "tage_5",
-        "label": "Étage 5"
-      },
-      {
-        "id": "tage_6",
-        "label": "Étage 6"
-      },
-      {
-        "id": "appartement",
-        "label": "Appartement"
-      },
-      {
-        "id": "b_timent_1",
-        "label": "Bâtiment 1"
-      },
-      {
-        "id": "b_timent_2",
-        "label": "Bâtiment 2"
-      },
-      {
-        "id": "b_timent_3",
-        "label": "Bâtiment 3"
-      },
-      {
-        "id": "b_timent_4",
-        "label": "Bâtiment 4"
-      },
-      {
-        "id": "b_timent_5",
-        "label": "Bâtiment 5"
-      },
-      {
-        "id": "b_timent_6",
-        "label": "Bâtiment 6"
-      },
-      {
-        "id": "b_timent_a",
-        "label": "Bâtiment A"
-      },
-      {
-        "id": "b_timent_b",
-        "label": "Bâtiment B"
-      },
-      {
-        "id": "b_timent_c",
-        "label": "Bâtiment C"
-      },
-      {
-        "id": "b_timent_d",
-        "label": "Bâtiment D"
-      },
-      {
-        "id": "b_timent_e",
-        "label": "Bâtiment E"
-      },
-      {
-        "id": "b_timent_f",
-        "label": "Bâtiment F"
-      },
-      {
-        "id": "chalet",
-        "label": "Chalet"
-      },
-      {
-        "id": "ch_teau",
-        "label": "Château"
-      },
-      {
-        "id": "ext_rieur",
-        "label": "Extérieur"
-      },
-      {
-        "id": "habitation_rdc",
-        "label": "Habitation RDC"
-      },
-      {
-        "id": "immeuble",
-        "label": "Immeuble"
-      },
-      {
-        "id": "local",
-        "label": "Local"
-      },
-      {
-        "id": "local_commercial",
-        "label": "Local commercial"
-      },
-      {
-        "id": "local_de_service",
-        "label": "Local de service"
-      },
-      {
-        "id": "local_technique",
-        "label": "Local technique"
-      },
-      {
-        "id": "magasin",
-        "label": "Magasin"
-      },
-      {
-        "id": "maison",
-        "label": "Maison"
-      },
-      {
-        "id": "pi_ce",
-        "label": "Pièce"
-      },
-      {
-        "id": "r_sidence",
-        "label": "Résidence"
-      },
-      {
-        "id": "serre",
-        "label": "Serre"
-      },
-      {
-        "id": "terrain_vague",
-        "label": "Terrain vague"
-      },
-      {
-        "id": "tunnel",
-        "label": "Tunnel"
-      },
-      {
-        "id": "villa",
-        "label": "Villa"
-      },
-      {
-        "id": "zone",
-        "label": "Zone"
-      }
+      {"id": "sous_sol", "label": "Sous-Sol"},
+      {"id": "rez_de_chauss_e", "label": "Rez de chaussée"},
+      {"id": "rez_de_jardin", "label": "Rez de jardin"},
+      {"id": "1er_tage", "label": "1er étage"},
+      {"id": "2_me_tage", "label": "2ème étage"},
+      {"id": "3_me_tage", "label": "3ème étage"},
+      {"id": "4_me_tage", "label": "4ème étage"},
+      {"id": "5_me_tage", "label": "5ème étage"},
+      {"id": "6_me_tage", "label": "6ème étage"},
+      {"id": "combles", "label": "Combles"},
+      {"id": "garage", "label": "Garage"},
+      {"id": "vide_sanitaire", "label": "Vide-sanitaire"},
+      {"id": "terrain", "label": "Terrain"},
+      {"id": "jardin", "label": "Jardin"},
+      {"id": "abri", "label": "Abri"},
+      {"id": "hangar", "label": "Hangar"},
+      {"id": "d_pendance", "label": "Dépendance"},
+      {"id": "d_pendances", "label": "Dépendances"},
+      {"id": "d_pendance_1", "label": "Dépendance 1"},
+      {"id": "d_pendance_2", "label": "Dépendance 2"},
+      {"id": "d_pendance_3", "label": "Dépendance 3"},
+      {"id": "1_re_d_pendance", "label": "1ère dépendance"},
+      {"id": "2_me_d_pendance", "label": "2ème dépendance"},
+      {"id": "3_me_d_pendance", "label": "3ème dépendance"},
+      {"id": "s_sol", "label": "S-Sol"},
+      {"id": "rdc", "label": "RdC"},
+      {"id": "rdj", "label": "RdJ"},
+      {"id": "tage_1", "label": "Étage 1"},
+      {"id": "tage_2", "label": "Étage 2"},
+      {"id": "tage_3", "label": "Étage 3"},
+      {"id": "tage_4", "label": "Étage 4"},
+      {"id": "tage_5", "label": "Étage 5"},
+      {"id": "tage_6", "label": "Étage 6"},
+      {"id": "appartement", "label": "Appartement"},
+      {"id": "b_timent_1", "label": "Bâtiment 1"},
+      {"id": "b_timent_2", "label": "Bâtiment 2"},
+      {"id": "b_timent_3", "label": "Bâtiment 3"},
+      {"id": "b_timent_4", "label": "Bâtiment 4"},
+      {"id": "b_timent_5", "label": "Bâtiment 5"},
+      {"id": "b_timent_6", "label": "Bâtiment 6"},
+      {"id": "b_timent_a", "label": "Bâtiment A"},
+      {"id": "b_timent_b", "label": "Bâtiment B"},
+      {"id": "b_timent_c", "label": "Bâtiment C"},
+      {"id": "b_timent_d", "label": "Bâtiment D"},
+      {"id": "b_timent_e", "label": "Bâtiment E"},
+      {"id": "b_timent_f", "label": "Bâtiment F"},
+      {"id": "chalet", "label": "Chalet"},
+      {"id": "ch_teau", "label": "Château"},
+      {"id": "ext_rieur", "label": "Extérieur"},
+      {"id": "habitation_rdc", "label": "Habitation RDC"},
+      {"id": "immeuble", "label": "Immeuble"},
+      {"id": "local", "label": "Local"},
+      {"id": "local_commercial", "label": "Local commercial"},
+      {"id": "local_de_service", "label": "Local de service"},
+      {"id": "local_technique", "label": "Local technique"},
+      {"id": "magasin", "label": "Magasin"},
+      {"id": "maison", "label": "Maison"},
+      {"id": "pi_ce", "label": "Pièce"},
+      {"id": "r_sidence", "label": "Résidence"},
+      {"id": "serre", "label": "Serre"},
+      {"id": "terrain_vague", "label": "Terrain vague"},
+      {"id": "tunnel", "label": "Tunnel"},
+      {"id": "villa", "label": "Villa"},
+      {"id": "zone", "label": "Zone"}
     ]
   },
   "pieces": {
     "label": "Liste des pieces",
     "version": "1.0",
     "items": [
-      {
-        "id": "abris",
-        "label": "Abris"
-      },
-      {
-        "id": "abris_anti_atomique",
-        "label": "Abris Anti-Atomique"
-      },
-      {
-        "id": "abris_bois",
-        "label": "Abris bois"
-      },
-      {
-        "id": "abris_de_jardin",
-        "label": "Abris de jardin"
-      },
-      {
-        "id": "acc_s",
-        "label": "Accès"
-      },
-      {
-        "id": "accueil",
-        "label": "Accueil"
-      },
-      {
-        "id": "appentis",
-        "label": "Appentis"
-      },
-      {
-        "id": "arri_re_cuisine",
-        "label": "Arrière-cuisine"
-      },
-      {
-        "id": "atelier",
-        "label": "Atelier"
-      },
-      {
-        "id": "balcon",
-        "label": "Balcon"
-      },
-      {
-        "id": "biblioth_que",
-        "label": "Bibliothèque"
-      },
-      {
-        "id": "boudoir",
-        "label": "Boudoir"
-      },
-      {
-        "id": "buanderie",
-        "label": "Buanderie"
-      },
-      {
-        "id": "bureau",
-        "label": "Bureau"
-      },
-      {
-        "id": "caf_t_ria",
-        "label": "Cafétéria"
-      },
-      {
-        "id": "cage_descalier",
-        "label": "Cage d'escalier"
-      },
-      {
-        "id": "cagibi",
-        "label": "Cagibi"
-      },
-      {
-        "id": "cantine",
-        "label": "Cantine"
-      },
-      {
-        "id": "cantou",
-        "label": "Cantou"
-      },
-      {
-        "id": "cave",
-        "label": "Cave"
-      },
-      {
-        "id": "cave_vins",
-        "label": "Cave à vins"
-      },
-      {
-        "id": "caveau",
-        "label": "Caveau"
-      },
-      {
-        "id": "cellier",
-        "label": "Cellier"
-      },
-      {
-        "id": "chais",
-        "label": "Chais"
-      },
-      {
-        "id": "chambre",
-        "label": "Chambre"
-      },
-      {
-        "id": "chambre_1",
-        "label": "Chambre 1"
-      },
-      {
-        "id": "chambre_2",
-        "label": "Chambre 2"
-      },
-      {
-        "id": "chambre_3",
-        "label": "Chambre 3"
-      },
-      {
-        "id": "chambre_4",
-        "label": "Chambre 4"
-      },
-      {
-        "id": "chambre_5",
-        "label": "Chambre 5"
-      },
-      {
-        "id": "chaufferie",
-        "label": "Chaufferie"
-      },
-      {
-        "id": "chenil",
-        "label": "Chenil"
-      },
-      {
-        "id": "coin_repas",
-        "label": "Coin repas"
-      },
-      {
-        "id": "combles_dhabitation",
-        "label": "Combles d'habitation"
-      },
-      {
-        "id": "combles_habitables",
-        "label": "Combles habitables"
-      },
-      {
-        "id": "combles_non_habitables",
-        "label": "Combles non habitables"
-      },
-      {
-        "id": "couloir",
-        "label": "Couloir"
-      },
-      {
-        "id": "couverture",
-        "label": "Couverture"
-      },
-      {
-        "id": "cuisine",
-        "label": "Cuisine"
-      },
-      {
-        "id": "cuisine_salle_manger",
-        "label": "Cuisine / Salle à manger"
-      },
-      {
-        "id": "cuisine_s_jour",
-        "label": "Cuisine / Séjour"
-      },
-      {
-        "id": "cuisine_am_ricaine",
-        "label": "Cuisine américaine"
-      },
-      {
-        "id": "d_barras",
-        "label": "Débarras"
-      },
-      {
-        "id": "d_gagement",
-        "label": "Dégagement"
-      },
-      {
-        "id": "d_p_t",
-        "label": "Dépôt"
-      },
-      {
-        "id": "dortoir",
-        "label": "Dortoir"
-      },
-      {
-        "id": "dressing",
-        "label": "Dressing"
-      },
-      {
-        "id": "curies",
-        "label": "Écuries"
-      },
-      {
-        "id": "entr_e",
-        "label": "Entrée"
-      },
-      {
-        "id": "entr_e_couloir",
-        "label": "Entrée/couloir"
-      },
-      {
-        "id": "escalier",
-        "label": "Escalier"
-      },
-      {
-        "id": "espace_de_vente",
-        "label": "Espace de vente"
-      },
-      {
-        "id": "fa_ade",
-        "label": "Façade"
-      },
-      {
-        "id": "fa_ade_arri_re",
-        "label": "Façade Arrière"
-      },
-      {
-        "id": "fa_ade_avant",
-        "label": "Façade Avant"
-      },
-      {
-        "id": "fa_ade_est",
-        "label": "Façade Est"
-      },
-      {
-        "id": "fa_ade_nord",
-        "label": "Façade Nord"
-      },
-      {
-        "id": "fa_ade_nord_est",
-        "label": "Façade Nord-Est"
-      },
-      {
-        "id": "fa_ade_nord_ouest",
-        "label": "Façade Nord-Ouest"
-      },
-      {
-        "id": "fa_ade_ouest",
-        "label": "Façade Ouest"
-      },
-      {
-        "id": "fa_ade_sud",
-        "label": "Façade Sud"
-      },
-      {
-        "id": "fa_ade_sud_est",
-        "label": "Façade Sud-Est"
-      },
-      {
-        "id": "fa_ade_sud_ouest",
-        "label": "Façade Sud-Ouest"
-      },
-      {
-        "id": "fa_ades",
-        "label": "Façades"
-      },
-      {
-        "id": "faux_grenier",
-        "label": "Faux grenier"
-      },
-      {
-        "id": "four_pain",
-        "label": "Four à pain"
-      },
-      {
-        "id": "fumoir",
-        "label": "Fumoir"
-      },
-      {
-        "id": "garage",
-        "label": "Garage"
-      },
-      {
-        "id": "garage_1",
-        "label": "Garage 1"
-      },
-      {
-        "id": "garage_2",
-        "label": "Garage 2"
-      },
-      {
-        "id": "garage_v_lo",
-        "label": "Garage à vélo"
-      },
-      {
-        "id": "garage_avec_faux_grenier",
-        "label": "Garage avec faux grenier"
-      },
-      {
-        "id": "garage_double",
-        "label": "Garage double"
-      },
-      {
-        "id": "grand_salon",
-        "label": "Grand salon"
-      },
-      {
-        "id": "grange",
-        "label": "Grange"
-      },
-      {
-        "id": "grenier",
-        "label": "Grenier"
-      },
-      {
-        "id": "hall",
-        "label": "Hall"
-      },
-      {
-        "id": "hangar",
-        "label": "Hangar"
-      },
-      {
-        "id": "infirmerie",
-        "label": "Infirmerie"
-      },
-      {
-        "id": "labo",
-        "label": "Labo"
-      },
-      {
-        "id": "lingerie",
-        "label": "Lingerie"
-      },
-      {
-        "id": "local",
-        "label": "Local"
-      },
-      {
-        "id": "local_v_lo",
-        "label": "Local à vélo"
-      },
-      {
-        "id": "local_boites_aux_lettres",
-        "label": "Local boites aux lettres"
-      },
-      {
-        "id": "local_chauffe_eau",
-        "label": "Local Chauffe Eau"
-      },
-      {
-        "id": "local_entretien",
-        "label": "Local entretien"
-      },
-      {
-        "id": "local_groupe_eau",
-        "label": "Local Groupe Eau"
-      },
-      {
-        "id": "local_poubelles",
-        "label": "Local poubelles"
-      },
-      {
-        "id": "local_poussettes",
-        "label": "Local poussettes"
-      },
-      {
-        "id": "local_serveur",
-        "label": "Local serveur"
-      },
-      {
-        "id": "local_sous_escalier",
-        "label": "Local sous escalier"
-      },
-      {
-        "id": "local_technique",
-        "label": "Local technique"
-      },
-      {
-        "id": "local_vide_ordures",
-        "label": "Local vide-ordures"
-      },
-      {
-        "id": "loggia",
-        "label": "Loggia"
-      },
-      {
-        "id": "mezzanine",
-        "label": "Mezzanine"
-      },
-      {
-        "id": "office",
-        "label": "Office"
-      },
-      {
-        "id": "palier",
-        "label": "Palier"
-      },
-      {
-        "id": "petit_salon",
-        "label": "Petit salon"
-      },
-      {
-        "id": "pi_ce",
-        "label": "Pièce"
-      },
-      {
-        "id": "pi_ce_1",
-        "label": "Pièce 1"
-      },
-      {
-        "id": "pi_ce_2",
-        "label": "Pièce 2"
-      },
-      {
-        "id": "pi_ce_3",
-        "label": "Pièce 3"
-      },
-      {
-        "id": "pi_ce_4",
-        "label": "Pièce 4"
-      },
-      {
-        "id": "pi_ce_5",
-        "label": "Pièce 5"
-      },
-      {
-        "id": "pi_ce_annexe",
-        "label": "Pièce annexe"
-      },
-      {
-        "id": "pignon",
-        "label": "Pignon"
-      },
-      {
-        "id": "pignon_droit",
-        "label": "Pignon Droit"
-      },
-      {
-        "id": "pignon_est",
-        "label": "Pignon Est"
-      },
-      {
-        "id": "pignon_gauche",
-        "label": "Pignon Gauche"
-      },
-      {
-        "id": "pignon_nord",
-        "label": "Pignon Nord"
-      },
-      {
-        "id": "pignon_nord_est",
-        "label": "Pignon Nord-Est"
-      },
-      {
-        "id": "pignon_nord_ouest",
-        "label": "Pignon Nord-Ouest"
-      },
-      {
-        "id": "pignon_ouest",
-        "label": "Pignon Ouest"
-      },
-      {
-        "id": "pignon_sud",
-        "label": "Pignon Sud"
-      },
-      {
-        "id": "pignon_sud_est",
-        "label": "Pignon Sud-Est"
-      },
-      {
-        "id": "pignon_sud_ouest",
-        "label": "Pignon Sud-Ouest"
-      },
-      {
-        "id": "pignons",
-        "label": "Pignons"
-      },
-      {
-        "id": "placard",
-        "label": "Placard"
-      },
-      {
-        "id": "placard_sous_escalier",
-        "label": "Placard sous escalier"
-      },
-      {
-        "id": "pool_house",
-        "label": "Pool-house"
-      },
-      {
-        "id": "porcherie",
-        "label": "Porcherie"
-      },
-      {
-        "id": "poulailler",
-        "label": "Poulailler"
-      },
-      {
-        "id": "pr_au",
-        "label": "Préau"
-      },
-      {
-        "id": "pressoir",
-        "label": "Pressoir"
-      },
-      {
-        "id": "quai_de_chargement",
-        "label": "Quai de chargement"
-      },
-      {
-        "id": "quai_dembarquement",
-        "label": "Quai d'embarquement"
-      },
-      {
-        "id": "r_ception",
-        "label": "Réception"
-      },
-      {
-        "id": "remise",
-        "label": "Remise"
-      },
-      {
-        "id": "r_serve",
-        "label": "Réserve"
-      },
-      {
-        "id": "salle_manger",
-        "label": "Salle à manger"
-      },
-      {
-        "id": "salle_de_bain",
-        "label": "Salle de bain"
-      },
-      {
-        "id": "salle_de_bain_wc",
-        "label": "Salle de bain + Wc"
-      },
-      {
-        "id": "salle_de_bains",
-        "label": "Salle de bains"
-      },
-      {
-        "id": "salle_de_classe",
-        "label": "Salle de classe"
-      },
-      {
-        "id": "salle_de_formation",
-        "label": "Salle de formation"
-      },
-      {
-        "id": "salle_de_jeux",
-        "label": "Salle de jeux"
-      },
-      {
-        "id": "salle_de_r_ception",
-        "label": "Salle de réception"
-      },
-      {
-        "id": "salle_de_restaurant",
-        "label": "Salle de restaurant"
-      },
-      {
-        "id": "salle_deau",
-        "label": "Salle d'eau"
-      },
-      {
-        "id": "salle_deau_wc",
-        "label": "Salle d'eau + Wc"
-      },
-      {
-        "id": "salle_informatique",
-        "label": "Salle informatique"
-      },
-      {
-        "id": "saloir",
-        "label": "Saloir"
-      },
-      {
-        "id": "salon",
-        "label": "Salon"
-      },
-      {
-        "id": "salon_s_jour",
-        "label": "Salon-séjour"
-      },
-      {
-        "id": "sanitaire",
-        "label": "Sanitaire"
-      },
-      {
-        "id": "sanitaires",
-        "label": "Sanitaires"
-      },
-      {
-        "id": "sas",
-        "label": "Sas"
-      },
-      {
-        "id": "secr_tariat",
-        "label": "Secrétariat"
-      },
-      {
-        "id": "s_jour",
-        "label": "Séjour"
-      },
-      {
-        "id": "s_jour_avec_coin_repas",
-        "label": "Séjour avec coin repas"
-      },
-      {
-        "id": "s_jour_salon",
-        "label": "Séjour-salon"
-      },
-      {
-        "id": "serre",
-        "label": "Serre"
-      },
-      {
-        "id": "stokage_couvert",
-        "label": "Stokage couvert"
-      },
-      {
-        "id": "terrasse",
-        "label": "Terrasse"
-      },
-      {
-        "id": "toilettes",
-        "label": "Toilettes"
-      },
-      {
-        "id": "v_randa",
-        "label": "Véranda"
-      },
-      {
-        "id": "vestiaire",
-        "label": "Vestiaire"
-      },
-      {
-        "id": "vestibule",
-        "label": "Vestibule"
-      },
-      {
-        "id": "vide_sanitaire",
-        "label": "Vide-sanitaire"
-      },
-      {
-        "id": "wc",
-        "label": "Wc"
-      },
-      {
-        "id": "zone_de_fret",
-        "label": "Zone de Fret"
-      },
-      {
-        "id": "zone_de_stokage",
-        "label": "Zone de stokage"
-      },
-      {
-        "id": "",
-        "label": "--------------------------------------------------------------"
-      },
-      {
-        "id": "vvv_pi_ces_diag_info_unicil_vvv",
-        "label": "VVV---  Pièces DIAG INFO - UNICIL  ---VVV"
-      },
-      {
-        "id": "",
-        "label": "-------------------------------------------------------------"
-      },
-      {
-        "id": "abords_de_la_construction_pc",
-        "label": "Abords de la construction PC"
-      },
-      {
-        "id": "abords_de_la_construction_pp",
-        "label": "Abords de la construction PP"
-      },
-      {
-        "id": "ascenseur",
-        "label": "Ascenseur"
-      },
-      {
-        "id": "balcon_1",
-        "label": "Balcon 1"
-      },
-      {
-        "id": "balcon_2",
-        "label": "Balcon 2"
-      },
-      {
-        "id": "balcon_3",
-        "label": "Balcon 3"
-      },
-      {
-        "id": "cabine_dascenseur",
-        "label": "Cabine d'ascenseur"
-      },
-      {
-        "id": "cage_descaliers",
-        "label": "Cage d'escaliers"
-      },
-      {
-        "id": "cave_1",
-        "label": "Cave 1"
-      },
-      {
-        "id": "cave_2",
-        "label": "Cave 2"
-      },
-      {
-        "id": "cellier_1",
-        "label": "Cellier 1"
-      },
-      {
-        "id": "cellier_2",
-        "label": "Cellier 2"
-      },
-      {
-        "id": "cellier_3",
-        "label": "Cellier 3"
-      },
-      {
-        "id": "circulation_garages",
-        "label": "Circulation garages"
-      },
-      {
-        "id": "combles_pc",
-        "label": "Combles PC"
-      },
-      {
-        "id": "combles_pp",
-        "label": "Combles PP"
-      },
-      {
-        "id": "couloir_caves",
-        "label": "Couloir caves"
-      },
-      {
-        "id": "couloir_pc",
-        "label": "Couloir PC"
-      },
-      {
-        "id": "couloir_pc_1",
-        "label": "Couloir PC 1"
-      },
-      {
-        "id": "couloir_pc_2",
-        "label": "Couloir PC 2"
-      },
-      {
-        "id": "couloir_pc_3",
-        "label": "Couloir PC 3"
-      },
-      {
-        "id": "couloir_pp",
-        "label": "Couloir PP"
-      },
-      {
-        "id": "couloir_pp_1",
-        "label": "Couloir PP 1"
-      },
-      {
-        "id": "couloir_pp_2",
-        "label": "Couloir PP 2"
-      },
-      {
-        "id": "couloir_pp_3",
-        "label": "Couloir PP 3"
-      },
-      {
-        "id": "cour_pc",
-        "label": "Cour PC"
-      },
-      {
-        "id": "cour_pp",
-        "label": "Cour PP"
-      },
-      {
-        "id": "coursives",
-        "label": "Coursives"
-      },
-      {
-        "id": "d_barras_1",
-        "label": "Débarras 1"
-      },
-      {
-        "id": "d_barras_2",
-        "label": "Débarras 2"
-      },
-      {
-        "id": "d_barras_3",
-        "label": "Débarras 3"
-      },
-      {
-        "id": "d_gagement_pc",
-        "label": "Dégagement PC"
-      },
-      {
-        "id": "d_gagement_pp",
-        "label": "Dégagement PP"
-      },
-      {
-        "id": "dressing_1",
-        "label": "Dressing 1"
-      },
-      {
-        "id": "dressing_2",
-        "label": "Dressing 2"
-      },
-      {
-        "id": "entr_e_pc",
-        "label": "Entrée PC"
-      },
-      {
-        "id": "entr_e_pp",
-        "label": "Entrée PP"
-      },
-      {
-        "id": "entr_e_s_jour",
-        "label": "Entrée/séjour"
-      },
-      {
-        "id": "fa_ades_pc",
-        "label": "Façades PC"
-      },
-      {
-        "id": "fa_ades_pp",
-        "label": "Façades PP"
-      },
-      {
-        "id": "gaines_technique",
-        "label": "Gaines technique"
-      },
-      {
-        "id": "garages",
-        "label": "Garages"
-      },
-      {
-        "id": "hall_dentr_e_pc",
-        "label": "Hall d'entrée PC"
-      },
-      {
-        "id": "hall_dentr_e_pp",
-        "label": "Hall d'entrée PP"
-      },
-      {
-        "id": "local_v_los",
-        "label": "Local à vélos"
-      },
-      {
-        "id": "local_commun",
-        "label": "Local commun"
-      },
-      {
-        "id": "local_commun_1",
-        "label": "Local commun 1"
-      },
-      {
-        "id": "local_commun_2",
-        "label": "Local commun 2"
-      },
-      {
-        "id": "local_commun_3",
-        "label": "Local commun 3"
-      },
-      {
-        "id": "local_cuve",
-        "label": "Local cuve"
-      },
-      {
-        "id": "local_sous_escalier_pc",
-        "label": "Local sous-escalier PC"
-      },
-      {
-        "id": "local_sous_escalier_pp",
-        "label": "Local sous-escalier PP"
-      },
-      {
-        "id": "local_sous_station",
-        "label": "Local sous-station"
-      },
-      {
-        "id": "local_transformateur",
-        "label": "Local transformateur"
-      },
-      {
-        "id": "local_vmc",
-        "label": "Local VMC"
-      },
-      {
-        "id": "locaux_divers",
-        "label": "Locaux divers"
-      },
-      {
-        "id": "loge_gardien",
-        "label": "Loge gardien"
-      },
-      {
-        "id": "loggia_1",
-        "label": "Loggia 1"
-      },
-      {
-        "id": "loggia_2",
-        "label": "Loggia 2"
-      },
-      {
-        "id": "machinerie_dascenseur",
-        "label": "Machinerie d'ascenseur"
-      },
-      {
-        "id": "parking",
-        "label": "Parking"
-      },
-      {
-        "id": "parking_1",
-        "label": "Parking 1"
-      },
-      {
-        "id": "parking_2",
-        "label": "Parking 2"
-      },
-      {
-        "id": "pi_ce_commerciale",
-        "label": "Pièce commerciale"
-      },
-      {
-        "id": "pi_ce_commerciale_1",
-        "label": "Pièce commerciale 1"
-      },
-      {
-        "id": "pi_ce_commerciale_10",
-        "label": "Pièce commerciale 10"
-      },
-      {
-        "id": "pi_ce_commerciale_11",
-        "label": "Pièce commerciale 11"
-      },
-      {
-        "id": "pi_ce_commerciale_12",
-        "label": "Pièce commerciale 12"
-      },
-      {
-        "id": "pi_ce_commerciale_13",
-        "label": "Pièce commerciale 13"
-      },
-      {
-        "id": "pi_ce_commerciale_14",
-        "label": "Pièce commerciale 14"
-      },
-      {
-        "id": "pi_ce_commerciale_15",
-        "label": "Pièce commerciale 15"
-      },
-      {
-        "id": "pi_ce_commerciale_2",
-        "label": "Pièce commerciale 2"
-      },
-      {
-        "id": "pi_ce_commerciale_3",
-        "label": "Pièce commerciale 3"
-      },
-      {
-        "id": "pi_ce_commerciale_4",
-        "label": "Pièce commerciale 4"
-      },
-      {
-        "id": "pi_ce_commerciale_5",
-        "label": "Pièce commerciale 5"
-      },
-      {
-        "id": "pi_ce_commerciale_6",
-        "label": "Pièce commerciale 6"
-      },
-      {
-        "id": "pi_ce_commerciale_7",
-        "label": "Pièce commerciale 7"
-      },
-      {
-        "id": "pi_ce_commerciale_8",
-        "label": "Pièce commerciale 8"
-      },
-      {
-        "id": "pi_ce_commerciale_9",
-        "label": "Pièce commerciale 9"
-      },
-      {
-        "id": "placard_1",
-        "label": "Placard 1"
-      },
-      {
-        "id": "placard_2",
-        "label": "Placard 2"
-      },
-      {
-        "id": "placard_3",
-        "label": "Placard 3"
-      },
-      {
-        "id": "placard_4",
-        "label": "Placard 4"
-      },
-      {
-        "id": "placard_5",
-        "label": "Placard 5"
-      },
-      {
-        "id": "porche_dentr_e",
-        "label": "Porche d'entrée"
-      },
-      {
-        "id": "rangement",
-        "label": "Rangement"
-      },
-      {
-        "id": "salle_de_bains_1",
-        "label": "Salle de bains 1"
-      },
-      {
-        "id": "salle_de_bains_2",
-        "label": "Salle de bains 2"
-      },
-      {
-        "id": "salle_de_bains_wc",
-        "label": "Salle de bains/WC"
-      },
-      {
-        "id": "salle_de_bains_wc_1",
-        "label": "Salle de bains/WC 1"
-      },
-      {
-        "id": "salle_de_bains_wc_2",
-        "label": "Salle de bains/WC 2"
-      },
-      {
-        "id": "salon_salle_manger",
-        "label": "Salon/salle à manger"
-      },
-      {
-        "id": "sanitaires_1",
-        "label": "Sanitaires 1"
-      },
-      {
-        "id": "sanitaires_2",
-        "label": "Sanitaires 2"
-      },
-      {
-        "id": "s_jour_avec_coin_cuisine",
-        "label": "Séjour avec coin cuisine"
-      },
-      {
-        "id": "terrasse_1",
-        "label": "Terrasse 1"
-      },
-      {
-        "id": "terrasse_2",
-        "label": "Terrasse 2"
-      },
-      {
-        "id": "toilettes_1",
-        "label": "Toilettes 1"
-      },
-      {
-        "id": "toilettes_2",
-        "label": "Toilettes 2"
-      },
-      {
-        "id": "toiture_pc",
-        "label": "Toiture PC"
-      },
-      {
-        "id": "toiture_pp",
-        "label": "Toiture PP"
-      },
-      {
-        "id": "toiture_terrasse_pc",
-        "label": "Toiture-terrasse PC"
-      },
-      {
-        "id": "toiture_terrasse_pp",
-        "label": "Toiture-terrasse PP"
-      },
-      {
-        "id": "v_randa_1",
-        "label": "Véranda 1"
-      },
-      {
-        "id": "v_randa_2",
-        "label": "Véranda 2"
-      },
-      {
-        "id": "vide_sanitaire_pc",
-        "label": "Vide-sanitaire PC"
-      },
-      {
-        "id": "vide_sanitaire_pp",
-        "label": "Vide-sanitaire PP"
-      },
-      {
-        "id": "",
-        "label": "--------------------------------------------------------------------------'"
-      },
-      {
-        "id": "vvv_pi_ces_diag_info_odhac87_vvv",
-        "label": "VVV---  Pièces DIAG INFO - ODHAC87  ---VVV"
-      },
-      {
-        "id": "vv_pi_ces_en_parties_communes_vv",
-        "label": "VV-- Pièces en Parties Communes --VV"
-      },
-      {
-        "id": "autres_annexes_ext_rieures",
-        "label": "Autres annexes extérieures"
-      },
-      {
-        "id": "autres_locaux_communs",
-        "label": "Autres locaux communs"
-      },
-      {
-        "id": "b_timent",
-        "label": "Bâtiment"
-      },
-      {
-        "id": "circulations_ext_rieures",
-        "label": "Circulations extérieures"
-      },
-      {
-        "id": "couloir_circulation_int_rieure",
-        "label": "Couloir/circulation intérieure"
-      },
-      {
-        "id": "lcr",
-        "label": "LCR"
-      },
-      {
-        "id": "local_chaufferie",
-        "label": "Local chaufferie"
-      },
-      {
-        "id": "local_eau",
-        "label": "Local eau"
-      },
-      {
-        "id": "local_lectrique",
-        "label": "Local électrique"
-      },
-      {
-        "id": "local_gaz",
-        "label": "Local gaz"
-      },
-      {
-        "id": "local_technique_entretien",
-        "label": "Local technique/entretien"
-      },
-      {
-        "id": "local_t_l_coms",
-        "label": "Local télécoms"
-      },
-      {
-        "id": "local_v_lo_poussettes",
-        "label": "Local vélo/poussettes"
-      },
-      {
-        "id": "local_vo",
-        "label": "Local VO"
-      },
-      {
-        "id": "loge",
-        "label": "Loge"
-      },
-      {
-        "id": "mezzanine_pc",
-        "label": "Mezzanine PC"
-      },
-      {
-        "id": "parking_couvert",
-        "label": "Parking couvert"
-      },
-      {
-        "id": "parking_ext_rieur",
-        "label": "Parking extérieur"
-      },
-      {
-        "id": "sans_objet",
-        "label": "Sans Objet"
-      },
-      {
-        "id": "vv_pi_ces_en_parties_privatives_vv",
-        "label": "VV-- Pièces en Parties Privatives --VV"
-      },
-      {
-        "id": "autre_local_privatif",
-        "label": "Autre local privatif"
-      },
-      {
-        "id": "autres_locaux_dactivit",
-        "label": "Autres locaux d'activité"
-      },
-      {
-        "id": "chambre_6",
-        "label": "Chambre 6"
-      },
-      {
-        "id": "chambre_7",
-        "label": "Chambre 7"
-      },
-      {
-        "id": "couloir_circulation",
-        "label": "Couloir/circulation"
-      },
-      {
-        "id": "cour",
-        "label": "Cour"
-      },
-      {
-        "id": "espace_ext_rieur_privatif",
-        "label": "Espace extérieur privatif"
-      },
-      {
-        "id": "local_commercial",
-        "label": "Local commercial"
-      },
-      {
-        "id": "logement",
-        "label": "Logement"
-      },
-      {
-        "id": "mezzanine_pp",
-        "label": "Mezzanine PP"
-      },
-      {
-        "id": "parking_couvert_privatif",
-        "label": "Parking couvert privatif"
-      },
-      {
-        "id": "parking_ext_rieur_privatif",
-        "label": "Parking extérieur privatif"
-      },
-      {
-        "id": "wc",
-        "label": "WC"
-      }
+      {"id": "abris", "label": "Abris"},
+      {"id": "abris_anti_atomique", "label": "Abris Anti-Atomique"},
+      {"id": "abris_bois", "label": "Abris bois"},
+      {"id": "abris_de_jardin", "label": "Abris de jardin"},
+      {"id": "acc_s", "label": "Accès"},
+      {"id": "accueil", "label": "Accueil"},
+      {"id": "appentis", "label": "Appentis"},
+      {"id": "arri_re_cuisine", "label": "Arrière-cuisine"},
+      {"id": "atelier", "label": "Atelier"},
+      {"id": "balcon", "label": "Balcon"},
+      {"id": "biblioth_que", "label": "Bibliothèque"},
+      {"id": "boudoir", "label": "Boudoir"},
+      {"id": "buanderie", "label": "Buanderie"},
+      {"id": "bureau", "label": "Bureau"},
+      {"id": "caf_t_ria", "label": "Cafétéria"},
+      {"id": "cage_descalier", "label": "Cage d'escalier"},
+      {"id": "cagibi", "label": "Cagibi"},
+      {"id": "cantine", "label": "Cantine"},
+      {"id": "cantou", "label": "Cantou"},
+      {"id": "cave", "label": "Cave"},
+      {"id": "cave_vins", "label": "Cave à vins"},
+      {"id": "caveau", "label": "Caveau"},
+      {"id": "cellier", "label": "Cellier"},
+      {"id": "chais", "label": "Chais"},
+      {"id": "chambre", "label": "Chambre"},
+      {"id": "chaufferie", "label": "Chaufferie"},
+      {"id": "chenil", "label": "Chenil"},
+      {"id": "coin_repas", "label": "Coin repas"},
+      {"id": "combles_dhabitation", "label": "Combles d'habitation"},
+      {"id": "combles_habitables", "label": "Combles habitables"},
+      {"id": "combles_non_habitables", "label": "Combles non habitables"},
+      {"id": "couloir", "label": "Couloir"},
+      {"id": "couverture", "label": "Couverture"},
+      {"id": "cuisine", "label": "Cuisine"},
+      {"id": "cuisine_salle_manger", "label": "Cuisine / Salle à manger"},
+      {"id": "cuisine_s_jour", "label": "Cuisine / Séjour"},
+      {"id": "cuisine_am_ricaine", "label": "Cuisine américaine"},
+      {"id": "d_barras", "label": "Débarras"},
+      {"id": "d_gagement", "label": "Dégagement"},
+      {"id": "d_p_t", "label": "Dépôt"},
+      {"id": "dortoir", "label": "Dortoir"},
+      {"id": "dressing", "label": "Dressing"},
+      {"id": "curies", "label": "Écuries"},
+      {"id": "entr_e", "label": "Entrée"},
+      {"id": "entr_e_couloir", "label": "Entrée/couloir"},
+      {"id": "escalier", "label": "Escalier"},
+      {"id": "espace_de_vente", "label": "Espace de vente"},
+      {"id": "fa_ade", "label": "Façade"},
+      {"id": "fa_ade_arri_re", "label": "Façade Arrière"},
+      {"id": "fa_ade_avant", "label": "Façade Avant"},
+      {"id": "fa_ade_est", "label": "Façade Est"},
+      {"id": "fa_ade_nord", "label": "Façade Nord"},
+      {"id": "fa_ade_nord_est", "label": "Façade Nord-Est"},
+      {"id": "fa_ade_nord_ouest", "label": "Façade Nord-Ouest"},
+      {"id": "fa_ade_ouest", "label": "Façade Ouest"},
+      {"id": "fa_ade_sud", "label": "Façade Sud"},
+      {"id": "fa_ade_sud_est", "label": "Façade Sud-Est"},
+      {"id": "fa_ade_sud_ouest", "label": "Façade Sud-Ouest"},
+      {"id": "fa_ades", "label": "Façades"},
+      {"id": "faux_grenier", "label": "Faux grenier"},
+      {"id": "four_pain", "label": "Four à pain"},
+      {"id": "fumoir", "label": "Fumoir"},
+      {"id": "garage", "label": "Garage"},
+      {"id": "garage_v_lo", "label": "Garage à vélo"},
+      {"id": "garage_avec_faux_grenier", "label": "Garage avec faux grenier"},
+      {"id": "garage_double", "label": "Garage double"},
+      {"id": "grand_salon", "label": "Grand salon"},
+      {"id": "grange", "label": "Grange"},
+      {"id": "grenier", "label": "Grenier"},
+      {"id": "hall", "label": "Hall"},
+      {"id": "hangar", "label": "Hangar"},
+      {"id": "infirmerie", "label": "Infirmerie"},
+      {"id": "labo", "label": "Labo"},
+      {"id": "lingerie", "label": "Lingerie"},
+      {"id": "local", "label": "Local"},
+      {"id": "local_v_lo", "label": "Local à vélo"},
+      {"id": "local_boites_aux_lettres", "label": "Local boites aux lettres"},
+      {"id": "local_chauffe_eau", "label": "Local Chauffe Eau"},
+      {"id": "local_entretien", "label": "Local entretien"},
+      {"id": "local_groupe_eau", "label": "Local Groupe Eau"},
+      {"id": "local_poubelles", "label": "Local poubelles"},
+      {"id": "local_poussettes", "label": "Local poussettes"},
+      {"id": "local_serveur", "label": "Local serveur"},
+      {"id": "local_sous_escalier", "label": "Local sous escalier"},
+      {"id": "local_technique", "label": "Local technique"},
+      {"id": "local_vide_ordures", "label": "Local vide-ordures"},
+      {"id": "loggia", "label": "Loggia"},
+      {"id": "mezzanine", "label": "Mezzanine"},
+      {"id": "office", "label": "Office"},
+      {"id": "palier", "label": "Palier"},
+      {"id": "petit_salon", "label": "Petit salon"},
+      {"id": "pi_ce", "label": "Pièce"},
+      {"id": "pi_ce_annexe", "label": "Pièce annexe"},
+      {"id": "pignon", "label": "Pignon"},
+      {"id": "pignon_droit", "label": "Pignon Droit"},
+      {"id": "pignon_est", "label": "Pignon Est"},
+      {"id": "pignon_gauche", "label": "Pignon Gauche"},
+      {"id": "pignon_nord", "label": "Pignon Nord"},
+      {"id": "pignon_nord_est", "label": "Pignon Nord-Est"},
+      {"id": "pignon_nord_ouest", "label": "Pignon Nord-Ouest"},
+      {"id": "pignon_ouest", "label": "Pignon Ouest"},
+      {"id": "pignon_sud", "label": "Pignon Sud"},
+      {"id": "pignon_sud_est", "label": "Pignon Sud-Est"},
+      {"id": "pignon_sud_ouest", "label": "Pignon Sud-Ouest"},
+      {"id": "pignons", "label": "Pignons"},
+      {"id": "placard", "label": "Placard"},
+      {"id": "placard_sous_escalier", "label": "Placard sous escalier"},
+      {"id": "pool_house", "label": "Pool-house"},
+      {"id": "porcherie", "label": "Porcherie"},
+      {"id": "poulailler", "label": "Poulailler"},
+      {"id": "pr_au", "label": "Préau"},
+      {"id": "pressoir", "label": "Pressoir"},
+      {"id": "quai_de_chargement", "label": "Quai de chargement"},
+      {"id": "quai_dembarquement", "label": "Quai d'embarquement"},
+      {"id": "r_ception", "label": "Réception"},
+      {"id": "remise", "label": "Remise"},
+      {"id": "r_serve", "label": "Réserve"},
+      {"id": "salle_manger", "label": "Salle à manger"},
+      {"id": "salle_de_bain", "label": "Salle de bain"},
+      {"id": "salle_de_bain_wc", "label": "Salle de bain + Wc"},
+      {"id": "salle_de_bains", "label": "Salle de bains"},
+      {"id": "salle_de_classe", "label": "Salle de classe"},
+      {"id": "salle_de_formation", "label": "Salle de formation"},
+      {"id": "salle_de_jeux", "label": "Salle de jeux"},
+      {"id": "salle_de_r_ception", "label": "Salle de réception"},
+      {"id": "salle_de_restaurant", "label": "Salle de restaurant"},
+      {"id": "salle_deau", "label": "Salle d'eau"},
+      {"id": "salle_deau_wc", "label": "Salle d'eau + Wc"},
+      {"id": "salle_informatique", "label": "Salle informatique"},
+      {"id": "saloir", "label": "Saloir"},
+      {"id": "salon", "label": "Salon"},
+      {"id": "salon_s_jour", "label": "Salon-séjour"},
+      {"id": "sanitaire", "label": "Sanitaire"},
+      {"id": "sanitaires", "label": "Sanitaires"},
+      {"id": "sas", "label": "Sas"},
+      {"id": "secr_tariat", "label": "Secrétariat"},
+      {"id": "s_jour", "label": "Séjour"},
+      {"id": "s_jour_avec_coin_repas", "label": "Séjour avec coin repas"},
+      {"id": "s_jour_salon", "label": "Séjour-salon"},
+      {"id": "serre", "label": "Serre"},
+      {"id": "stokage_couvert", "label": "Stokage couvert"},
+      {"id": "terrasse", "label": "Terrasse"},
+      {"id": "toilettes", "label": "Toilettes"},
+      {"id": "v_randa", "label": "Véranda"},
+      {"id": "vestiaire", "label": "Vestiaire"},
+      {"id": "vestibule", "label": "Vestibule"},
+      {"id": "vide_sanitaire", "label": "Vide-sanitaire"},
+      {"id": "wc", "label": "Wc"},
+      {"id": "zone_de_fret", "label": "Zone de Fret"},
+      {"id": "zone_de_stokage", "label": "Zone de stokage"},
+      {"id": "", "label": "--------------------------------------------------------------"},
+      {"id": "vvv_pi_ces_diag_info_unicil_vvv", "label": "VVV---  Pièces DIAG INFO - UNICIL  ---VVV"},
+      {"id": "", "label": "-------------------------------------------------------------"},
+      {"id": "abords_de_la_construction_pc", "label": "Abords de la construction PC"},
+      {"id": "abords_de_la_construction_pp", "label": "Abords de la construction PP"},
+      {"id": "ascenseur", "label": "Ascenseur"},
+      {"id": "cabine_dascenseur", "label": "Cabine d'ascenseur"},
+      {"id": "cage_descaliers", "label": "Cage d'escaliers"},
+      {"id": "circulation_garages", "label": "Circulation garages"},
+      {"id": "combles_pc", "label": "Combles PC"},
+      {"id": "combles_pp", "label": "Combles PP"},
+      {"id": "couloir_caves", "label": "Couloir caves"},
+      {"id": "couloir_pc", "label": "Couloir PC"},
+      {"id": "couloir_pp", "label": "Couloir PP"},
+      {"id": "cour_pc", "label": "Cour PC"},
+      {"id": "cour_pp", "label": "Cour PP"},
+      {"id": "coursives", "label": "Coursives"},
+      {"id": "d_gagement_pc", "label": "Dégagement PC"},
+      {"id": "d_gagement_pp", "label": "Dégagement PP"},
+      {"id": "entr_e_pc", "label": "Entrée PC"},
+      {"id": "entr_e_pp", "label": "Entrée PP"},
+      {"id": "entr_e_s_jour", "label": "Entrée/séjour"},
+      {"id": "fa_ades_pc", "label": "Façades PC"},
+      {"id": "fa_ades_pp", "label": "Façades PP"},
+      {"id": "gaines_technique", "label": "Gaines technique"},
+      {"id": "garages", "label": "Garages"},
+      {"id": "hall_dentr_e_pc", "label": "Hall d'entrée PC"},
+      {"id": "hall_dentr_e_pp", "label": "Hall d'entrée PP"},
+      {"id": "local_v_los", "label": "Local à vélos"},
+      {"id": "local_commun", "label": "Local commun"},
+      {"id": "local_cuve", "label": "Local cuve"},
+      {"id": "local_sous_escalier_pc", "label": "Local sous-escalier PC"},
+      {"id": "local_sous_escalier_pp", "label": "Local sous-escalier PP"},
+      {"id": "local_sous_station", "label": "Local sous-station"},
+      {"id": "local_transformateur", "label": "Local transformateur"},
+      {"id": "local_vmc", "label": "Local VMC"},
+      {"id": "locaux_divers", "label": "Locaux divers"},
+      {"id": "loge_gardien", "label": "Loge gardien"},
+      {"id": "machinerie_dascenseur", "label": "Machinerie d'ascenseur"},
+      {"id": "parking", "label": "Parking"},
+      {"id": "pi_ce_commerciale", "label": "Pièce commerciale"},
+      {"id": "porche_dentr_e", "label": "Porche d'entrée"},
+      {"id": "rangement", "label": "Rangement"},
+      {"id": "salle_de_bains_wc", "label": "Salle de bains/WC"},
+      {"id": "salon_salle_manger", "label": "Salon/salle à manger"},
+      {"id": "s_jour_avec_coin_cuisine", "label": "Séjour avec coin cuisine"},
+      {"id": "toiture_pc", "label": "Toiture PC"},
+      {"id": "toiture_pp", "label": "Toiture PP"},
+      {"id": "toiture_terrasse_pc", "label": "Toiture-terrasse PC"},
+      {"id": "toiture_terrasse_pp", "label": "Toiture-terrasse PP"},
+      {"id": "vide_sanitaire_pc", "label": "Vide-sanitaire PC"},
+      {"id": "vide_sanitaire_pp", "label": "Vide-sanitaire PP"},
+      {"id": "", "label": "--------------------------------------------------------------------------'"},
+      {"id": "vvv_pi_ces_diag_info_odhac87_vvv", "label": "VVV---  Pièces DIAG INFO - ODHAC87  ---VVV"},
+      {"id": "vv_pi_ces_en_parties_communes_vv", "label": "VV-- Pièces en Parties Communes --VV"},
+      {"id": "autres_annexes_ext_rieures", "label": "Autres annexes extérieures"},
+      {"id": "autres_locaux_communs", "label": "Autres locaux communs"},
+      {"id": "b_timent", "label": "Bâtiment"},
+      {"id": "circulations_ext_rieures", "label": "Circulations extérieures"},
+      {"id": "couloir_circulation_int_rieure", "label": "Couloir/circulation intérieure"},
+      {"id": "lcr", "label": "LCR"},
+      {"id": "local_chaufferie", "label": "Local chaufferie"},
+      {"id": "local_eau", "label": "Local eau"},
+      {"id": "local_lectrique", "label": "Local électrique"},
+      {"id": "local_gaz", "label": "Local gaz"},
+      {"id": "local_technique_entretien", "label": "Local technique/entretien"},
+      {"id": "local_t_l_coms", "label": "Local télécoms"},
+      {"id": "local_v_lo_poussettes", "label": "Local vélo/poussettes"},
+      {"id": "local_vo", "label": "Local VO"},
+      {"id": "loge", "label": "Loge"},
+      {"id": "mezzanine_pc", "label": "Mezzanine PC"},
+      {"id": "parking_couvert", "label": "Parking couvert"},
+      {"id": "parking_ext_rieur", "label": "Parking extérieur"},
+      {"id": "sans_objet", "label": "Sans Objet"},
+      {"id": "vv_pi_ces_en_parties_privatives_vv", "label": "VV-- Pièces en Parties Privatives --VV"},
+      {"id": "autre_local_privatif", "label": "Autre local privatif"},
+      {"id": "autres_locaux_dactivit", "label": "Autres locaux d'activité"},
+      {"id": "couloir_circulation", "label": "Couloir/circulation"},
+      {"id": "cour", "label": "Cour"},
+      {"id": "espace_ext_rieur_privatif", "label": "Espace extérieur privatif"},
+      {"id": "local_commercial", "label": "Local commercial"},
+      {"id": "logement", "label": "Logement"},
+      {"id": "mezzanine_pp", "label": "Mezzanine PP"},
+      {"id": "parking_couvert_privatif", "label": "Parking couvert privatif"},
+      {"id": "parking_ext_rieur_privatif", "label": "Parking extérieur privatif"},
+      {"id": "wc", "label": "WC"}
     ]
   },
   "justifications": {
     "label": "Justification de non visite",
     "version": "1.0",
     "items": [
-      {
-        "id": "absence_de_clef",
-        "label": "Absence de clef"
-      },
-      {
-        "id": "absence_de_trappe_de_visite",
-        "label": "Absence de trappe de visite"
-      },
-      {
-        "id": "acc_s_condamn",
-        "label": "Accès condamné"
-      },
-      {
-        "id": "danger_animal",
-        "label": "Danger animal"
-      },
-      {
-        "id": "encombrement_trop_important",
-        "label": "Encombrement trop important"
-      },
-      {
-        "id": "hauteur_trop_importante",
-        "label": "Hauteur trop importante"
-      },
-      {
-        "id": "hors_datteinte",
-        "label": "Hors d'atteinte"
-      },
-      {
-        "id": "impossibilit_dentrer",
-        "label": "Impossibilité d'entrer"
-      },
-      {
-        "id": "inaccessible_en_raison_de_lencombrement",
-        "label": "Inaccessible en raison de l'encombrement"
-      },
-      {
-        "id": "interdiction_du_propri_taire",
-        "label": "Interdiction du propriétaire"
-      },
-      {
-        "id": "moyen_dacc_s_insuffisant",
-        "label": "Moyen d'accès insuffisant"
-      },
-      {
-        "id": "partie_inond_e",
-        "label": "Partie inondée"
-      },
-      {
-        "id": "plafond_mena_ant_de_seffondrer",
-        "label": "Plafond menaçant de s'effondrer"
-      },
-      {
-        "id": "plancher_mena_ant_de_seffondrer",
-        "label": "Plancher menaçant de s'effondrer"
-      },
-      {
-        "id": "probl_me_dautorisation",
-        "label": "Problème d'autorisation"
-      },
-      {
-        "id": "probl_mes_m_caniques",
-        "label": "Problèmes mécaniques"
-      },
-      {
-        "id": "s_curit_insuffisante",
-        "label": "Sécurité insuffisante"
-      },
-      {
-        "id": "serrure_hors_service",
-        "label": "Serrure hors service"
-      },
-      {
-        "id": "trappe_dacc_s_trop_petite",
-        "label": "Trappe d'accès trop petite"
-      },
-      {
-        "id": "zone_dacc_s_r_glement",
-        "label": "Zone d'accès réglementé"
-      }
+      {"id": "absence_de_clef", "label": "Absence de clef"},
+      {"id": "absence_de_trappe_de_visite", "label": "Absence de trappe de visite"},
+      {"id": "acc_s_condamn", "label": "Accès condamné"},
+      {"id": "danger_animal", "label": "Danger animal"},
+      {"id": "encombrement_trop_important", "label": "Encombrement trop important"},
+      {"id": "hauteur_trop_importante", "label": "Hauteur trop importante"},
+      {"id": "hors_datteinte", "label": "Hors d'atteinte"},
+      {"id": "impossibilit_dentrer", "label": "Impossibilité d'entrer"},
+      {"id": "inaccessible_en_raison_de_lencombrement", "label": "Inaccessible en raison de l'encombrement"},
+      {"id": "interdiction_du_propri_taire", "label": "Interdiction du propriétaire"},
+      {"id": "moyen_dacc_s_insuffisant", "label": "Moyen d'accès insuffisant"},
+      {"id": "partie_inond_e", "label": "Partie inondée"},
+      {"id": "plafond_mena_ant_de_seffondrer", "label": "Plafond menaçant de s'effondrer"},
+      {"id": "plancher_mena_ant_de_seffondrer", "label": "Plancher menaçant de s'effondrer"},
+      {"id": "probl_me_dautorisation", "label": "Problème d'autorisation"},
+      {"id": "probl_mes_m_caniques", "label": "Problèmes mécaniques"},
+      {"id": "s_curit_insuffisante", "label": "Sécurité insuffisante"},
+      {"id": "serrure_hors_service", "label": "Serrure hors service"},
+      {"id": "trappe_dacc_s_trop_petite", "label": "Trappe d'accès trop petite"},
+      {"id": "zone_dacc_s_r_glement", "label": "Zone d'accès réglementé"}
     ]
   },
   "moyens": {
     "label": "Moyens à mettre en œuvre",
     "version": "1.0",
     "items": [
-      {
-        "id": "donner_un_acc_s",
-        "label": "Donner un accès"
-      },
-      {
-        "id": "s_curiser_le_plancher",
-        "label": "Sécuriser le plancher"
-      },
-      {
-        "id": "demander_les_cl_s_au_donneur_dordre",
-        "label": "Demander les clés au donneur d'ordre"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_ouverture_du_local",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après ouverture du local"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_cr_ation_dacc_s_et_de_ventilation_adapt_s_type_tr_mies",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après création d’accès et de ventilation adaptés -type trémies-"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_enl_vement_des_objets_encombrants",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après enlèvement des objets encombrants"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_mise_disposition_de_moyens_d_l_vations_adapt_s_et_s_curis_s",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après mise à disposition de moyens d’élévations adaptés et sécurisés"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_vacuation_des_locaux_et_apr_s_d_montage_dun_ou_plusieurs_ch_ssis_par_une_entreprise_sp_cialis_e",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après évacuation des locaux et après démontage d’un ou plusieurs châssis par une entreprise spécialisée"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_retrait_du_faux_plafond_par_entreprise_sp_cialis_e",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après retrait du faux plafond par entreprise spécialisée"
-      },
-      {
-        "id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_purge_du_local",
-        "label": "Investigations approfondies à prévoir avant le démarrage des travaux après purge du local"
-      },
-      {
-        "id": "investigations_approfondies_avant_le_d_marrage_des_travaux_suite_au_refus_de_pr_l_vement_du_donneur_dordre_de_loccupant_au_jour_de_notre_visite",
-        "label": "Investigations approfondies avant le démarrage des travaux suite au refus de prélèvement du donneur d’ordre / de l’occupant au jour de notre visite"
-      }
+      {"id": "donner_un_acc_s", "label": "Donner un accès"},
+      {"id": "s_curiser_le_plancher", "label": "Sécuriser le plancher"},
+      {"id": "demander_les_cl_s_au_donneur_dordre", "label": "Demander les clés au donneur d'ordre"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_ouverture_du_local", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après ouverture du local"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_cr_ation_dacc_s_et_de_ventilation_adapt_s_type_tr_mies", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après création d'accès et de ventilation adaptés -type trémies-"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_enl_vement_des_objets_encombrants", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après enlèvement des objets encombrants"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_mise_disposition_de_moyens_d_l_vations_adapt_s_et_s_curis_s", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après mise à disposition de moyens d'élévations adaptés et sécurisés"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_vacuation_des_locaux_et_apr_s_d_montage_dun_ou_plusieurs_ch_ssis_par_une_entreprise_sp_cialis_e", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après évacuation des locaux et après démontage d'un ou plusieurs châssis par une entreprise spécialisée"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_retrait_du_faux_plafond_par_entreprise_sp_cialis_e", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après retrait du faux plafond par entreprise spécialisée"},
+      {"id": "investigations_approfondies_pr_voir_avant_le_d_marrage_des_travaux_apr_s_purge_du_local", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après purge du local"},
+      {"id": "investigations_approfondies_avant_le_d_marrage_des_travaux_suite_au_refus_de_pr_l_vement_du_donneur_dordre_de_loccupant_au_jour_de_notre_visite", "label": "Investigations approfondies avant le démarrage des travaux suite au refus de prélèvement du donneur d'ordre / de l'occupant au jour de notre visite"}
     ]
   }
 }
