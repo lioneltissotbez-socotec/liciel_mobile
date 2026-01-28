@@ -129,31 +129,45 @@ function addMissionPhoto(numeroDossier) {
   input.accept = "image/*";
   input.capture = "environment";
 
-  input.onchange = () => {
+  input.onchange = async () => {
     const file = input.files[0];
     if (!file) return;
 
-    mission.photos = mission.photos || [];
+    try {
+      // Compression de la photo
+      const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+      
+      mission.photos = mission.photos || [];
 
-    // Supprimer ancienne photo de présentation
-    mission.photos = mission.photos.filter(
-      p => p.typePhoto !== "presentation"
-    );
+      // Supprimer ancienne photo de présentation
+      mission.photos = mission.photos.filter(
+        p => p.typePhoto !== "presentation"
+      );
 
-    mission.photos.push({
-      id: crypto.randomUUID(),
-      name: file.name,
-      blob: file,
-      domaine: "mission",
-      typePhoto: "presentation",
-      clefComposant: mission.numeroDossier,
-      localisation: "Présentation"
-    });
+      mission.photos.push({
+        id: crypto.randomUUID(),
+        name: file.name,
+        blob: compressed, // 🔥 Version compressée
+        domaine: "mission",
+        typePhoto: "presentation",
+        clefComposant: mission.numeroDossier,
+        localisation: "Présentation"
+      });
 
-    saveMission();
-    alert("Photo de présentation enregistrée");
+      saveMission();
+      
+      // Message de confirmation
+      if (saved) {
+        alert("Photo de présentation enregistrée (originale dans galerie)");
+      } else {
+        alert("Photo de présentation enregistrée");
+      }
+      
+    } catch (error) {
+      console.error('❌ Erreur ajout photo mission:', error);
+      alert('Erreur lors de l\'ajout de la photo');
+    }
   };
 
   input.click();
 }
-

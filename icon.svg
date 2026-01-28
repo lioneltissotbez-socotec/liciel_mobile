@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fond -->
+  <rect width="512" height="512" fill="#2563eb" rx="64"/>
+  
+  <!-- Lettre L stylisée -->
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="400" font-weight="bold" fill="#ffffff" text-anchor="middle">L</text>
+  
+  <!-- Sous-titre -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="60" fill="#93c5fd" text-anchor="middle">SOCOTEC</text>
+</svg>

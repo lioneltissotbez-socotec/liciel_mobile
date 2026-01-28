@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <title>LICIEL – Saisie terrain</title>
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LICIEL Mobile">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="description" content="Application terrain pour diagnostics immobiliers SOCOTEC">
+
   <!-- Styles globaux -->
   <link rel="stylesheet" href="style.css">
 
@@ -34,6 +43,10 @@
 
     <h3>Missions existantes</h3>
     <div id="missions-list"></div>
+    
+    <button class="secondary" onclick="openArchiveManager()" style="margin-top: 20px;">
+      ⚙️ Gestion des données
+    </button>
   </section>
 
   <!-- Écran pièces -->
@@ -59,6 +72,8 @@
 <script src="core/store.js"></script>
 <script src="core/db.js"></script>
 <script src="core/migrations.js"></script>
+<script src="core/photo-compressor.js"></script>
+<script src="core/archive-manager.js"></script>
 
 <!-- ZIP -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -86,6 +101,50 @@
 
 <!-- App (TOUJOURS EN DERNIER) -->
 <script src="app.js"></script>
+
+<!-- Service Worker Registration -->
+<script>
+  // Enregistrement du Service Worker pour PWA
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('✅ Service Worker enregistré:', registration.scope);
+          
+          // Vérifier les mises à jour
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            console.log('🔄 Mise à jour du Service Worker détectée');
+            
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Nouvelle version disponible
+                console.log('✨ Nouvelle version disponible');
+                
+                // Optionnel : Afficher une notification à l'utilisateur
+                if (confirm('Une nouvelle version est disponible. Recharger maintenant ?')) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  window.location.reload();
+                }
+              }
+            });
+          });
+        })
+        .catch((error) => {
+          console.error('❌ Erreur Service Worker:', error);
+        });
+    });
+    
+    // Recharger quand le nouveau SW prend le contrôle
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  }
+</script>
 
 
 </body>

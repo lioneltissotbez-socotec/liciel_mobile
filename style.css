@@ -391,3 +391,50 @@ footer button {
   border-color: #dc2626;
 }
 
+/* Modal de gestion des archives */
+.archive-manager-modal {
+  max-width: 500px;
+}
+
+.data-stats {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.data-stats p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.snapshots-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 12px 0;
+}
+
+.snapshot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.snapshot-info {
+  flex: 1;
+}
+
+.snapshot-info strong {
+  font-size: 15px;
+  color: #111;
+}
+
+.snapshot-info span {
+  font-size: 13px;
+  color: #6b7280;
+}
+

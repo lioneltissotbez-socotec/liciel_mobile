@@ -193,23 +193,37 @@ function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
 // PHOTOS — MODE GLOBAL
 // ======================================================
 
-function pPhoto(file) {
+async function pPhoto(file) {
   if (!file) return;
 
-  store.mission.photos = store.mission.photos || [];
+  try {
+    // Compression de la photo
+    const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+    
+    store.mission.photos = store.mission.photos || [];
 
-  store.mission.photos.push({
-    id: crypto.randomUUID(),
-    name: file.name,
-    blob: file,
+    store.mission.photos.push({
+      id: crypto.randomUUID(),
+      name: file.name,
+      blob: compressed, // 🔥 Version compressée
 
-    domaine: "piece",
-    clefComposant: currentPiece.id,
-    localisation: `${currentPiece.batiment || "?"} – ${currentPiece.nom || "?"}`
-  });
+      domaine: "piece",
+      clefComposant: currentPiece.id,
+      localisation: `${currentPiece.batiment || "?"} – ${currentPiece.nom || "?"}`
+    });
 
-  saveMission();
-  editPiece(currentPiece.id);
+    // Message de confirmation
+    if (saved) {
+      console.log('✅ Photo ajoutée (originale sauvegardée dans la galerie)');
+    }
+
+    saveMission();
+    editPiece(currentPiece.id);
+    
+  } catch (error) {
+    console.error('❌ Erreur ajout photo pièce:', error);
+    alert('Erreur lors de l\'ajout de la photo');
+  }
 }
 
 function getPhotosForComponent(componentId) {

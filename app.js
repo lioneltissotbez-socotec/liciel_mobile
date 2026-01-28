@@ -287,31 +287,46 @@ async function addMissionPhotoInEdit(numero) {
     const file = input.files[0];
     if (!file) return;
     
-    const mission = await loadMission(numero);
-    if (!mission) return;
-    
-    mission.photos = mission.photos || [];
-    
-    mission.photos.push({
-      id: crypto.randomUUID(),
-      name: file.name,
-      blob: file,
-      domaine: "mission",
-      clefComposant: null,
-      localisation: `Mission ${numero}`
-    });
-    
-    mission.derniereSauvegarde = new Date().toISOString();
-    const tx = db.transaction("missions", "readwrite");
-    tx.objectStore("missions").put(mission);
-    
-    await new Promise(resolve => {
-      tx.oncomplete = resolve;
-    });
-    
-    // Rafraîchir le modal
-    closeOverlay();
-    editMission(numero);
+    try {
+      // Compression de la photo
+      const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+      
+      const mission = await loadMission(numero);
+      if (!mission) return;
+      
+      mission.photos = mission.photos || [];
+      
+      // Utiliser la version compressée dans l'app
+      mission.photos.push({
+        id: crypto.randomUUID(),
+        name: file.name,
+        blob: compressed, // 🔥 Version compressée
+        domaine: "mission",
+        clefComposant: null,
+        localisation: `Mission ${numero}`
+      });
+      
+      mission.derniereSauvegarde = new Date().toISOString();
+      const tx = db.transaction("missions", "readwrite");
+      tx.objectStore("missions").put(mission);
+      
+      await new Promise(resolve => {
+        tx.oncomplete = resolve;
+      });
+      
+      // Message de confirmation
+      if (saved) {
+        console.log('✅ Photo ajoutée (originale sauvegardée dans la galerie)');
+      }
+      
+      // Rafraîchir le modal
+      closeOverlay();
+      editMission(numero);
+      
+    } catch (error) {
+      console.error('❌ Erreur ajout photo:', error);
+      alert('Erreur lors de l\'ajout de la photo');
+    }
   };
   
   input.click();
@@ -327,27 +342,41 @@ async function replaceMissionPhotoInEdit(numero) {
     const file = input.files[0];
     if (!file) return;
     
-    const mission = await loadMission(numero);
-    if (!mission) return;
-    
-    // Trouver et remplacer la photo
-    const photoIndex = mission.photos.findIndex(ph => ph.domaine === "mission");
-    if (photoIndex !== -1) {
-      mission.photos[photoIndex].name = file.name;
-      mission.photos[photoIndex].blob = file;
+    try {
+      // Compression de la photo
+      const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+      
+      const mission = await loadMission(numero);
+      if (!mission) return;
+      
+      // Trouver et remplacer la photo
+      const photoIndex = mission.photos.findIndex(ph => ph.domaine === "mission");
+      if (photoIndex !== -1) {
+        mission.photos[photoIndex].name = file.name;
+        mission.photos[photoIndex].blob = compressed; // 🔥 Version compressée
+      }
+      
+      mission.derniereSauvegarde = new Date().toISOString();
+      const tx = db.transaction("missions", "readwrite");
+      tx.objectStore("missions").put(mission);
+      
+      await new Promise(resolve => {
+        tx.oncomplete = resolve;
+      });
+      
+      // Message de confirmation
+      if (saved) {
+        console.log('✅ Photo remplacée (originale sauvegardée dans la galerie)');
+      }
+      
+      // Rafraîchir le modal
+      closeOverlay();
+      editMission(numero);
+      
+    } catch (error) {
+      console.error('❌ Erreur remplacement photo:', error);
+      alert('Erreur lors du remplacement de la photo');
     }
-    
-    mission.derniereSauvegarde = new Date().toISOString();
-    const tx = db.transaction("missions", "readwrite");
-    tx.objectStore("missions").put(mission);
-    
-    await new Promise(resolve => {
-      tx.oncomplete = resolve;
-    });
-    
-    // Rafraîchir le modal
-    closeOverlay();
-    editMission(numero);
   };
   
   input.click();
@@ -427,6 +456,157 @@ async function saveMissionEdit(oldNumero) {
 function closeOverlay() {
   document.querySelector(".overlay")?.remove();
 }
+
+/**
+ * Ouvre l'interface de gestion des archives
+ */
+async function openArchiveManager() {
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  
+  const content = document.createElement("div");
+  content.className = "overlay-content archive-manager-modal";
+  
+  // Récupérer les statistiques
+  const missions = await listMissions();
+  const snapshots = await ArchiveManager.listSnapshots();
+  
+  // Calculer l'espace utilisé (approximatif)
+  const estimatedSize = JSON.stringify(missions).length / 1024 / 1024;
+  
+  content.innerHTML = `
+    <h3>⚙️ Gestion des données</h3>
+    
+    <div class="data-stats">
+      <p><strong>📦 Missions actives :</strong> ${missions.length}</p>
+      <p><strong>💾 Espace estimé :</strong> ${estimatedSize.toFixed(2)} MB</p>
+      <p><strong>🔄 Auto-save :</strong> Toutes les 10 min (5 derniers conservés)</p>
+    </div>
+    
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
+    
+    <h4>Archives automatiques</h4>
+    <div class="snapshots-list" id="snapshots-list">
+      ${snapshots.length > 0 ? snapshots.map(snap => {
+        const date = new Date(snap.timestamp);
+        const dateStr = date.toLocaleDateString('fr-FR', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        return `
+          <div class="snapshot-row">
+            <div class="snapshot-info">
+              <strong>${dateStr}</strong><br>
+              <span>${snap.count} mission(s)</span>
+            </div>
+            <button class="secondary" onclick="restoreArchive(${snap.id})" style="width: auto; padding: 8px 16px; margin: 0;">
+              Restaurer
+            </button>
+          </div>
+        `;
+      }).join('') : '<p style="opacity: 0.6;">Aucune archive disponible</p>'}
+    </div>
+    
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e5e7eb;">
+    
+    <h4>Actions manuelles</h4>
+    <button class="primary" onclick="exportAllMissions()" style="margin-bottom: 8px;">
+      📥 Exporter toutes les missions
+    </button>
+    <button class="secondary" onclick="importMissionsFile()" style="margin-bottom: 8px;">
+      📤 Importer une archive
+    </button>
+    <button class="secondary" onclick="clearAllArchives()" style="margin-bottom: 8px; color: #dc2626;">
+      🗑️ Nettoyer les archives auto
+    </button>
+    
+    <button class="secondary" onclick="closeOverlay()" style="margin-top: 12px;">
+      Fermer
+    </button>
+  `;
+  
+  overlay.appendChild(content);
+  document.body.appendChild(overlay);
+}
+
+/**
+ * Restaure une archive
+ */
+async function restoreArchive(snapshotId) {
+  if (!confirm('Restaurer cette archive ? Les missions actuelles seront remplacées.')) {
+    return;
+  }
+  
+  const success = await ArchiveManager.restoreSnapshot(snapshotId);
+  
+  if (success) {
+    alert('✅ Archive restaurée avec succès');
+    closeOverlay();
+    renderMissionList();
+  } else {
+    alert('❌ Erreur lors de la restauration');
+  }
+}
+
+/**
+ * Exporte toutes les missions
+ */
+async function exportAllMissions() {
+  const success = await ArchiveManager.exportToFile();
+  
+  if (success) {
+    alert('✅ Export téléchargé');
+  } else {
+    alert('❌ Erreur lors de l\'export');
+  }
+}
+
+/**
+ * Importe un fichier d'archives
+ */
+async function importMissionsFile() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    
+    try {
+      const result = await ArchiveManager.importFromFile(file);
+      alert(`✅ Import terminé\n${result.imported} mission(s) importée(s)\n${result.skipped} mission(s) ignorée(s)`);
+      closeOverlay();
+      renderMissionList();
+    } catch (error) {
+      alert('❌ Erreur lors de l\'import: ' + error.message);
+    }
+  };
+  
+  input.click();
+}
+
+/**
+ * Nettoie toutes les archives automatiques
+ */
+async function clearAllArchives() {
+  if (!confirm('Supprimer toutes les archives automatiques ?')) {
+    return;
+  }
+  
+  const success = await ArchiveManager.clearAllSnapshots();
+  
+  if (success) {
+    alert('✅ Archives supprimées');
+    closeOverlay();
+  } else {
+    alert('❌ Erreur lors de la suppression');
+  }
+}
+
 
 async function deleteMission(numero) {
   if (!confirm(`Supprimer définitivement la mission ${numero} ?`)) return;
