@@ -214,7 +214,7 @@ async function pPhoto(file) {
 
     // Message de confirmation
     if (saved) {
-      console.log('✅ Photo ajoutée (originale sauvegardée dans la galerie)');
+      console.log('✅ Photo ajoutée (photo compressée et sauvegardée)');
     }
 
     saveMission();

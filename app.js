@@ -316,7 +316,7 @@ async function addMissionPhotoInEdit(numero) {
       
       // Message de confirmation
       if (saved) {
-        console.log('✅ Photo ajoutée (originale sauvegardée dans la galerie)');
+        console.log('✅ Photo ajoutée (photo compressée et sauvegardée)');
       }
       
       // Rafraîchir le modal
@@ -366,7 +366,7 @@ async function replaceMissionPhotoInEdit(numero) {
       
       // Message de confirmation
       if (saved) {
-        console.log('✅ Photo remplacée (originale sauvegardée dans la galerie)');
+        console.log('✅ Photo remplacée (photo compressée et sauvegardée)');
       }
       
       // Rafraîchir le modal
@@ -645,11 +645,52 @@ async function resumeMission(numero) {
 
 
 async function init() {
-  await openDB();
-  await loadDictionnaires();
-  await loadDictionnairesDescription();
-  await renderMissionList();
-  render();
+  const progressFill = document.getElementById('progress-fill');
+  const loadingStatus = document.getElementById('loading-status');
+  const loadingBar = document.getElementById('loading-bar');
+  const startContent = document.getElementById('start-content');
+  
+  try {
+    // Étape 1: IndexedDB
+    loadingStatus.textContent = 'Connexion à la base de données...';
+    progressFill.style.width = '20%';
+    await openDB();
+    
+    // Étape 2: Dictionnaires
+    loadingStatus.textContent = 'Chargement des dictionnaires...';
+    progressFill.style.width = '40%';
+    await loadDictionnaires();
+    
+    // Étape 3: Dictionnaires description
+    loadingStatus.textContent = 'Chargement des descriptions...';
+    progressFill.style.width = '60%';
+    await loadDictionnairesDescription();
+    
+    // Étape 4: Liste des missions
+    loadingStatus.textContent = 'Chargement des missions...';
+    progressFill.style.width = '80%';
+    await renderMissionList();
+    
+    // Étape 5: Finalisation
+    loadingStatus.textContent = 'Prêt !';
+    progressFill.style.width = '100%';
+    progressFill.classList.add('complete');
+    
+    // Attendre un peu pour montrer la barre verte
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Masquer le loader, afficher le contenu
+    loadingBar.style.display = 'none';
+    startContent.style.display = 'block';
+    
+    render();
+    
+  } catch (error) {
+    console.error('❌ Erreur initialisation:', error);
+    loadingStatus.textContent = 'Erreur de chargement. Veuillez rafraîchir la page.';
+    loadingStatus.style.color = '#dc2626';
+    progressFill.style.background = '#dc2626';
+  }
 }
 
 init();

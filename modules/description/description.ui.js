@@ -204,9 +204,12 @@ function renderUREditForm(ur) {
     (Array.isArray(ur.localisation?.items) ? ur.localisation.items : []).length === 0
       ? `<div class="plomb-empty muted">Aucune localisation sélectionnée</div>`
       : (ur.localisation.items).map(loc => {
-          const entry = ur.plombByLoc?.[loc] || { mesure: null, degradation: null };
+          const entry = ur.plombByLoc?.[loc] || { mesure: null, degradation: null, photoId: null };
           const mesureVal = entry.mesure ?? "";
           const degrVal = entry.degradation ?? "";
+          const photoId = entry.photoId;
+          const hasPhoto = photoId && store.mission.photos.find(p => p.id === photoId);
+          
           return `
             <div class="plomb-loc-row">
               <div class="plomb-loc-tag">${loc}</div>
@@ -229,6 +232,14 @@ function renderUREditForm(ur) {
                 <option ${degrVal==="Etat d'usage" ? "selected" : ""}>Etat d'usage</option>
                 <option ${degrVal==="Dégradé" ? "selected" : ""}>Dégradé</option>
               </select>
+              
+              <button 
+                class="photo-btn-loc ${hasPhoto ? 'has-photo' : ''}" 
+                onclick="takeLocalisationPhoto('${loc}')"
+                title="${hasPhoto ? 'Modifier la photo' : 'Ajouter une photo'}"
+              >
+                📷${hasPhoto ? ' ✓' : ''}
+              </button>
             </div>
           `;
         }).join("")
@@ -239,32 +250,6 @@ function renderUREditForm(ur) {
 
 </div>
 
-    <h3>Photos de l’élément</h3>
-
-    <input
-      type="file"
-      accept="image/*"
-      capture="environment"
-      onchange="addPhotoToUR(this.files[0])"
-    >
-
-    <div class="photos">
-      ${
-        getPhotosForUR(ur).map(ph => `
-          <div class="photo-row">
-            <img
-              src="${URL.createObjectURL(ph.blob)}"
-              class="photo-thumb photo-thumb-large"
-              onclick="openURPhotoPreview('${ph.id}')"
-            >
-            <div class="photo-actions">
-              <button onclick="replaceURPhoto('${ph.id}')">🖊</button>
-              <button onclick="deleteURPhoto('${ph.id}')">🗑</button>
-            </div>
-          </div>
-        `).join("")
-      }
-    </div>
 
     <button class="primary" onclick="renderDescriptionScreen()">✅ Valider</button>
     <button class="secondary" onclick="renderDescriptionScreen()">⬅ Annuler</button>
@@ -326,51 +311,79 @@ function getPhotosForUR(ur) {
   );
 }
 
-function addPhotoToUR(file) {
+async function addPhotoToUR(file) {
   if (!file) return;
 
   const ur = getEditingUR();
   if (!ur) return;
 
-  const photoId = crypto.randomUUID();
+  try {
+    // Compression de la photo
+    const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+    
+    const photoId = crypto.randomUUID();
 
-  const photo = {
-    id: photoId,
-    name: file.name,
-    blob: file,
-    clefComposant: ur.id,
-    domaine: "description",
-    localisation: `${ur.type} ${(ur.localisation?.items || []).join(", ")}`
-  };
+    const photo = {
+      id: photoId,
+      name: file.name,
+      blob: compressed, // 🔥 Version compressée
+      clefComposant: ur.id,
+      domaine: "description",
+      localisation: `${ur.type} ${(ur.localisation?.items || []).join(", ")}`
+    };
 
-  store.mission.photos.push(photo);
+    store.mission.photos.push(photo);
 
-  ur.photos = ur.photos || [];
-  ur.photos.push(photoId);
+    ur.photos = ur.photos || [];
+    ur.photos.push(photoId);
 
-  saveMission();
-  renderUREditForm(ur);
+    // Message de confirmation
+    if (saved) {
+      console.log('✅ Photo UR ajoutée (photo compressée et sauvegardée)');
+    }
+
+    saveMission();
+    renderUREditForm(ur);
+    
+  } catch (error) {
+    console.error('❌ Erreur ajout photo UR:', error);
+    alert('Erreur lors de l\'ajout de la photo');
+  }
 }
 
 
-function replaceURPhoto(photoId) {
+async function replaceURPhoto(photoId) {
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
   input.capture = "environment";
 
-  input.onchange = () => {
+  input.onchange = async () => {
     const file = input.files[0];
     if (!file) return;
 
-    const photo = store.mission.photos.find(p => p.id === photoId);
-    if (!photo) return;
+    try {
+      // Compression de la photo
+      const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+      
+      const photo = store.mission.photos.find(p => p.id === photoId);
+      if (!photo) return;
 
-    photo.name = file.name;
-    photo.blob = file;
+      photo.name = file.name;
+      photo.blob = compressed; // 🔥 Version compressée
 
-    saveMission();
-    renderUREditForm(getEditingUR());
+      // Message de confirmation
+      if (saved) {
+        console.log('✅ Photo UR remplacée (photo compressée et sauvegardée)');
+      }
+
+      saveMission();
+      renderUREditForm(getEditingUR());
+      
+    } catch (error) {
+      console.error('❌ Erreur remplacement photo UR:', error);
+      alert('Erreur lors du remplacement de la photo');
+    }
   };
 
   input.click();
@@ -651,4 +664,112 @@ function plombApplyModeToAll(mode) {
 window.plombApplyModeToAll = plombApplyModeToAll;
 window.plombSetMesureForLoc = plombSetMesureForLoc;
 window.plombSetDegradationForLoc = plombSetDegradationForLoc;
+
+// ======================================================
+// PHOTOS PAR LOCALISATION
+// ======================================================
+
+/**
+ * Prendre une photo pour une localisation spécifique
+ */
+function takeLocalisationPhoto(loc) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.capture = "environment";
+  
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    
+    await addPhotoToLocalisation(file, loc);
+  };
+  
+  input.click();
+}
+
+/**
+ * Ajouter une photo à une localisation
+ */
+async function addPhotoToLocalisation(file, loc) {
+  if (!file) return;
+  
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  try {
+    // Compression de la photo
+    const { compressed, saved } = await PhotoCompressor.processPhoto(file);
+    
+    const photoId = crypto.randomUUID();
+    
+    // Récupérer la pièce pour la localisation
+    const pieceId = store.ui?.currentDescriptionPieceId;
+    const piece = store.mission?.pieces.find(p => p.id === pieceId);
+    
+    const photo = {
+      id: photoId,
+      name: file.name,
+      blob: compressed,
+      clefComposant: generateClefComposant(),
+      domaine: "description",
+      localisation: piece ? `${piece.batiment} - ${piece.nom}` : "Non localisée",
+      
+      // Métadonnées pour l'export
+      urId: ur.id,
+      urLoc: loc,
+      urType: ur.type,
+      urSubstrat: ur.substrat,
+      urRevetement: ur.revetement,
+      urMesure: (ur.plombByLoc[loc] || {}).mesure,
+      urDegradation: (ur.plombByLoc[loc] || {}).degradation
+    };
+    
+    store.mission.photos.push(photo);
+    
+    // Supprimer l'ancienne photo si elle existe
+    const oldPhotoId = (ur.plombByLoc[loc] || {}).photoId;
+    if (oldPhotoId) {
+      store.mission.photos = store.mission.photos.filter(p => p.id !== oldPhotoId);
+    }
+    
+    // Stocker l'ID de la photo dans la localisation
+    ur.plombByLoc[loc] = ur.plombByLoc[loc] || {};
+    ur.plombByLoc[loc].photoId = photoId;
+    
+    saveMission();
+    renderUREditForm(ur);
+    
+    console.log(`✅ Photo ajoutée pour localisation ${loc}`);
+    
+  } catch (error) {
+    console.error('❌ Erreur ajout photo localisation:', error);
+    alert('Erreur lors de l\'ajout de la photo');
+  }
+}
+
+/**
+ * Supprimer la photo d'une localisation
+ */
+function deleteLocalisationPhoto(loc) {
+  if (!confirm(`Supprimer la photo de la localisation ${loc} ?`)) return;
+  
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  const photoId = (ur.plombByLoc[loc] || {}).photoId;
+  if (!photoId) return;
+  
+  // Supprimer de la liste globale
+  store.mission.photos = store.mission.photos.filter(p => p.id !== photoId);
+  
+  // Supprimer la référence
+  ur.plombByLoc[loc].photoId = null;
+  
+  saveMission();
+  renderUREditForm(ur);
+}
+
+window.takeLocalisationPhoto = takeLocalisationPhoto;
+window.deleteLocalisationPhoto = deleteLocalisationPhoto;
 

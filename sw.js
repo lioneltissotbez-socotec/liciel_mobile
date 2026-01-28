@@ -3,8 +3,8 @@
  * Gère le cache et le mode offline
  */
 
-const CACHE_NAME = 'liciel-mobile-v2';
-const CACHE_VERSION = '2.0.0';
+const CACHE_NAME = 'liciel-mobile-v5';
+const CACHE_VERSION = '3.2.0';
 
 // Fichiers à mettre en cache pour le mode offline
 const FILES_TO_CACHE = [
@@ -23,6 +23,7 @@ const FILES_TO_CACHE = [
   './core/plomb.rules.js',
   './core/photo-compressor.js',
   './core/archive-manager.js',
+  './core/utils.js',
   
   // Modules
   './modules/pieces/pieces.ui.js',

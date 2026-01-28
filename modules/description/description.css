@@ -167,7 +167,7 @@
 .plomb-loc-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .plomb-loc-row {
   display: grid;
-  grid-template-columns: 52px 1fr 160px;
+  grid-template-columns: 52px 1fr 160px 60px;
   gap: 8px;
   align-items: center;
 }
@@ -181,3 +181,31 @@
 }
 .plomb-loc-input, .plomb-loc-select { height: 40px; }
 .plomb-empty { padding: 10px 0; }
+
+/* Bouton photo par localisation */
+.photo-btn-loc {
+  min-width: 50px;
+  height: 40px;
+  padding: 0 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  background: #e5e7eb;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.photo-btn-loc:hover {
+  background: #d1d5db;
+}
+
+.photo-btn-loc.has-photo {
+  background: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+  font-weight: 500;
+}
+
+.photo-btn-loc.has-photo:hover {
+  background: #a7f3d0;
+}

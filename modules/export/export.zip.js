@@ -36,7 +36,7 @@ async function exportMissionZIP(mission) {
   // ===== DOSSIER PHOTOS =====
   const photosDir = root.folder("photos");
   for (const f of files) {
-    photosDir.file(`${f.id}.jpg`, f.blob);
+    photosDir.file(f.name, f.blob);
   }
 
   const blob = await zip.generateAsync({ type: "blob" });

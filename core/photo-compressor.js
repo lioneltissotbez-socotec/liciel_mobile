@@ -147,22 +147,20 @@ const PhotoCompressor = {
   },
 
   /**
-   * Process complet : compression + sauvegarde galerie
+   * Process complet : compression uniquement (pas de sauvegarde galerie)
    * @param {File} file - Fichier photo original
    * @returns {Promise<{original: File, compressed: Blob, saved: boolean}>}
    */
   async processPhoto(file) {
-    // 1. Compression
+    // Compression uniquement
     const { original, compressed, reduction } = await this.compressPhoto(file);
     
-    // 2. Sauvegarde originale dans galerie
-    const saved = await this.saveToGallery(original);
-    
+    // Pas de sauvegarde galerie (photos déjà persistées dans IndexedDB)
     return {
       original,
       compressed,
       reduction,
-      saved
+      saved: false
     };
   },
 

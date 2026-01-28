@@ -37,19 +37,31 @@
 
   <!-- Écran démarrage -->
   <section class="screen active" id="screen-start">
-    <h2>Nouvelle mission</h2>
-
-    <label>Numéro de dossier</label>
-    <input id="input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
-
-    <button class="primary" onclick="startMission()">Démarrer la mission</button>
-
-    <h3>Missions existantes</h3>
-    <div id="missions-list"></div>
+    <!-- Barre de chargement -->
+    <div id="loading-bar" class="loading-container">
+      <h2>Chargement de l'application...</h2>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+      <p id="loading-status" class="loading-status">Initialisation...</p>
+    </div>
     
-    <button class="secondary" onclick="openArchiveManager()" style="margin-top: 20px;">
-      ⚙️ Gestion des données
-    </button>
+    <!-- Contenu principal (masqué au démarrage) -->
+    <div id="start-content" class="start-content" style="display: none;">
+      <h2>Nouvelle mission</h2>
+
+      <label>Numéro de dossier</label>
+      <input id="input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
+
+      <button class="primary" onclick="startMission()">Démarrer la mission</button>
+
+      <h3>Missions existantes</h3>
+      <div id="missions-list"></div>
+      
+      <button class="secondary" onclick="openArchiveManager()" style="margin-top: 20px;">
+        ⚙️ Gestion des données
+      </button>
+    </div>
   </section>
 
   <!-- Écran pièces -->
@@ -77,6 +89,7 @@
 <script src="core/migrations.js"></script>
 <script src="core/photo-compressor.js"></script>
 <script src="core/archive-manager.js"></script>
+<script src="core/utils.js"></script>
 
 <!-- ZIP -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
