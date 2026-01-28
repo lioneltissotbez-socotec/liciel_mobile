@@ -8,41 +8,41 @@ const CACHE_VERSION = '1.0.0';
 
 // Fichiers à mettre en cache pour le mode offline
 const FILES_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json',
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
   
   // Core
-  '/core/db.js',
-  '/core/store.js',
-  '/core/migrations.js',
-  '/core/dictionnaires.js',
-  '/core/dictionnaires_description.js',
-  '/core/plomb.rules.js',
-  '/core/photo-compressor.js',
-  '/core/archive-manager.js',
+  './core/db.js',
+  './core/store.js',
+  './core/migrations.js',
+  './core/dictionnaires.js',
+  './core/dictionnaires_description.js',
+  './core/plomb.rules.js',
+  './core/photo-compressor.js',
+  './core/archive-manager.js',
   
   // Modules
-  '/modules/pieces/pieces.ui.js',
-  '/modules/pieces/pieces.model.js',
-  '/modules/pieces/pieces.css',
-  '/modules/photos/photos.ui.js',
-  '/modules/photos/photos.css',
-  '/modules/description/description.ui.js',
-  '/modules/description/description.css',
-  '/modules/export/export.utils.js',
-  '/modules/export/export.pieces.js',
-  '/modules/export/export.photos.js',
-  '/modules/export/export.description.js',
-  '/modules/export/export.zip.js',
+  './modules/pieces/pieces.ui.js',
+  './modules/pieces/pieces.model.js',
+  './modules/pieces/pieces.css',
+  './modules/photos/photos.ui.js',
+  './modules/photos/photos.css',
+  './modules/description/description.ui.js',
+  './modules/description/description.css',
+  './modules/export/export.utils.js',
+  './modules/export/export.pieces.js',
+  './modules/export/export.photos.js',
+  './modules/export/export.description.js',
+  './modules/export/export.zip.js',
   
   // Data
-  '/data/dictionnaires.json',
-  '/data/revetements.json',
-  '/data/substrats.json',
-  '/data/types_elements.json'
+  './data/dictionnaires.json',
+  './data/revetements.json',
+  './data/substrats.json',
+  './data/types_elements.json'
 ];
 
 /**
