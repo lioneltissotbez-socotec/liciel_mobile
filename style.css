@@ -438,3 +438,70 @@ footer button {
   color: #6b7280;
 }
 
+/* Notification de mise à jour */
+.update-notification {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  background: #1f2937;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+.update-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.update-content span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.update-content button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.update-content button:first-of-type {
+  background: #2563eb;
+  color: white;
+}
+
+.update-content button:first-of-type:hover {
+  background: #1d4ed8;
+}
+
+.update-content button:last-of-type {
+  background: #374151;
+  color: white;
+}
+
+.update-content button:last-of-type:hover {
+  background: #4b5563;
+}
+

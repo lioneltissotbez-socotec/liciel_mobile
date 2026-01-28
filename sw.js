@@ -3,8 +3,8 @@
  * Gère le cache et le mode offline
  */
 
-const CACHE_NAME = 'liciel-mobile-v1';
-const CACHE_VERSION = '1.0.0';
+const CACHE_NAME = 'liciel-mobile-v2';
+const CACHE_VERSION = '2.0.0';
 
 // Fichiers à mettre en cache pour le mode offline
 const FILES_TO_CACHE = [

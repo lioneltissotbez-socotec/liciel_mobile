@@ -124,11 +124,8 @@
                 // Nouvelle version disponible
                 console.log('✨ Nouvelle version disponible');
                 
-                // Optionnel : Afficher une notification à l'utilisateur
-                if (confirm('Une nouvelle version est disponible. Recharger maintenant ?')) {
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
-                  window.location.reload();
-                }
+                // Afficher un message discret au lieu d'une alerte
+                showUpdateNotification(newWorker);
               }
             });
           });
@@ -137,6 +134,27 @@
           console.error('❌ Erreur Service Worker:', error);
         });
     });
+    
+    // Fonction pour afficher une notification de mise à jour
+    function showUpdateNotification(newWorker) {
+      // Créer une notification discrète
+      const notification = document.createElement('div');
+      notification.className = 'update-notification';
+      notification.innerHTML = `
+        <div class="update-content">
+          <span>✨ Nouvelle version disponible</span>
+          <button onclick="applyUpdate()">Mettre à jour</button>
+          <button onclick="this.parentElement.parentElement.remove()">Plus tard</button>
+        </div>
+      `;
+      document.body.appendChild(notification);
+      
+      // Fonction pour appliquer la mise à jour
+      window.applyUpdate = () => {
+        newWorker.postMessage({ type: 'SKIP_WAITING' });
+        notification.remove();
+      };
+    }
     
     // Recharger quand le nouveau SW prend le contrôle
     let refreshing = false;
