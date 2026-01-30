@@ -1,0 +1,17 @@
+{
+  "label": "Moyens à mettre en œuvre",
+  "version": "1.0",
+  "items": [
+    {"id": "donner_un_acces", "label": "Donner un accès"},
+    {"id": "securiser_le_plancher", "label": "Sécuriser le plancher"},
+    {"id": "demander_les_cles_au_donneur_dordre", "label": "Demander les clés au donneur d'ordre"},
+    {"id": "investigations_approfondies_apres_ouverture_du_local", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après ouverture du local"},
+    {"id": "investigations_approfondies_apres_creation_dacces", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après création d'accès et de ventilation adaptés -type trémies-"},
+    {"id": "investigations_approfondies_apres_enlevement_objets", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après enlèvement des objets encombrants"},
+    {"id": "investigations_approfondies_apres_moyens_elevations", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après mise à disposition de moyens d'élévations adaptés et sécurisés"},
+    {"id": "investigations_approfondies_apres_evacuation_locaux", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après évacuation des locaux et après démontage d'un ou plusieurs châssis par une entreprise spécialisée"},
+    {"id": "investigations_approfondies_apres_retrait_faux_plafond", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après retrait du faux plafond par entreprise spécialisée"},
+    {"id": "investigations_approfondies_apres_purge_du_local", "label": "Investigations approfondies à prévoir avant le démarrage des travaux après purge du local"},
+    {"id": "investigations_approfondies_suite_refus_prelevement", "label": "Investigations approfondies avant le démarrage des travaux suite au refus de prélèvement du donneur d'ordre / de l'occupant au jour de notre visite"}
+  ]
+}

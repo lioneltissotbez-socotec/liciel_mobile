@@ -48,12 +48,7 @@
     
     <!-- Contenu principal (masqué au démarrage) -->
     <div id="start-content" class="start-content" style="display: none;">
-      <h2>Nouvelle mission</h2>
-
-      <label>Numéro de dossier</label>
-      <input id="input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
-
-      <button class="primary" onclick="startMission()">Démarrer la mission</button>
+      <button class="primary" onclick="openNewMissionModal()">➕ Nouvelle mission</button>
 
       <h3>Missions existantes</h3>
       <div id="missions-list"></div>
@@ -62,10 +57,65 @@
         ⚙️ Gestion des données
       </button>
     </div>
+    
+    <!-- Modal nouvelle mission -->
+    <div id="new-mission-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h2>✨ Nouvelle mission</h2>
+        
+        <label>Numéro de dossier</label>
+        <input id="modal-input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
+        
+        <label>Type de bien</label>
+        <select id="modal-type-bien" onchange="updateModalTemplateVisibility()">
+          <option value="">-- Sélectionner --</option>
+          <option value="habitation">Habitation</option>
+          <option value="tertiaire">Tertiaire</option>
+          <option value="industrie">Industrie</option>
+        </select>
+        
+        <label>Liste des pièces</label>
+        <select id="modal-liste-pieces" onchange="updateModalTemplateVisibility()">
+          <option value="standard">Standard</option>
+          <option value="unicil">UNICIL</option>
+          <option value="odhac87">ODHAC 87</option>
+        </select>
+        
+        <!-- Saisie assistée (conditionnelle) -->
+        <div id="modal-template-section" style="display: none;">
+          <div class="template-selector">
+            <label class="checkbox-label">
+              <input type="checkbox" id="modal-use-template" checked onchange="toggleModalTemplateSelector()">
+              <span>✨ Utiliser la saisie assistée (recommandé)</span>
+            </label>
+            
+            <div id="modal-template-options" style="margin-top: 16px;">
+              <label>Modèle</label>
+              <select id="modal-template-subtype">
+                <option value="">-- Sélectionner un modèle --</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button class="primary" onclick="createNewMission()">Créer</button>
+          <button class="secondary" onclick="closeNewMissionModal()">Annuler</button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Écran pièces -->
   <section class="screen" id="screen-pieces"></section>
+
+  <!-- Écran résumé mission -->
+  <section class="screen" id="screen-resume">
+    <div style="padding: 20px;">
+      <h2>📊 Résumé de la mission</h2>
+      <p class="muted">Page en construction...</p>
+    </div>
+  </section>
 
   <!-- Écran description de pièce -->
 <section class="screen" id="screen-description"></section>
@@ -76,9 +126,7 @@
 </main>
 
 <footer id="app-footer">
-  <button onclick="go('start')">🏠</button>
-  <button onclick="go('pieces')">🚪</button>
-  <button onclick="go('photos')">📷</button>
+  <!-- Footer dynamique : vide sur accueil, icônes mission quand mission ouverte -->
 </footer>
 
 <!-- Core -->
@@ -90,6 +138,8 @@
 <script src="core/photo-compressor.js"></script>
 <script src="core/archive-manager.js"></script>
 <script src="core/utils.js"></script>
+<script src="core/templates.js"></script>
+<script src="core/footer.js"></script>
 
 <!-- ZIP -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>

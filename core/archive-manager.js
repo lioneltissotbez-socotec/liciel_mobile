@@ -26,13 +26,22 @@ const ArchiveManager = {
   async init() {
     console.log('📦 Initialisation du système d\'archivage');
     
-    // Créer le store d'archives si nécessaire
-    await this.ensureArchiveStore();
-    
-    // Démarrer l'auto-save
-    this.startAutoSave();
-    
-    console.log(`✅ Auto-save activé (toutes les ${this.config.autoSaveInterval / 60000} min)`);
+    try {
+      // Créer le store d'archives si nécessaire
+      const db = await this.ensureArchiveStore();
+      
+      if (!db) {
+        console.warn('⚠️ Store archives non disponible, archivage désactivé');
+        return;
+      }
+      
+      // Démarrer l'auto-save
+      this.startAutoSave();
+      
+      console.log(`✅ Auto-save activé (toutes les ${this.config.autoSaveInterval / 60000} min)`);
+    } catch (error) {
+      console.error('❌ Erreur initialisation archivage:', error);
+    }
   },
 
   /**
@@ -40,7 +49,8 @@ const ArchiveManager = {
    */
   async ensureArchiveStore() {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open('liciel-terrain-db', 2); // Version 2 pour ajouter le store
+      // Utiliser la même version que db.js
+      const request = indexedDB.open('liciel-terrain-db', 1);
       
       request.onupgradeneeded = (event) => {
         const db = event.target.result;
@@ -58,12 +68,30 @@ const ArchiveManager = {
         }
       };
       
-      request.onsuccess = () => {
-        resolve(request.result);
+      request.onsuccess = (event) => {
+        const db = event.target.result;
+        
+        // Vérifier si le store archives existe
+        if (!db.objectStoreNames.contains('archives')) {
+          // Le store n'existe pas, on ne peut pas le créer sans upgrade
+          // On résout quand même pour ne pas bloquer l'app
+          console.warn('⚠️ Store archives non créé, archivage désactivé');
+          db.close();
+          resolve(null);
+        } else {
+          db.close();
+          resolve(db);
+        }
       };
       
-      request.onerror = () => {
-        reject(request.error);
+      request.onerror = (event) => {
+        console.error('❌ Erreur ouverture IndexedDB:', event.target.error);
+        reject(event.target.error);
+      };
+      
+      request.onblocked = () => {
+        console.warn('⚠️ IndexedDB bloqué par une autre connexion');
+        reject(new Error('IndexedDB blocked'));
       };
     });
   },
@@ -112,6 +140,12 @@ const ArchiveManager = {
       
       // Sauvegarder dans IndexedDB
       const db = await this.ensureArchiveStore();
+      
+      if (!db) {
+        console.warn('⚠️ Archivage non disponible, snapshot ignoré');
+        return;
+      }
+      
       const tx = db.transaction('archives', 'readwrite');
       const store = tx.objectStore('archives');
       
@@ -187,6 +221,13 @@ const ArchiveManager = {
   async listSnapshots() {
     try {
       const db = await this.ensureArchiveStore();
+      
+      // Si pas de store archives, retourner liste vide
+      if (!db) {
+        console.warn('⚠️ Archivage non disponible, aucun snapshot');
+        return [];
+      }
+      
       const tx = db.transaction('archives', 'readonly');
       const store = tx.objectStore('archives');
       const index = store.index('timestamp');
@@ -379,9 +420,5 @@ const ArchiveManager = {
   }
 };
 
-// Initialisation automatique au chargement
-if (typeof window !== 'undefined') {
-  window.addEventListener('load', () => {
-    ArchiveManager.init();
-  });
-}
+// Export pour accès global
+window.ArchiveManager = ArchiveManager;

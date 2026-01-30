@@ -1,0 +1,32 @@
+{
+  "defaut": [
+    {
+      "type": "MUR",
+      "localisations": ["A", "B", "C", "D"]
+    },
+    {
+      "type": "PLINTHE",
+      "localisations": ["A", "B", "C", "D"]
+    },
+    {
+      "type": "FENÊTRE",
+      "localisations": ["F1"]
+    },
+    {
+      "type": "PORTE",
+      "localisations": ["P1"]
+    },
+    {
+      "type": "PLAFOND",
+      "localisations": []
+    },
+    {
+      "type": "SOL",
+      "localisations": []
+    },
+    {
+      "type": "RADIATEUR",
+      "localisations": []
+    }
+  ]
+}

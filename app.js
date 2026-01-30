@@ -11,6 +11,13 @@ function render() {
   const active = document.getElementById("screen-" + store.ui.screen);
   if (active) active.classList.add("active");
 
+  // 🆕 Mise à jour footer selon contexte
+  if (store.ui.screen === "start") {
+    updateFooter('home'); // Page accueil : footer vide
+  } else {
+    updateFooter('mission'); // Mission ouverte : footer avec icônes
+  }
+
   // Rendu spécifique par écran
   if (store.ui.screen === "pieces" && typeof renderPiecesScreen === "function") {
     renderPiecesScreen();
@@ -30,6 +37,7 @@ function render() {
     pieces: "Pièces",
     photos: "Photos",
     description: "Description de la pièce",
+    resume: "Résumé de la mission",
   };
 
   document.getElementById("header-title").innerText =
@@ -55,6 +63,9 @@ async function startMission() {
     zpsos: [],
     prelevements: [],
     photos: [],
+    
+    // 🆕 CONTEXTE (template utilisé)
+    contexte: null,
 
     // 🔴 PARAMÉTRAGE MÉTIER PLOMB
     settings: {
@@ -84,6 +95,12 @@ async function startMission() {
       dpe: false
     }
   };
+  
+  // 🆕 Appliquer le template si sélectionné
+  const templateData = await getSelectedTemplate();
+  if (templateData) {
+    applyPiecesTemplate(mission, templateData);
+  }
 }
 
 
@@ -105,31 +122,31 @@ async function renderMissionList() {
     
     // Récupérer les modules actifs
     const modules = m.modules || {};
-    const moduleIcons = [];
-    if (modules.plombTravaux) moduleIcons.push("🔨");
-    if (modules.amiante) moduleIcons.push("🧪");
-    if (modules.gaz) moduleIcons.push("🔥");
-    if (modules.electricite) moduleIcons.push("⚡");
-    if (modules.mesurages) moduleIcons.push("📏");
-    if (modules.termites) moduleIcons.push("🐛");
-    if (modules.dpe) moduleIcons.push("🏠");
+const moduleIcons = [];
+    if (modules.plombTravaux) moduleIcons.push(`<img src="assets/icons/plomb.png" class="module-icon" title="Plomb" />`);
+    if (modules.amiante) moduleIcons.push(`<img src="assets/icons/amiante.png" class="module-icon" title="Amiante" />`);
+    if (modules.gaz) moduleIcons.push(`<img src="assets/icons/gaz.png" class="module-icon" title="Gaz" />`);
+    if (modules.electricite) moduleIcons.push(`<img src="assets/icons/electicite.png" class="module-icon" title="Électricité" />`);
+    if (modules.mesurages) moduleIcons.push(`<img src="assets/icons/mesurage.png" class="module-icon" title="Mesurages" />`);
+    if (modules.termites) moduleIcons.push(`<img src="assets/icons/termites.png" class="module-icon" title="Termites" />`);
+    if (modules.dpe) moduleIcons.push(`<img src="assets/icons/DPE.png" class="module-icon" title="DPE" />`);
     
     const moduleDisplay = moduleIcons.length > 0 
-      ? `<div class="mission-modules">${moduleIcons.join(" ")}</div>` 
+      ? `<div class="mission-modules">${moduleIcons.join("")}</div>` 
       : "";
     
     c.innerHTML += `
       <div class="mission-row">
 
-        <!-- 📦 EXPORT -->
+        <!-- EXPORT -->
         <button
           class="secondary export"
           title="Exporter la mission"
           onclick="exportMissionByNumero('${m.numeroDossier}')">
-          📦
+          <img src="assets/icons/export.svg" class="action-icon" alt="Export" />
         </button>
 
-        <!-- ▶️ OUVRIR LA MISSION -->
+        <!-- OUVRIR LA MISSION -->
         <button
           class="secondary main"
           onclick="resumeMission('${m.numeroDossier}')">
@@ -139,30 +156,30 @@ async function renderMissionList() {
           </div>
         </button>
 
-        <!-- ✏️ / 📷 / 🗑 -->
+        <!-- ACTIONS -->
         <div class="mission-actions">
 
         
-  <!-- 📷 Photo principale -->
+  <!-- Photo principale -->
   <button
     class="photo-btn ${photoClass}"
     title="${hasPhoto ? 'Photo de présentation (✓)' : 'Ajouter une photo de présentation'}"
     onclick="addMissionPhoto('${m.numeroDossier}')">
-    📷
+    <img src="assets/icons/photo.png" class="action-icon" alt="Photo" />
   </button>
 
-  <!-- ✏️ Éditer -->
+  <!-- Éditer -->
   <button
     title="Éditer la mission"
     onclick="editMission('${m.numeroDossier}')">
-    ✏️
+    <img src="assets/icons/edit.svg" class="action-icon" alt="Éditer" />
   </button>
 
-  <!-- 🗑 Supprimer -->
+  <!-- Supprimer -->
   <button
     title="Supprimer la mission"
     onclick="deleteMission('${m.numeroDossier}')">
-    🗑
+    <img src="assets/icons/delete.svg" class="action-icon" alt="Supprimer" />
   </button>
 
 </div>
@@ -639,7 +656,15 @@ function ensureMissionSettings(mission) {
 
 async function resumeMission(numero) {
   store.mission = await loadMission(numero);
-  ensureMissionSettings(store.mission); // 🔴 ICI
+  ensureMissionSettings(store.mission);
+  
+  // 🆕 Recharger les dictionnaires selon le client de la mission
+  if (store.mission.contexte?.listePieces) {
+    console.log(`🔄 Rechargement dictionnaires (${store.mission.contexte.listePieces})...`);
+    await loadDictionnaires();
+    console.log('✅ Dictionnaires rechargés');
+  }
+  
   go("pieces");
 }
 
@@ -671,7 +696,25 @@ async function init() {
     progressFill.style.width = '80%';
     await renderMissionList();
     
-    // Étape 5: Finalisation
+    // Étape 5: Archivage auto (non bloquant)
+    loadingStatus.textContent = 'Activation archivage automatique...';
+    progressFill.style.width = '90%';
+    
+    try {
+      if (window.ArchiveManager) {
+        // Timeout de 2 secondes max
+        await Promise.race([
+          ArchiveManager.init(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+        ]);
+        console.log('✅ Archivage activé');
+      }
+    } catch (error) {
+      console.warn('⚠️ Archivage non disponible:', error.message);
+      // L'app continue sans archivage automatique
+    }
+    
+    // Étape 6: Finalisation
     loadingStatus.textContent = 'Prêt !';
     progressFill.style.width = '100%';
     progressFill.classList.add('complete');
@@ -713,3 +756,95 @@ async function exportMissionByNumero(numero) {
   }
   exportMissionZIP(mission);
 }
+
+/**
+ * Crée une nouvelle mission depuis la modal
+ */
+async function createNewMission() {
+  const numero = document.getElementById("modal-input-dossier").value.trim();
+  if (!numero) {
+    alert("Numéro de dossier obligatoire");
+    return;
+  }
+
+  // Vérifier si la mission existe déjà
+  let mission = await loadMission(numero);
+
+  if (mission) {
+    alert(`La mission ${numero} existe déjà. Utilisez "Missions existantes" pour l'ouvrir.`);
+    return;
+  }
+
+  // Créer nouvelle mission
+  const typeBien = document.getElementById('modal-type-bien').value;
+  const listePieces = document.getElementById('modal-liste-pieces').value;
+  
+  mission = {
+    numeroDossier: numero,
+    dateCreation: new Date().toISOString(),
+    derniereSauvegarde: null,
+
+    pieces: [],
+    zpsos: [],
+    prelevements: [],
+    photos: [],
+    
+    // 🆕 Contexte avec client
+    contexte: {
+      typeBien: typeBien,
+      listePieces: listePieces,
+      templatesUtilises: false
+    },
+
+    settings: {
+      mode: "CREP",
+      plomb: {
+        crep: {
+          autoBelowOne: true,
+          randomMin: 0.05,
+          randomMax: 0.95
+        },
+        avantTravaux: {
+          autoUncertainty: true,
+          uncertaintyRatio: 0.10
+        }
+      }
+    },
+
+    modules: {
+      plombTravaux: false,
+      amiante: false,
+      gaz: false,
+      electricite: false,
+      mesurages: false,
+      termites: false,
+      dpe: false
+    }
+  };
+  
+  // Appliquer le template si sélectionné
+  const templateData = await getSelectedTemplateFromModal();
+  if (templateData) {
+    applyPiecesTemplate(mission, templateData);
+    mission.contexte.templatesUtilises = true;
+    mission.contexte.label = templateData.template.label;
+    console.log(`✅ Mission créée avec template: ${mission.pieces.length} pièces`);
+  } else {
+    console.log('✅ Mission créée sans template');
+  }
+
+  store.mission = mission;
+  ensureMissionSettings(store.mission);
+  await saveMission();
+  
+  // 🆕 Recharger les dictionnaires selon le client sélectionné
+  console.log(`🔄 Rechargement dictionnaires (${mission.contexte.listePieces})...`);
+  await loadDictionnaires();
+  console.log('✅ Dictionnaires rechargés');
+  
+  // Fermer la modal et aller aux pièces
+  closeNewMissionModal();
+  go("pieces");
+}
+
+window.createNewMission = createNewMission;

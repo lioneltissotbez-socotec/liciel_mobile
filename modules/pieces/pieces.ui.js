@@ -23,6 +23,16 @@ function renderPiecesScreen() {
   });
 
   let html = `<button class="primary" onclick="addPiece()">➕ Ajouter une pièce</button>`;
+  
+  // 🆕 Info template si utilisé
+  if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
+    html += `
+      <div class="template-info">
+        <p>📋 Modèle appliqué : <strong>${store.mission.contexte.label}</strong></p>
+        <button class="secondary" onclick="changeTemplate()">🔄 Changer de modèle</button>
+      </div>
+    `;
+  }
 
   Object.keys(byBatiment).forEach(batiment => {
     const pieces = byBatiment[batiment];
@@ -503,10 +513,53 @@ function openMultiPieceSelector(dict) {
     const controlsDiv = document.createElement("div");
     controlsDiv.className = "multi-piece-controls";
     
+    // 🆕 Vérifier si on doit masquer les boutons +/- (UNICIL et ODHAC = noms imposés)
+    const listePieces = store.mission?.contexte?.listePieces || 'standard';
+    const hideIndexation = (listePieces === 'unicil' || listePieces === 'odhac87');
+    
+    // 🆕 Pour UNICIL/ODHAC : clic direct sur le nom = toggle sélection
+    if (hideIndexation) {
+      nameDiv.style.cursor = "pointer";
+      nameDiv.style.userSelect = "none"; // Évite la sélection de texte
+      
+      // Ajouter un effet hover
+      nameDiv.addEventListener("mouseenter", () => {
+        if (!row.classList.contains("selected")) {
+          nameDiv.style.backgroundColor = "#f0f0f0";
+        }
+      });
+      nameDiv.addEventListener("mouseleave", () => {
+        nameDiv.style.backgroundColor = "";
+      });
+      
+      nameDiv.addEventListener("click", (e) => {
+        e.stopPropagation(); // Éviter la propagation
+        console.log(`🖱️ Clic sur pièce: ${item.label}`);
+        
+        // Toggle : si la pièce est sélectionnée, la déselectionner, sinon la sélectionner
+        const currentCount = window.pieceCounter[item.label];
+        const isSelected = (currentCount !== undefined && currentCount !== null);
+        
+        if (isSelected) {
+          // Désélectionner
+          delete window.pieceCounter[item.label];
+          row.classList.remove("selected");
+          console.log(`❌ Pièce désélectionnée: ${item.label}`);
+        } else {
+          // Sélectionner : count = 0 pour UNICIL/ODHAC (pas d'indexation)
+          window.pieceCounter[item.label] = 0;
+          row.classList.add("selected");
+          console.log(`✅ Pièce sélectionnée: ${item.label}`);
+        }
+        updateMultiPieceSummary();
+      });
+    }
+    
     const btnMinus = document.createElement("button");
     btnMinus.className = "counter-btn";
     btnMinus.textContent = "−";
     btnMinus.addEventListener("click", () => decrementPiece(item.label));
+    if (hideIndexation) btnMinus.style.display = "none";
     
     const counterSpan = document.createElement("span");
     counterSpan.className = "counter-value";
@@ -514,11 +567,13 @@ function openMultiPieceSelector(dict) {
     // Afficher seulement si une valeur existe
     counterSpan.textContent = hasValue ? count : "";
     counterSpan.style.minWidth = "30px";
+    if (hideIndexation) counterSpan.style.display = "none";
     
     const btnPlus = document.createElement("button");
     btnPlus.className = "counter-btn";
     btnPlus.textContent = "+";
     btnPlus.addEventListener("click", () => incrementPiece(item.label));
+    if (hideIndexation) btnPlus.style.display = "none";
     
     controlsDiv.appendChild(btnMinus);
     controlsDiv.appendChild(counterSpan);
@@ -737,3 +792,28 @@ function escapeQuotes(s) {
 function closeOverlay() {
   document.querySelector(".overlay")?.remove();
 }
+
+/**
+ * Change le template de pièces
+ */
+async function changeTemplate() {
+  if (!confirm('Changer de modèle ? Les pièces actuelles seront remplacées.')) {
+    return;
+  }
+  
+  // Supprimer les pièces et le contexte
+  store.mission.pieces = [];
+  store.mission.contexte = null;
+  await saveMission();
+  
+  // Revenir à l'écran de démarrage
+  go('start');
+  
+  // Réafficher le contenu (pas le loader)
+  setTimeout(() => {
+    document.getElementById('loading-bar').style.display = 'none';
+    document.getElementById('start-content').style.display = 'block';
+  }, 100);
+}
+
+window.changeTemplate = changeTemplate;

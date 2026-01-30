@@ -1,0 +1,296 @@
+{
+  "habitations": {
+    "maison_plain_pied": {
+      "label": "🏡 Maison individuelle – plain-pied",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée / sas", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Salle à manger", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Couloir", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de bain", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 01", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 02", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 03", "batiment": "Rez de chaussée" },
+        { "nom": "Cellier / buanderie", "batiment": "Rez de chaussée" },
+        { "nom": "Garage", "batiment": "Rez de chaussée" },
+        { "nom": "Terrasse", "batiment": "Rez de chaussée", "optionnel": true },
+        { "nom": "Local technique / chaufferie", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "maison_r1": {
+      "label": "🏡 Maison individuelle – 1 niveau (R+1)",
+      "batiments": ["Rez de chaussée", "Étage"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Salle à manger", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Cellier / buanderie", "batiment": "Rez de chaussée" },
+        { "nom": "Garage", "batiment": "Rez de chaussée" },
+        { "nom": "Escalier", "batiment": "Rez de chaussée" },
+        { "nom": "Local technique", "batiment": "Rez de chaussée" },
+        { "nom": "Palier", "batiment": "Étage" },
+        { "nom": "Couloir", "batiment": "Étage" },
+        { "nom": "Chambre 1", "batiment": "Étage" },
+        { "nom": "Chambre 2", "batiment": "Étage" },
+        { "nom": "Chambre 3", "batiment": "Étage" },
+        { "nom": "Salle de bain", "batiment": "Étage" },
+        { "nom": "WC", "batiment": "Étage" },
+        { "nom": "Dressing / placard", "batiment": "Étage" }
+      ]
+    },
+    
+    "maison_r2": {
+      "label": "🏡 Maison individuelle – 2 niveaux (R+2)",
+      "batiments": ["Rez de chaussée", "1er étage", "2e étage / combles"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Salle à manger", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Cellier", "batiment": "Rez de chaussée" },
+        { "nom": "Garage", "batiment": "Rez de chaussée" },
+        { "nom": "Escalier", "batiment": "Rez de chaussée" },
+        { "nom": "Palier", "batiment": "1er étage" },
+        { "nom": "Chambre 1", "batiment": "1er étage" },
+        { "nom": "Chambre 2", "batiment": "1er étage" },
+        { "nom": "Salle de bain", "batiment": "1er étage" },
+        { "nom": "WC", "batiment": "1er étage" },
+        { "nom": "Palier", "batiment": "2e étage / combles" },
+        { "nom": "Chambre 3", "batiment": "2e étage / combles" },
+        { "nom": "Chambre 4", "batiment": "2e étage / combles" },
+        { "nom": "Salle d'eau", "batiment": "2e étage / combles" },
+        { "nom": "Grenier / combles", "batiment": "2e étage / combles" }
+      ]
+    },
+    
+    "studio": {
+      "label": "🏠 Studio",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Pièce principale", "batiment": "Rez de chaussée" },
+        { "nom": "Coin cuisine / kitchenette", "batiment": "Rez de chaussée" },
+        { "nom": "Salle d'eau", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Placard / rangement", "batiment": "Rez de chaussée" },
+        { "nom": "Balcon", "batiment": "Rez de chaussée", "optionnel": true }
+      ]
+    },
+    
+    "t1": {
+      "label": "🏠 T1",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / chambre", "batiment": "Rez de chaussée" },
+        { "nom": "Salle d'eau", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Dégagement / placard", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "t2": {
+      "label": "🏠 T2",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de bain", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Dégagement / rangement", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "t3": {
+      "label": "🏠 T3",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 1", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 2", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de bain", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Dégagement", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "t4": {
+      "label": "🏠 T4",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 1", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 2", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 3", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de bain", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Dégagement", "batiment": "Rez de chaussée" },
+        { "nom": "Balcon / loggia", "batiment": "Rez de chaussée", "optionnel": true }
+      ]
+    },
+    
+    "t5": {
+      "label": "🏠 T5",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Salle à manger", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 1", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 2", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 3", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre 4", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de bain", "batiment": "Rez de chaussée" },
+        { "nom": "Salle d'eau", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Dégagement", "batiment": "Rez de chaussée" },
+        { "nom": "Rangement / dressing", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "appartement_standard": {
+      "label": "🏢 Logement collectif (appartement standard)",
+      "batiments": ["Rez de chaussée", "Annexes"],
+      "pieces": [
+        { "nom": "Entrée", "batiment": "Rez de chaussée" },
+        { "nom": "Séjour / salon", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Dégagement", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de bain / salle d'eau", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre", "batiment": "Rez de chaussée" },
+        { "nom": "Balcon / loggia", "batiment": "Rez de chaussée", "optionnel": true },
+        { "nom": "Cave", "batiment": "Annexes", "optionnel": true },
+        { "nom": "Parking / garage", "batiment": "Annexes", "optionnel": true }
+      ]
+    }
+  },
+  
+  "tertiaire": {
+    "commerce_boutique": {
+      "label": "🛍️ Commerce (boutique)",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Vitrine / façade", "batiment": "Rez de chaussée" },
+        { "nom": "Espace de vente", "batiment": "Rez de chaussée" },
+        { "nom": "Réserve", "batiment": "Rez de chaussée" },
+        { "nom": "Arrière-boutique", "batiment": "Rez de chaussée" },
+        { "nom": "Bureau", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Local technique", "batiment": "Rez de chaussée" },
+        { "nom": "Local ménage", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "restaurant": {
+      "label": "🍽️ Restaurant",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée clients", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de restauration", "batiment": "Rez de chaussée" },
+        { "nom": "Bar", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée" },
+        { "nom": "Zone plonge", "batiment": "Rez de chaussée" },
+        { "nom": "Réserve sèche", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre froide", "batiment": "Rez de chaussée" },
+        { "nom": "Vestiaires personnel", "batiment": "Rez de chaussée" },
+        { "nom": "WC personnel", "batiment": "Rez de chaussée" },
+        { "nom": "WC clients", "batiment": "Rez de chaussée" },
+        { "nom": "Local déchets", "batiment": "Rez de chaussée" },
+        { "nom": "Local technique", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "bureaux": {
+      "label": "🏢 Bureaux",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Accueil", "batiment": "Rez de chaussée" },
+        { "nom": "Salle d'attente", "batiment": "Rez de chaussée" },
+        { "nom": "Open space", "batiment": "Rez de chaussée" },
+        { "nom": "Bureau individuel", "batiment": "Rez de chaussée" },
+        { "nom": "Salle de réunion", "batiment": "Rez de chaussée" },
+        { "nom": "Kitchenette / cafétéria", "batiment": "Rez de chaussée" },
+        { "nom": "Archives", "batiment": "Rez de chaussée" },
+        { "nom": "Local serveur / IT", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Local ménage", "batiment": "Rez de chaussée" },
+        { "nom": "Circulations / couloirs", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "grande_surface": {
+      "label": "🛒 Grande surface / magasin",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Entrée clients", "batiment": "Rez de chaussée" },
+        { "nom": "Surface de vente", "batiment": "Rez de chaussée" },
+        { "nom": "Rayons", "batiment": "Rez de chaussée" },
+        { "nom": "Caisses", "batiment": "Rez de chaussée" },
+        { "nom": "Réserve", "batiment": "Rez de chaussée" },
+        { "nom": "Quai de livraison", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre froide", "batiment": "Rez de chaussée", "optionnel": true },
+        { "nom": "Bureau direction", "batiment": "Rez de chaussée" },
+        { "nom": "Salle du personnel", "batiment": "Rez de chaussée" },
+        { "nom": "Vestiaires", "batiment": "Rez de chaussée" },
+        { "nom": "WC personnel", "batiment": "Rez de chaussée" },
+        { "nom": "WC clients", "batiment": "Rez de chaussée" },
+        { "nom": "Local technique", "batiment": "Rez de chaussée" },
+        { "nom": "Local déchets", "batiment": "Rez de chaussée" }
+      ]
+    },
+    
+    "hotel": {
+      "label": "🏨 Hôtel",
+      "batiments": ["Rez de chaussée", "Étages"],
+      "pieces": [
+        { "nom": "Entrée / hall", "batiment": "Rez de chaussée" },
+        { "nom": "Réception", "batiment": "Rez de chaussée" },
+        { "nom": "Salle petit-déjeuner", "batiment": "Rez de chaussée" },
+        { "nom": "Salon / espace commun", "batiment": "Rez de chaussée" },
+        { "nom": "Chambre type", "batiment": "Étages" },
+        { "nom": "Salle de bain chambre", "batiment": "Étages" },
+        { "nom": "Couloir / circulation", "batiment": "Étages" },
+        { "nom": "Office étage", "batiment": "Étages" },
+        { "nom": "Lingerie", "batiment": "Rez de chaussée" },
+        { "nom": "Local ménage", "batiment": "Rez de chaussée" },
+        { "nom": "Réserve", "batiment": "Rez de chaussée" },
+        { "nom": "Bureau administratif", "batiment": "Rez de chaussée" },
+        { "nom": "Cuisine", "batiment": "Rez de chaussée", "optionnel": true },
+        { "nom": "WC personnel", "batiment": "Rez de chaussée" },
+        { "nom": "Local technique", "batiment": "Rez de chaussée" }
+      ]
+    }
+  },
+  
+  "industrie": {
+    "atelier_standard": {
+      "label": "🏭 Atelier / industrie standard",
+      "batiments": ["Rez de chaussée"],
+      "pieces": [
+        { "nom": "Zone de production", "batiment": "Rez de chaussée" },
+        { "nom": "Zone de stockage", "batiment": "Rez de chaussée" },
+        { "nom": "Quai de chargement", "batiment": "Rez de chaussée" },
+        { "nom": "Bureau", "batiment": "Rez de chaussée" },
+        { "nom": "Vestiaires", "batiment": "Rez de chaussée" },
+        { "nom": "WC", "batiment": "Rez de chaussée" },
+        { "nom": "Local technique", "batiment": "Rez de chaussée" }
+      ]
+    }
+  }
+}

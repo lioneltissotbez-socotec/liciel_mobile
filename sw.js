@@ -3,8 +3,8 @@
  * Gère le cache et le mode offline
  */
 
-const CACHE_NAME = 'liciel-mobile-v5';
-const CACHE_VERSION = '3.2.0';
+const CACHE_NAME = 'liciel-mobile-v23';
+const CACHE_VERSION = '3.7.4';
 
 // Fichiers à mettre en cache pour le mode offline
 const FILES_TO_CACHE = [
@@ -24,6 +24,24 @@ const FILES_TO_CACHE = [
   './core/photo-compressor.js',
   './core/archive-manager.js',
   './core/utils.js',
+  './core/templates.js',
+  './core/footer.js',
+  
+  // Assets
+  './assets/icons/dossiers.svg',
+  './assets/icons/Maison.png',
+  './assets/icons/Pieces.png',
+  './assets/icons/photo.png',
+  './assets/icons/plomb.png',
+  './assets/icons/amiante.png',
+  './assets/icons/electicite.png',
+  './assets/icons/gaz.png',
+  './assets/icons/DPE.png',
+  './assets/icons/termites.png',
+  './assets/icons/mesurage.png',
+  './assets/icons/export.svg',
+  './assets/icons/edit.svg',
+  './assets/icons/delete.svg',
   
   // Modules
   './modules/pieces/pieces.ui.js',
@@ -43,7 +61,15 @@ const FILES_TO_CACHE = [
   './data/dictionnaires.json',
   './data/revetements.json',
   './data/substrats.json',
-  './data/types_elements.json'
+  './data/types_elements.json',
+  './data/templates-pieces.json',
+  './data/templates-descriptions.json',
+  './data/batiments.json',
+  './data/pieces_standard.json',
+  './data/pieces_unicil.json',
+  './data/pieces_odhac87.json',
+  './data/justifications.json',
+  './data/moyens.json'
 ];
 
 /**

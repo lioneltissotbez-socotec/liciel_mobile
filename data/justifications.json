@@ -1,0 +1,26 @@
+{
+  "label": "Justification de non visite",
+  "version": "1.0",
+  "items": [
+    {"id": "absence_de_clef", "label": "Absence de clef"},
+    {"id": "absence_de_trappe_de_visite", "label": "Absence de trappe de visite"},
+    {"id": "acces_condamne", "label": "Accès condamné"},
+    {"id": "danger_animal", "label": "Danger animal"},
+    {"id": "encombrement_trop_important", "label": "Encombrement trop important"},
+    {"id": "hauteur_trop_importante", "label": "Hauteur trop importante"},
+    {"id": "hors_datteinte", "label": "Hors d'atteinte"},
+    {"id": "impossibilite_dentrer", "label": "Impossibilité d'entrer"},
+    {"id": "inaccessible_en_raison_de_lencombrement", "label": "Inaccessible en raison de l'encombrement"},
+    {"id": "interdiction_du_proprietaire", "label": "Interdiction du propriétaire"},
+    {"id": "moyen_dacces_insuffisant", "label": "Moyen d'accès insuffisant"},
+    {"id": "partie_inondee", "label": "Partie inondée"},
+    {"id": "plafond_menacant_de_seffondrer", "label": "Plafond menaçant de s'effondrer"},
+    {"id": "plancher_menacant_de_seffondrer", "label": "Plancher menaçant de s'effondrer"},
+    {"id": "probleme_dautorisation", "label": "Problème d'autorisation"},
+    {"id": "problemes_mecaniques", "label": "Problèmes mécaniques"},
+    {"id": "securite_insuffisante", "label": "Sécurité insuffisante"},
+    {"id": "serrure_hors_service", "label": "Serrure hors service"},
+    {"id": "trappe_dacces_trop_petite", "label": "Trappe d'accès trop petite"},
+    {"id": "zone_dacces_reglemente", "label": "Zone d'accès réglementé"}
+  ]
+}

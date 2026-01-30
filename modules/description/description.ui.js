@@ -47,6 +47,16 @@ piece.descriptions.forEach(ur => {
   screen.innerHTML = `
     <h2>${piece.nom || "Pièce sans nom"}</h2>
     <p><strong>Bâtiment :</strong> ${piece.batiment || "-"}</p>
+    
+    <!-- 🆕 Checkbox liste par défaut -->
+    ${piece.descriptions.length === 0 ? `
+    <div class="template-checkbox">
+      <label class="checkbox-label">
+        <input type="checkbox" id="use-default-descriptions" onchange="toggleDefaultDescriptions()">
+        <span>📋 Pré-remplir avec la liste par défaut (Murs, Plinthes, Fenêtre, Porte, Plafond, Sol, Radiateur)</span>
+      </label>
+    </div>
+    ` : ''}
 
     <button class="primary" onclick="addUR()">➕ Ajouter un élément</button>
 
@@ -773,3 +783,21 @@ function deleteLocalisationPhoto(loc) {
 window.takeLocalisationPhoto = takeLocalisationPhoto;
 window.deleteLocalisationPhoto = deleteLocalisationPhoto;
 
+
+/**
+ * Active/désactive le pré-remplissage avec la liste par défaut
+ */
+async function toggleDefaultDescriptions() {
+  const checkbox = document.getElementById('use-default-descriptions');
+  if (!checkbox || !checkbox.checked) return;
+  
+  const piece = store.mission.pieces.find(p => p.id === store.ui.currentDescriptionPieceId);
+  if (!piece) return;
+  
+  // Appliquer le template
+  await applyDescriptionsTemplate(piece);
+  await saveMission();
+  renderDescriptionScreen();
+}
+
+window.toggleDefaultDescriptions = toggleDefaultDescriptions;
