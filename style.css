@@ -353,6 +353,7 @@ footer > div {
   flex-shrink: 0;
 }
 
+
 /* Modal d'édition de mission */
 .mission-edit-modal {
   max-width: 450px;

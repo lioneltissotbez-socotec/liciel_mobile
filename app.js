@@ -122,7 +122,7 @@ async function renderMissionList() {
     
     // Récupérer les modules actifs
     const modules = m.modules || {};
-const moduleIcons = [];
+    const moduleIcons = [];
     if (modules.plombTravaux) moduleIcons.push(`<img src="assets/icons/plomb.png" class="module-icon" title="Plomb" />`);
     if (modules.amiante) moduleIcons.push(`<img src="assets/icons/amiante.png" class="module-icon" title="Amiante" />`);
     if (modules.gaz) moduleIcons.push(`<img src="assets/icons/gaz.png" class="module-icon" title="Gaz" />`);

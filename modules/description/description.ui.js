@@ -200,6 +200,7 @@ function renderUREditForm(ur) {
 
 <div class="plomb-actions compact">
   <button onclick="plombApplyModeToAll('NM')">NM</button>
+  <button onclick="plombApplyModeToAll('DASH')">-</button>
   <button onclick="plombApplyModeToAll('ZERO')">=0</button>
   <button onclick="plombApplyModeToAll('LT_03')">&lt;0,3</button>
   <button onclick="plombApplyModeToAll('LT_1')">&lt;1</button>
@@ -225,11 +226,13 @@ function renderUREditForm(ur) {
               <div class="plomb-loc-tag">${loc}</div>
 
               <input
+                id="mesure-plomb-${loc.replace(/\s/g, '_')}"
                 class="plomb-loc-input"
                 type="text"
                 value="${mesureVal}"
-                oninput="plombSetMesureForLoc('${loc}', this.value)"
+                onclick="openNumericKeypad('${loc}')"
                 placeholder="ex : 0,42 ou NM"
+                readonly
               />
 
               <select
@@ -647,6 +650,11 @@ function plombApplyModeToAll(mode) {
       entry.degradation = null;
     }
 
+    if (mode === "DASH") {
+      entry.mesure = "-";
+      entry.degradation = null;
+    }
+
     if (mode === "ZERO") {
       entry.mesure = 0;
       entry.degradation = null;
@@ -801,3 +809,140 @@ async function toggleDefaultDescriptions() {
 }
 
 window.toggleDefaultDescriptions = toggleDefaultDescriptions;
+
+// =====================================================
+// PAVÉ NUMÉRIQUE ET BOUTONS RAPIDES MESURES
+// =====================================================
+
+/**
+ * Définit une valeur prédéfinie pour une mesure plomb
+ */
+function setPlombMesure(localisation, valeur) {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  if (!ur.plombByLoc) ur.plombByLoc = {};
+  if (!ur.plombByLoc[localisation]) {
+    ur.plombByLoc[localisation] = { mesure: null, degradation: null, photoId: null };
+  }
+  
+  ur.plombByLoc[localisation].mesure = valeur;
+  saveMission();
+  renderUREditForm(ur);
+}
+
+/**
+ * Ouvre le pavé numérique géant
+ */
+function openNumericKeypad(localisation) {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  const currentValue = ur.plombByLoc?.[localisation]?.mesure || '';
+  
+  closeDescOverlay();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content numeric-keypad">
+      <h3>Saisie mesure</h3>
+      <div class="keypad-location">${localisation}</div>
+      
+      <div class="keypad-display">
+        <input type="text" id="keypad-input" value="${currentValue}" readonly />
+      </div>
+      
+      <div class="keypad-special-buttons">
+        <button onclick="keypadSetValue('NM')">NM</button>
+        <button onclick="keypadSetValue('-')">-</button>
+        <button onclick="keypadSetValue('=0')">=0</button>
+        <button onclick="keypadSetValue('<0,3')">&lt;0,3</button>
+        <button onclick="keypadSetValue('<1')">&lt;1</button>
+      </div>
+      
+      <div class="keypad-grid">
+        <button onclick="keypadAppend('7')">7</button>
+        <button onclick="keypadAppend('8')">8</button>
+        <button onclick="keypadAppend('9')">9</button>
+        
+        <button onclick="keypadAppend('4')">4</button>
+        <button onclick="keypadAppend('5')">5</button>
+        <button onclick="keypadAppend('6')">6</button>
+        
+        <button onclick="keypadAppend('1')">1</button>
+        <button onclick="keypadAppend('2')">2</button>
+        <button onclick="keypadAppend('3')">3</button>
+        
+        <button onclick="keypadAppend('0')">0</button>
+        <button onclick="keypadAppend(',')">,</button>
+        <button onclick="keypadBackspace()">⌫</button>
+      </div>
+      
+      <div class="keypad-actions">
+        <button class="primary" onclick="keypadConfirm('${localisation.replace(/'/g, "\\'")}')">✓ Valider</button>
+        <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+}
+
+/**
+ * Ajoute un caractère au pavé numérique
+ */
+function keypadAppend(char) {
+  const input = document.getElementById('keypad-input');
+  if (!input) return;
+  input.value += char;
+}
+
+/**
+ * Définit une valeur prédéfinie dans le pavé
+ */
+function keypadSetValue(value) {
+  const input = document.getElementById('keypad-input');
+  if (!input) return;
+  
+  // Cas spéciaux : générer un random au lieu d'afficher le symbole
+  if (value === '<0,3') {
+    input.value = randomBetween(0.11, 0.29);
+  } else if (value === '<1') {
+    input.value = randomBetween(0.31, 0.99);
+  } else if (value === '=0') {
+    input.value = '0';
+  } else {
+    input.value = value;
+  }
+}
+
+/**
+ * Efface le dernier caractère
+ */
+function keypadBackspace() {
+  const input = document.getElementById('keypad-input');
+  if (!input) return;
+  input.value = input.value.slice(0, -1);
+}
+
+/**
+ * Valide la saisie du pavé numérique
+ */
+function keypadConfirm(localisation) {
+  const input = document.getElementById('keypad-input');
+  if (!input) return;
+  
+  const value = input.value;
+  setPlombMesure(localisation, value);
+  closeDescOverlay();
+}
+
+// Exposer globalement
+window.setPlombMesure = setPlombMesure;
+window.openNumericKeypad = openNumericKeypad;
+window.keypadAppend = keypadAppend;
+window.keypadSetValue = keypadSetValue;
+window.keypadBackspace = keypadBackspace;
+window.keypadConfirm = keypadConfirm;
+

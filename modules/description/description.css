@@ -209,3 +209,106 @@
 .photo-btn-loc.has-photo:hover {
   background: #a7f3d0;
 }
+
+/* ===============================
+   PAVÉ NUMÉRIQUE ET BOUTONS RAPIDES
+================================ */
+
+
+/* Pavé numérique géant */
+.numeric-keypad {
+  max-width: 350px;
+}
+
+.keypad-location {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.keypad-display {
+  margin-bottom: 20px;
+}
+
+.keypad-display input {
+  width: 100%;
+  font-size: 32px;
+  text-align: center;
+  padding: 16px;
+  border: 2px solid #2563eb;
+  border-radius: 8px;
+  background: #fff;
+  font-weight: 600;
+  color: #111;
+}
+
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.keypad-grid button {
+  height: 70px;
+  font-size: 28px;
+  font-weight: 600;
+  background: linear-gradient(145deg, #ffffff, #f3f4f6);
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #111;
+}
+
+.keypad-grid button:active {
+  transform: translateY(2px);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.keypad-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.keypad-actions button {
+  flex: 1;
+  font-size: 18px;
+  padding: 14px;
+}
+
+
+/* Boutons spéciaux dans le pavé numérique */
+.keypad-special-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.keypad-special-buttons button {
+  flex: 1;
+  min-width: 55px;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(145deg, #fef3c7, #fde68a);
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  color: #92400e;
+  box-shadow: 
+    0 2px 4px rgba(245, 158, 11, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.keypad-special-buttons button:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 1px 2px rgba(245, 158, 11, 0.3),
+    inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}

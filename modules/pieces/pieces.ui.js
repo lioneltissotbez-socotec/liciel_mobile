@@ -75,7 +75,15 @@ function renderPiecesScreen() {
             </div>
 
             <div class="card-icons">
-              ${!p.visite ? "<span class='warn'>⚠️</span>" : ""}
+              ${!p.visite ? (() => {
+                const hasJustif = p.justification && p.justification.trim() !== "";
+                const hasMoyen = p.moyens && p.moyens.trim() !== "";
+                const warnClass = (hasJustif && hasMoyen) ? "warn warn-ok" : "warn warn-missing";
+                const title = (hasJustif && hasMoyen) 
+                  ? "Non visite justifiée - Cliquer pour marquer visitée" 
+                  : "Non visite NON justifiée - Cliquer pour marquer visitée";
+                return `<span class='${warnClass}' onclick="markPieceAsVisited('${p.id}')" title="${title}">⚠️</span>`;
+              })() : ""}
               ${nbPhotos ? `<span title="${nbPhotos} photo(s)">📷</span>` : ""}
               <span title="Supprimer" onclick="deletePiece('${p.id}')">🗑</span>
             </div>
@@ -817,3 +825,18 @@ async function changeTemplate() {
 }
 
 window.changeTemplate = changeTemplate;
+
+/**
+ * Marque une pièce comme visitée (via clic sur ⚠️)
+ */
+function markPieceAsVisited(pieceId) {
+  const piece = store.mission?.pieces.find(p => p.id === pieceId);
+  if (!piece) return;
+  
+  piece.visite = true;
+  saveMission();
+  renderPiecesScreen();
+}
+
+window.markPieceAsVisited = markPieceAsVisited;
+
