@@ -33,6 +33,14 @@ async function exportMissionZIP(mission) {
     encodeWin1252(descriptionXML)
   );
 
+  // ===== CREP =====
+  if (typeof window.generateCREPXML === "function") {
+    const crepXML = window.generateCREPXML();
+    if (crepXML) {
+      xml.file("Table_Z_CREP.xml", encodeWin1252(crepXML));
+    }
+  }
+
   // ===== DOSSIER PHOTOS =====
   const photosDir = root.folder("photos");
   for (const f of files) {

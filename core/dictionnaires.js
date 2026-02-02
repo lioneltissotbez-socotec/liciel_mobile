@@ -41,9 +41,10 @@ async function loadDictionnaires() {
     ]);
     
     // Construire le dictionnaire complet
+    // pieces_standard.json contient {batiments, pieces}, les autres contiennent directement {label, items}
     const dict = {
       batiments: batimentsData,
-      pieces: piecesData,
+      pieces: piecesData.pieces || piecesData, // Extraire .pieces si présent (standard), sinon utiliser direct (unicil/odhac)
       justifications: justificationsData,
       moyens: moyensData
     };

@@ -82,12 +82,12 @@ function renderDescriptionScreen() {
     <div class="plomb-mode-selector">
       <label class="checkbox-label">
         <input type="checkbox" id="mode-crep" ${piece.modeCREP !== false ? 'checked' : ''} onchange="toggleModeCREP()">
-        <span><strong>Mode CREP</strong> (règle 2-3 mesures par localisation)</span>
+        <span><strong>Mode CREP</strong> (règle 2-3 mesures par repère)</span>
       </label>
       <div class="small muted" style="margin-top:4px">
         ${piece.modeCREP !== false 
-          ? '✅ Actif : 2 mesures minimum, 3ème si une localisation ≥ 1 mg/cm²' 
-          : '⚠️ Désactivé : Mode Plomb Avant Travaux (1 mesure par localisation)'}
+          ? '✅ Actif : 2 mesures minimum, 3ème si une repère ≥ 1 mg/cm²' 
+          : '⚠️ Désactivé : Mode Plomb Avant Travaux (1 mesure par repère)'}
       </div>
     </div>
     
@@ -111,14 +111,25 @@ function renderDescriptionScreen() {
               <div class="card ur-card">
                 <div>
                   <strong>${ur.type}</strong>
-– ${formatURLocalisation(ur)}
+– ${formatURrepère(ur)}
                 </div>
                 <div class="small">
   ${ur.substrat || "—"} / ${ur.revetement || "—"}
 </div>
 
-<div class="small">
-  📷 ${ur.photos ? ur.photos.length : 0}
+                <div class="small">
+  📷 ${(() => {
+    // Compter photos liées à cet UR
+    let count = (ur.photos || []).length; // Photos anciennes
+    if (ur.plombByLoc) {
+      Object.values(ur.plombByLoc).forEach(entry => {
+        if (entry.photoId && store.mission.photos.find(p => p.id === entry.photoId)) {
+          count++;
+        }
+      });
+    }
+    return count;
+  })()}
 </div>
 
 ${renderPlombSummary(ur)}
@@ -187,6 +198,12 @@ function editUR(urId) {
 function renderUREditForm(ur) {
   // Migration automatique de la structure UR (utilise core/migrations.js)
   migrateURStructure(ur);
+  
+  // Sécurité : forcer initialisation localisation
+  if (!ur.localisation || !Array.isArray(ur.localisation.items)) {
+    ur.localisation = { items: [] };
+  }
+  
   saveMission();
 
   const screen = document.getElementById("screen-description");
@@ -205,21 +222,22 @@ function renderUREditForm(ur) {
 </div>
 
 
-    <label>Localisation</label>
+    <label>Repère</label>
 <div class="letters">
-  ${["A","B","C","D","E","F"].map(l => `
+  ${["A","B","C","D","E"].map(l => `
     <button
-      class="${ur.localisation.items.includes(l) ? "active" : ""}"
+      class="${(ur.localisation && ur.localisation.items && ur.localisation.items.includes(l)) ? "active" : ""}"
       onclick="toggleLocalisationItem('${l}')">
       ${l}
     </button>
   `).join("")}
 
+  <button class="add-btn-txt" onclick="openRepereManuel()">Txt</button>
   <button class="add-btn" onclick="openLocalisationPlus()">+</button>
 </div>
 
 <div class="small muted">
-  Sélection : ${ur.localisation.items.join(", ") || "—"}
+  Sélection : ${(ur.localisation && ur.localisation.items) ? ur.localisation.items.join(", ") : "—"}
 </div>
 
 
@@ -239,7 +257,7 @@ function renderUREditForm(ur) {
   <button class="icon" onclick="openDescList('revetements')">📋</button>
 </div>
 
-<h3>Mesures plomb (par localisation)</h3>
+<h3>Mesures plomb (par repère)</h3>
 
 <div class="plomb-actions compact">
   <button onclick="plombApplyModeToAll('NM')">NM</button>
@@ -251,14 +269,14 @@ function renderUREditForm(ur) {
 
 <div class="small muted" style="margin-top:6px">
   ${getCurrentDescriptionPiece().modeCREP 
-    ? "Mode CREP : 2 mesures minimum par localisation" 
+    ? "Mode CREP : 2 mesures minimum par repère" 
     : "Mode Avant Travaux : Cocher PE pour Par Extension"}
 </div>
 
 <div class="plomb-loc-list">
   ${
     (Array.isArray(ur.localisation?.items) ? ur.localisation.items : []).length === 0
-      ? `<div class="plomb-empty muted">Aucune localisation sélectionnée</div>`
+      ? `<div class="plomb-empty muted">Aucune repère sélectionnée</div>`
       : (ur.localisation.items).map(loc => {
           // Initialiser entry si manquant
           if (!ur.plombByLoc) ur.plombByLoc = {};
@@ -290,8 +308,8 @@ function renderUREditForm(ur) {
           return `
             <div class="plomb-loc-row ${entry.isDeclenchante ? 'is-declenchante' : ''}">
               
-              <!-- Header : Tag + PE + Badge -->
-              <div class="plomb-loc-header">
+              <!-- LIGNE 1 : Repère + PE + Badge + Mesures -->
+              <div class="plomb-ligne-1">
                 <div class="plomb-loc-tag">${loc}</div>
                 
                 ${!modeCREP ? `
@@ -304,79 +322,81 @@ function renderUREditForm(ur) {
                 ` : ''}
                 
                 ${entry.isDeclenchante ? `
-                  <span class="badge-declenchante">⚠️ Déclenchante</span>
+                  <span class="badge-declenchante">⚠️</span>
                 ` : ''}
-              </div>
-              
-              <!-- Type UD -->
-              <div class="plomb-loc-type">${ur.type || 'UD'}</div>
-
-              <!-- Mesures compactes -->
-              ${!isPE ? `
-                <div class="plomb-mesures-grid">
-                  ${entry.mesures && entry.mesures.length > 0 ? entry.mesures.map((m, idx) => `
-                    <div class="mesure-cell">
+                
+                ${!isPE ? `
+                  <div class="plomb-mesures-inline">
+                    ${entry.mesures && entry.mesures.length > 0 ? entry.mesures.map((m, idx) => `
                       <input
+                        class="mesure-input"
                         value="${m}"
                         onclick="openMesureKeypad('${loc.replace(/'/g, "\\'")}', ${idx})"
                         readonly
                         title="Mesure ${idx + 1}"
                       />
-                    </div>
-                  `).join('') : ''}
-                  
-                  ${!entry.isDeclenchante && Array.isArray(entry.mesures) ? `
-                    <button class="btn-add-mesure" onclick="addMesureManuelle('${loc.replace(/'/g, "\\'")}')">+</button>
-                  ` : ''}
-                </div>
-              ` : `
-                <div class="muted small">— (Par Extension)</div>
-              `}
-
-              <!-- Dégradation + Observation en ligne -->
-              <div class="plomb-loc-fields">
-                ${!isPE ? `
-                  <div>
-                    <label>Dégradation</label>
-                    <select
-                      class="plomb-loc-select"
-                      onchange="plombSetDegradationForLoc('${loc.replace(/'/g, "\\'")}', this.value)"
-                    >
-                      <option value="" ${degrVal==="" ? "selected" : ""}>—</option>
-                      <option ${degrVal==="Non visible" ? "selected" : ""}>Non visible</option>
-                      <option ${degrVal==="Non dégradé" ? "selected" : ""}>Non dégradé</option>
-                      <option ${degrVal==="Etat d'usage" ? "selected" : ""}>Etat d'usage</option>
-                      <option ${degrVal==="Dégradé" ? "selected" : ""}>Dégradé</option>
-                    </select>
+                    `).join('') : ''}
+                    
+                    ${!entry.isDeclenchante && Array.isArray(entry.mesures) ? `
+                      <button class="btn-add-mesure-inline" onclick="addMesureManuelle('${loc.replace(/'/g, "\\'")}')">+</button>
+                    ` : ''}
                   </div>
-                ` : ''}
-                
-                <div>
-                  <label>Observation</label>
-                  <select
-                    class="plomb-loc-select"
-                    onchange="plombSetObservationForLoc('${loc.replace(/'/g, "\\'")}', this.value)"
-                    ${isPE ? 'disabled' : ''}
-                  >
-                    <option value="" ${observation==="" ? "selected" : ""}>—</option>
-                    <option ${observation==="Par Extension" ? "selected" : ""}>Par Extension</option>
-                    <option ${observation==="Element récent" ? "selected" : ""}>Élément récent</option>
-                    <option ${observation==="Hors d'atteinte >3m" ? "selected" : ""}>Hors d'atteinte >3m</option>
-                    <option ${observation==="Saisie libre" ? "selected" : ""}>Saisie libre</option>
-                  </select>
-                </div>
+                ` : `
+                  <span class="muted small">PE</span>
+                `}
               </div>
               
-              ${isPE ? '<div class="muted small">Observation auto : Par Extension</div>' : ''}
-
-              <!-- Photo -->
-              ${!isPE ? `
-                <button 
-                  class="photo-btn-loc ${hasPhoto ? 'has-photo' : ''}" 
-                  onclick="takeLocalisationPhoto('${loc.replace(/'/g, "\\'")}')">
-                  📷 ${hasPhoto ? 'Photo ajoutée' : 'Ajouter photo'}
-                </button>
-              ` : ''}
+              <!-- LIGNE 2 : Dégradation + Observation + Photo -->
+              <div class="plomb-ligne-2">
+                ${!isPE ? `
+                  <select
+                    class="plomb-select-inline"
+                    onchange="plombSetDegradationForLoc('${loc.replace(/'/g, "\\'")}', this.value)"
+                    title="Dégradation"
+                  >
+                    <option value="" ${degrVal==="" ? "selected" : ""}>—</option>
+                    <option ${degrVal==="Non visible" ? "selected" : ""}>Non visible</option>
+                    <option ${degrVal==="Non dégradé" ? "selected" : ""}>Non dégradé</option>
+                    <option ${degrVal==="Etat d'usage" ? "selected" : ""}>Etat d'usage</option>
+                    <option ${degrVal==="Dégradé" ? "selected" : ""}>Dégradé</option>
+                  </select>
+                ` : ''}
+                
+                ${(() => {
+                  const isSaisieLibre = observation && !['', 'Par Extension', 'Element récent', 'Hors d\'atteinte >3m'].includes(observation);
+                  return !isPE ? `
+                    <select
+                      id="obs-select-${loc.replace(/\s/g, '_')}"
+                      class="plomb-select-inline"
+                      onchange="plombObservationChange('${loc.replace(/'/g, "\\'")}', this.value)"
+                      style="${isSaisieLibre ? 'display:none' : ''}"
+                      title="Observation"
+                    >
+                      <option value="" ${observation==="" ? "selected" : ""}>—</option>
+                      <option ${observation==="Par Extension" ? "selected" : ""}>Par Extension</option>
+                      <option ${observation==="Element récent" ? "selected" : ""}>Élément récent</option>
+                      <option ${observation==="Hors d'atteinte >3m" ? "selected" : ""}>Hors d'atteinte >3m</option>
+                      <option value="__LIBRE__">✏️ Saisie libre</option>
+                    </select>
+                    <input 
+                      id="obs-libre-${loc.replace(/\s/g, '_')}"
+                      type="text" 
+                      class="plomb-select-inline"
+                      value="${isSaisieLibre ? observation : ''}"
+                      onblur="plombSetObservationForLoc('${loc.replace(/'/g, "\\'")}', this.value)"
+                      placeholder="Saisie libre..."
+                      style="${isSaisieLibre ? '' : 'display:none'}">
+                  ` : `<span class="muted small">Par Extension</span>`;
+                })()}
+                
+                ${!isPE ? `
+                  <button 
+                    class="photo-btn-icon ${hasPhoto ? 'has-photo' : ''}" 
+                    onclick="takeLocalisationPhoto('${loc.replace(/'/g, "\\'")}')">
+                    📷
+                  </button>
+                ` : ''}
+              </div>
             </div>
           `;
         }).join("")
@@ -466,7 +486,7 @@ async function addPhotoToUR(file) {
       blob: compressed, // 🔥 Version compressée
       clefComposant: ur.id,
       domaine: "description",
-      localisation: `${ur.type} ${(ur.localisation?.items || []).join(", ")}`
+      repère: `${ur.type} ${(ur.localisation?.items || []).join(", ")}`
     };
 
     store.mission.photos.push(photo);
@@ -666,7 +686,7 @@ function toggleLocalisationItem(value) {
   renderUREditForm(ur);
 }
 
-function getAdvancedLocalisationOptions() {
+function getAdvancedrepèreOptions() {
   const letters = Array.from({ length: 20 }, (_, i) =>
     String.fromCharCode(71 + i) // G → Z
   );
@@ -686,7 +706,7 @@ function openLocalisationPlus() {
   const ur = getEditingUR();
   if (!ur) return;
 
-  const { letters, p, f } = getAdvancedLocalisationOptions();
+  const { letters, p, f } = getAdvancedrepèreOptions();
 
   const renderGroup = (title, items) => `
     <div class="loc-group">
@@ -707,8 +727,8 @@ function openLocalisationPlus() {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
   overlay.innerHTML = `
-    <div class="overlay-content localisation-plus">
-      <h3>Localisation avancée</h3>
+    <div class="overlay-content repère-plus">
+      <h3>repère avancée</h3>
 
       <div class="loc-grid">
         ${renderGroup("Lettres", letters)}
@@ -723,7 +743,7 @@ function openLocalisationPlus() {
   document.body.appendChild(overlay);
 }
 
-function formatURLocalisation(ur) {
+function formatURrepère(ur) {
   const items = ur?.localisation?.items;
   if (!Array.isArray(items) || items.length === 0) return "—";
   return items.join(", ");
@@ -785,7 +805,7 @@ function plombApplyModeToAll(mode) {
       isPE: false
     };
     
-    // Skip PE localisations (Mode Avant Travaux)
+    // Skip PE repères (Mode Avant Travaux)
     if (entry.isPE) return;
 
     if (mode === "NM") {
@@ -847,7 +867,7 @@ function checkAndAddTroisiemeMesure(ur) {
   
   const locs = Object.keys(ur.plombByLoc);
   
-  // 1. Chercher les localisations déclenchantes (≥ 1)
+  // 1. Chercher les repères déclenchantes (≥ 1)
   const declenchantes = [];
   locs.forEach(loc => {
     const entry = ur.plombByLoc[loc];
@@ -903,11 +923,11 @@ window.plombSetMesureForLoc = plombSetMesureForLoc;
 window.plombSetDegradationForLoc = plombSetDegradationForLoc;
 
 // ======================================================
-// PHOTOS PAR LOCALISATION
+// PHOTOS PAR repère
 // ======================================================
 
 /**
- * Prendre une photo pour une localisation spécifique
+ * Prendre une photo pour une repère spécifique
  */
 function takeLocalisationPhoto(loc) {
   const input = document.createElement("input");
@@ -926,7 +946,7 @@ function takeLocalisationPhoto(loc) {
 }
 
 /**
- * Ajouter une photo à une localisation
+ * Ajouter une photo à une repère
  */
 async function addPhotoToLocalisation(file, loc) {
   if (!file) return;
@@ -940,7 +960,7 @@ async function addPhotoToLocalisation(file, loc) {
     
     const photoId = crypto.randomUUID();
     
-    // Récupérer la pièce pour la localisation
+    // Récupérer la pièce pour la repère
     const pieceId = store.ui?.currentDescriptionPieceId;
     const piece = store.mission?.pieces.find(p => p.id === pieceId);
     
@@ -950,7 +970,7 @@ async function addPhotoToLocalisation(file, loc) {
       blob: compressed,
       clefComposant: generateClefComposant(),
       domaine: "description",
-      localisation: piece ? `${piece.batiment} - ${piece.nom}` : "Non localisée",
+      repère: piece ? `${piece.batiment} - ${piece.nom}` : "Non localisée",
       
       // Métadonnées pour l'export
       urId: ur.id,
@@ -970,26 +990,26 @@ async function addPhotoToLocalisation(file, loc) {
       store.mission.photos = store.mission.photos.filter(p => p.id !== oldPhotoId);
     }
     
-    // Stocker l'ID de la photo dans la localisation
+    // Stocker l'ID de la photo dans la repère
     ur.plombByLoc[loc] = ur.plombByLoc[loc] || {};
     ur.plombByLoc[loc].photoId = photoId;
     
     saveMission();
     renderUREditForm(ur);
     
-    console.log(`✅ Photo ajoutée pour localisation ${loc}`);
+    console.log(`✅ Photo ajoutée pour repère ${loc}`);
     
   } catch (error) {
-    console.error('❌ Erreur ajout photo localisation:', error);
+    console.error('❌ Erreur ajout photo repère:', error);
     alert('Erreur lors de l\'ajout de la photo');
   }
 }
 
 /**
- * Supprimer la photo d'une localisation
+ * Supprimer la photo d'une repère
  */
 function deleteLocalisationPhoto(loc) {
-  if (!confirm(`Supprimer la photo de la localisation ${loc} ?`)) return;
+  if (!confirm(`Supprimer la photo de la repère ${loc} ?`)) return;
   
   const ur = getEditingUR();
   if (!ur) return;
@@ -1008,6 +1028,7 @@ function deleteLocalisationPhoto(loc) {
 }
 
 window.takeLocalisationPhoto = takeLocalisationPhoto;
+window.openLocalisationPlus = openLocalisationPlus;
 window.deleteLocalisationPhoto = deleteLocalisationPhoto;
 
 
@@ -1046,13 +1067,13 @@ function toggleModeCREP() {
 window.toggleModeCREP = toggleModeCREP;
 
 /**
- * Active/désactive Par Extension sur une localisation (Mode Avant Travaux)
+ * Active/désactive Par Extension sur une repère (Mode Avant Travaux)
  */
-function togglePE(localisation, isPE) {
+function togglePE(repère, isPE) {
   const ur = getEditingUR();
-  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[repère]) return;
   
-  const entry = ur.plombByLoc[localisation];
+  const entry = ur.plombByLoc[repère];
   entry.isPE = isPE;
   
   if (isPE) {
@@ -1072,13 +1093,13 @@ function togglePE(localisation, isPE) {
 }
 
 /**
- * Définit l'observation pour une localisation
+ * Définit l'observation pour une repère
  */
-function plombSetObservationForLoc(localisation, value) {
+function plombSetObservationForLoc(repère, value) {
   const ur = getEditingUR();
-  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[repère]) return;
   
-  ur.plombByLoc[localisation].observation = value;
+  ur.plombByLoc[repère].observation = value;
   saveMission();
   renderUREditForm(ur);
 }
@@ -1095,16 +1116,16 @@ window.plombSetObservationForLoc = plombSetObservationForLoc;
 /**
  * Définit une valeur prédéfinie pour une mesure plomb
  */
-function setPlombMesure(localisation, valeur) {
+function setPlombMesure(repère, valeur) {
   const ur = getEditingUR();
   if (!ur) return;
   
   if (!ur.plombByLoc) ur.plombByLoc = {};
-  if (!ur.plombByLoc[localisation]) {
-    ur.plombByLoc[localisation] = { mesure: null, degradation: null, photoId: null };
+  if (!ur.plombByLoc[repère]) {
+    ur.plombByLoc[repère] = { mesure: null, degradation: null, photoId: null };
   }
   
-  ur.plombByLoc[localisation].mesure = valeur;
+  ur.plombByLoc[repère].mesure = valeur;
   saveMission();
   renderUREditForm(ur);
 }
@@ -1153,12 +1174,12 @@ function keypadBackspace() {
 /**
  * Valide la saisie du pavé numérique
  */
-function keypadConfirm(localisation) {
+function keypadConfirm(repère) {
   const input = document.getElementById('keypad-input');
   if (!input) return;
   
   const value = input.value;
-  setPlombMesure(localisation, value);
+  setPlombMesure(repère, value);
   closeDescOverlay();
 }
 
@@ -1174,11 +1195,11 @@ window.keypadConfirm = keypadConfirm;
 /**
  * Ouvre le pavé numérique pour une mesure spécifique
  */
-function openMesureKeypad(localisation, index) {
+function openMesureKeypad(repère, index) {
   const ur = getEditingUR();
   if (!ur) return;
   
-  const entry = ur.plombByLoc?.[localisation];
+  const entry = ur.plombByLoc?.[repère];
   if (!entry) return;
   
   const currentValue = entry.mesures?.[index] || '';
@@ -1190,7 +1211,7 @@ function openMesureKeypad(localisation, index) {
   overlay.innerHTML = `
     <div class="overlay-content numeric-keypad">
       <h3>Saisie mesure ${index + 1}</h3>
-      <div class="keypad-location">${localisation}</div>
+      <div class="keypad-location">${repère}</div>
       
       <div class="keypad-display">
         <input type="text" id="keypad-input" value="${currentValue}" readonly />
@@ -1223,7 +1244,7 @@ function openMesureKeypad(localisation, index) {
       </div>
       
       <div class="keypad-actions">
-        <button class="primary" onclick="keypadConfirmMesure('${localisation.replace(/'/g, "\\'")}', ${index})">✓ Valider</button>
+        <button class="primary" onclick="keypadConfirmMesure('${repère.replace(/'/g, "\\'")}', ${index})">✓ Valider</button>
         <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
       </div>
     </div>
@@ -1235,15 +1256,15 @@ function openMesureKeypad(localisation, index) {
 /**
  * Validation pavé numérique avec recalcul 3ème mesure
  */
-function keypadConfirmMesure(localisation, index) {
+function keypadConfirmMesure(repère, index) {
   const input = document.getElementById('keypad-input');
   if (!input) return;
   
   const value = input.value;
   const ur = getEditingUR();
-  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[repère]) return;
   
-  const entry = ur.plombByLoc[localisation];
+  const entry = ur.plombByLoc[repère];
   
   // Mettre à jour la mesure à l'index donné
   if (!Array.isArray(entry.mesures)) entry.mesures = [];
@@ -1266,11 +1287,11 @@ window.keypadConfirmMesure = keypadConfirmMesure;
 /**
  * Ajoute une mesure manuelle vide
  */
-function addMesureManuelle(localisation) {
+function addMesureManuelle(repère) {
   const ur = getEditingUR();
-  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[repère]) return;
   
-  const entry = ur.plombByLoc[localisation];
+  const entry = ur.plombByLoc[repère];
   if (!Array.isArray(entry.mesures)) entry.mesures = [];
   
   const newIndex = entry.mesures.length;
@@ -1280,7 +1301,79 @@ function addMesureManuelle(localisation) {
   renderUREditForm(ur);
   
   // Ouvrir pavé immédiatement
-  setTimeout(() => openMesureKeypad(localisation, newIndex), 100);
+  setTimeout(() => openMesureKeypad(repère, newIndex), 100);
 }
 
 window.addMesureManuelle = addMesureManuelle;
+
+/**
+ * Gestion changement observation (select ou input libre)
+ */
+function plombObservationChange(repère, value) {
+  const ur = getEditingUR();
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[repère]) return;
+  
+  if (value === '__LIBRE__') {
+    // Afficher input libre
+    const locId = repère.replace(/\s/g, '_');
+    const selectElem = document.getElementById(`obs-select-${locId}`);
+    const libreElem = document.getElementById(`obs-libre-${locId}`);
+    if (selectElem) selectElem.style.display = 'none';
+    if (libreElem) {
+      libreElem.style.display = 'block';
+      const input = libreElem.querySelector('input');
+      if (input) input.focus();
+    }
+  } else {
+    // Valeur prédéfinie
+    ur.plombByLoc[repère].observation = value;
+    saveMission();
+  }
+}
+
+/**
+ * Retour au select depuis saisie libre
+ */
+function plombRetourSelect(repère) {
+  const locId = repère.replace(/\s/g, '_');
+  const selectElem = document.getElementById(`obs-select-${locId}`);
+  const libreElem = document.getElementById(`obs-libre-${locId}`);
+  
+  if (selectElem) selectElem.style.display = 'block';
+  if (libreElem) libreElem.style.display = 'none';
+  
+  // Remettre à vide
+  const ur = getEditingUR();
+  if (ur && ur.plombByLoc && ur.plombByLoc[repère]) {
+    ur.plombByLoc[repère].observation = '';
+    saveMission();
+  }
+  
+  renderUREditForm(ur);
+}
+
+window.plombObservationChange = plombObservationChange;
+window.plombRetourSelect = plombRetourSelect;
+
+/**
+ * Ouvrir saisie manuelle de repère
+ */
+function openRepereManuel() {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  const repereManuel = prompt("Saisie manuelle du repère :", "");
+  if (!repereManuel || repereManuel.trim() === "") return;
+  
+  const repere = repereManuel.trim().toUpperCase();
+  
+  // Ajouter le repère s'il n'existe pas déjà
+  if (!ur.localisation.items.includes(repere)) {
+    ur.localisation.items.push(repere);
+    plombEnsureByLoc(ur);
+    saveMission();
+    renderUREditForm(ur);
+  }
+}
+
+window.openRepereManuel = openRepereManuel;

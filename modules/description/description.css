@@ -307,147 +307,6 @@
   background: #bfdbfe;
 }
 
-/* ===============================
-   LOCALISATION - COMPACT V4.1
-================================ */
-
-.plomb-loc-row {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 8px;
-  margin-bottom: 6px;
-}
-
-.plomb-loc-row.is-declenchante {
-  background: #fef2f2;
-  border-left: 3px solid #dc2626;
-}
-
-.plomb-loc-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-  flex-wrap: wrap;
-}
-
-.plomb-loc-tag {
-  font-weight: 600;
-  font-size: 14px;
-  color: #111;
-}
-
-.checkbox-pe {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 11px;
-  cursor: pointer;
-  color: #6b7280;
-}
-
-.checkbox-pe input {
-  width: 14px;
-  height: 14px;
-}
-
-.badge-declenchante {
-  background: #fee2e2;
-  border: 1px solid #dc2626;
-  color: #991b1b;
-  padding: 2px 5px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.plomb-loc-type {
-  font-size: 10px;
-  color: #9ca3af;
-  margin-bottom: 4px;
-}
-
-.plomb-mesures-grid {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
-}
-
-.mesure-cell input {
-  width: 50px;
-  padding: 4px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.mesure-cell input:hover {
-  border-color: #2563eb;
-  background: #eff6ff;
-}
-
-.plomb-loc-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-bottom: 6px;
-}
-
-.plomb-loc-fields label {
-  font-size: 9px;
-  color: #6b7280;
-  font-weight: 500;
-  margin-bottom: 2px;
-  display: block;
-}
-
-.plomb-loc-select {
-  width: 100%;
-  padding: 5px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 11px;
-}
-
-.photo-btn-loc {
-  width: 100%;
-  padding: 5px;
-  font-size: 11px;
-  border-radius: 4px;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  cursor: pointer;
-}
-
-.photo-btn-loc.has-photo {
-  background: #d1fae5;
-  border-color: #10b981;
-  color: #065f46;
-}
-
-.btn-add-mesure {
-  width: 50px;
-  padding: 4px;
-  background: #dbeafe;
-  border: 1px solid #3b82f6;
-  border-radius: 4px;
-  color: #1e40af;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* ===============================
-   PAVÉ NUMÉRIQUE
-================================ */
-
-.numeric-keypad {
   max-width: 350px;
 }
 
@@ -532,4 +391,146 @@
   flex: 1;
   font-size: 16px;
   padding: 12px;
+}
+
+.btn-retour-select {
+  margin-top: 4px;
+  width: 100%;
+  padding: 4px;
+  font-size: 10px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-btn-txt {
+  background: #dbeafe !important;
+  border-color: #3b82f6 !important;
+  color: #1e40af !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+}
+/* ===============================
+   LAYOUT 2 LIGNES V4.2
+================================ */
+
+.plomb-loc-row {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+}
+
+.plomb-loc-row.is-declenchante {
+  background: #fef2f2;
+  border-left: 3px solid #dc2626;
+}
+
+/* LIGNE 1 : Repère + PE + Badge + Mesures */
+.plomb-ligne-1 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.plomb-loc-tag {
+  font-weight: 600;
+  font-size: 13px;
+  color: #111;
+  min-width: 30px;
+}
+
+.checkbox-pe {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.checkbox-pe input {
+  width: 12px;
+  height: 12px;
+}
+
+.badge-declenchante {
+  background: #fee2e2;
+  border: 1px solid #dc2626;
+  color: #991b1b;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.plomb-mesures-inline {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.mesure-input {
+  width: 48px;
+  padding: 3px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mesure-input:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.btn-add-mesure-inline {
+  width: 28px;
+  padding: 2px;
+  background: #dbeafe;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  color: #1e40af;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* LIGNE 2 : Dégradation + Observation + Photo */
+.plomb-ligne-2 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.plomb-select-inline {
+  flex: 1;
+  padding: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 10px;
+  min-width: 0;
+}
+
+.photo-btn-icon {
+  width: 32px;
+  height: 26px;
+  padding: 0;
+  font-size: 14px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.photo-btn-icon.has-photo {
+  background: #d1fae5;
+  border-color: #10b981;
 }
