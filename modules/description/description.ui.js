@@ -5,9 +5,13 @@ function renderPlombSummary(ur) {
 
   const entries = Object.entries(ur.plombByLoc)
     .map(([loc, v]) => {
-      if (!v || v.mesure === null || v.mesure === "") return null;
-      if (v.mesure === "NM") return `${loc} : NM`;
-      return `${loc} : ${v.mesure}${v.degradation ? " – " + v.degradation : ""}`;
+      if (!v || !v.mesures || v.mesures.length === 0) return null;
+      
+      const mesuresStr = v.mesures.join(" | ");
+      const declBadge = v.isDeclenchante ? " ⚠️" : "";
+      const peBadge = v.isPE ? " (PE)" : "";
+      
+      return `${loc} : ${mesuresStr}${declBadge}${peBadge}${v.degradation ? " – " + v.degradation : ""}`;
     })
     .filter(Boolean);
 
@@ -32,21 +36,60 @@ function renderDescriptionScreen() {
   }
 
   piece.descriptions = piece.descriptions || [];
-
-  // 🔁 Migration ancienne structure (lettres → localisation)
-piece.descriptions.forEach(ur => {
-  if (!ur.localisation) {
-    ur.localisation = {
-      lettres: Array.isArray(ur.lettres) ? [...ur.lettres] : [],
-      numeros: []
-    };
-    delete ur.lettres;
+  
+  // Initialiser modeCREP par défaut
+  if (piece.modeCREP === undefined) {
+    piece.modeCREP = true;
   }
-});
+
+  // 🆕 Migration V3 → V4 : mesure unique → mesures[]
+  piece.descriptions.forEach(ur => {
+    if (!ur.plombByLoc) return;
+    
+    Object.keys(ur.plombByLoc).forEach(loc => {
+      const entry = ur.plombByLoc[loc];
+      
+      // Migration : mesure → mesures[]
+      if (entry.mesure !== undefined && !Array.isArray(entry.mesures)) {
+        entry.mesures = entry.mesure !== null && entry.mesure !== "" 
+          ? [entry.mesure] 
+          : [];
+        delete entry.mesure;
+      }
+      
+      // Initialiser si manquant
+      if (!Array.isArray(entry.mesures)) {
+        entry.mesures = [];
+      }
+      if (entry.isDeclenchante === undefined) {
+        entry.isDeclenchante = false;
+      }
+      if (entry.observation === undefined) {
+        entry.observation = "";
+      }
+      if (entry.isPE === undefined) {
+        entry.isPE = false;
+      }
+    });
+  });
+  
 
   screen.innerHTML = `
     <h2>${piece.nom || "Pièce sans nom"}</h2>
     <p><strong>Bâtiment :</strong> ${piece.batiment || "-"}</p>
+    
+    <!-- Mode diagnostic plomb -->
+    <div class="plomb-mode-selector">
+      <label class="checkbox-label">
+        <input type="checkbox" id="mode-crep" ${piece.modeCREP !== false ? 'checked' : ''} onchange="toggleModeCREP()">
+        <span><strong>Mode CREP</strong> (règle 2-3 mesures par localisation)</span>
+      </label>
+      <div class="small muted" style="margin-top:4px">
+        ${piece.modeCREP !== false 
+          ? '✅ Actif : 2 mesures minimum, 3ème si une localisation ≥ 1 mg/cm²' 
+          : '⚠️ Désactivé : Mode Plomb Avant Travaux (1 mesure par localisation)'}
+      </div>
+    </div>
     
     <!-- 🆕 Checkbox liste par défaut -->
     ${piece.descriptions.length === 0 ? `
@@ -207,7 +250,9 @@ function renderUREditForm(ur) {
 </div>
 
 <div class="small muted" style="margin-top:6px">
-  Saisis une valeur par localisation. Les boutons ci-dessus remplissent automatiquement chaque champ (modifiable ensuite).
+  ${getCurrentDescriptionPiece().modeCREP 
+    ? "Mode CREP : 2 mesures minimum par localisation" 
+    : "Mode Avant Travaux : Cocher PE pour Par Extension"}
 </div>
 
 <div class="plomb-loc-list">
@@ -215,44 +260,123 @@ function renderUREditForm(ur) {
     (Array.isArray(ur.localisation?.items) ? ur.localisation.items : []).length === 0
       ? `<div class="plomb-empty muted">Aucune localisation sélectionnée</div>`
       : (ur.localisation.items).map(loc => {
-          const entry = ur.plombByLoc?.[loc] || { mesure: null, degradation: null, photoId: null };
-          const mesureVal = entry.mesure ?? "";
+          // Initialiser entry si manquant
+          if (!ur.plombByLoc) ur.plombByLoc = {};
+          if (!ur.plombByLoc[loc]) {
+            ur.plombByLoc[loc] = { 
+              mesures: [], 
+              degradation: null, 
+              photoId: null,
+              isDeclenchante: false,
+              observation: "",
+              isPE: false
+            };
+          }
+          
+          const entry = ur.plombByLoc[loc];
+          
+          // Sécurité : forcer mesures en tableau
+          if (!Array.isArray(entry.mesures)) {
+            entry.mesures = [];
+          }
+          
           const degrVal = entry.degradation ?? "";
           const photoId = entry.photoId;
           const hasPhoto = photoId && store.mission.photos.find(p => p.id === photoId);
+          const modeCREP = getCurrentDescriptionPiece().modeCREP;
+          const isPE = entry.isPE || false;
+          const observation = entry.observation || "";
           
           return `
-            <div class="plomb-loc-row">
-              <div class="plomb-loc-tag">${loc}</div>
-
-              <input
-                id="mesure-plomb-${loc.replace(/\s/g, '_')}"
-                class="plomb-loc-input"
-                type="text"
-                value="${mesureVal}"
-                onclick="openNumericKeypad('${loc}')"
-                placeholder="ex : 0,42 ou NM"
-                readonly
-              />
-
-              <select
-                class="plomb-loc-select"
-                onchange="plombSetDegradationForLoc('${loc}', this.value)"
-              >
-                <option value="" ${degrVal==="" ? "selected" : ""}>—</option>
-                <option ${degrVal==="Non visible" ? "selected" : ""}>Non visible</option>
-                <option ${degrVal==="Non dégradé" ? "selected" : ""}>Non dégradé</option>
-                <option ${degrVal==="Etat d'usage" ? "selected" : ""}>Etat d'usage</option>
-                <option ${degrVal==="Dégradé" ? "selected" : ""}>Dégradé</option>
-              </select>
+            <div class="plomb-loc-row ${entry.isDeclenchante ? 'is-declenchante' : ''}">
               
-              <button 
-                class="photo-btn-loc ${hasPhoto ? 'has-photo' : ''}" 
-                onclick="takeLocalisationPhoto('${loc}')"
-                title="${hasPhoto ? 'Modifier la photo' : 'Ajouter une photo'}"
-              >
-                📷${hasPhoto ? ' ✓' : ''}
-              </button>
+              <!-- Header : Tag + PE + Badge -->
+              <div class="plomb-loc-header">
+                <div class="plomb-loc-tag">${loc}</div>
+                
+                ${!modeCREP ? `
+                  <label class="checkbox-pe">
+                    <input type="checkbox" 
+                           ${isPE ? 'checked' : ''} 
+                           onchange="togglePE('${loc.replace(/'/g, "\\'")}', this.checked)">
+                    <span>PE</span>
+                  </label>
+                ` : ''}
+                
+                ${entry.isDeclenchante ? `
+                  <span class="badge-declenchante">⚠️ Déclenchante</span>
+                ` : ''}
+              </div>
+              
+              <!-- Type UD -->
+              <div class="plomb-loc-type">${ur.type || 'UD'}</div>
+
+              <!-- Mesures compactes -->
+              ${!isPE ? `
+                <div class="plomb-mesures-grid">
+                  ${entry.mesures && entry.mesures.length > 0 ? entry.mesures.map((m, idx) => `
+                    <div class="mesure-cell">
+                      <input
+                        value="${m}"
+                        onclick="openMesureKeypad('${loc.replace(/'/g, "\\'")}', ${idx})"
+                        readonly
+                        title="Mesure ${idx + 1}"
+                      />
+                    </div>
+                  `).join('') : ''}
+                  
+                  ${!entry.isDeclenchante && Array.isArray(entry.mesures) ? `
+                    <button class="btn-add-mesure" onclick="addMesureManuelle('${loc.replace(/'/g, "\\'")}')">+</button>
+                  ` : ''}
+                </div>
+              ` : `
+                <div class="muted small">— (Par Extension)</div>
+              `}
+
+              <!-- Dégradation + Observation en ligne -->
+              <div class="plomb-loc-fields">
+                ${!isPE ? `
+                  <div>
+                    <label>Dégradation</label>
+                    <select
+                      class="plomb-loc-select"
+                      onchange="plombSetDegradationForLoc('${loc.replace(/'/g, "\\'")}', this.value)"
+                    >
+                      <option value="" ${degrVal==="" ? "selected" : ""}>—</option>
+                      <option ${degrVal==="Non visible" ? "selected" : ""}>Non visible</option>
+                      <option ${degrVal==="Non dégradé" ? "selected" : ""}>Non dégradé</option>
+                      <option ${degrVal==="Etat d'usage" ? "selected" : ""}>Etat d'usage</option>
+                      <option ${degrVal==="Dégradé" ? "selected" : ""}>Dégradé</option>
+                    </select>
+                  </div>
+                ` : ''}
+                
+                <div>
+                  <label>Observation</label>
+                  <select
+                    class="plomb-loc-select"
+                    onchange="plombSetObservationForLoc('${loc.replace(/'/g, "\\'")}', this.value)"
+                    ${isPE ? 'disabled' : ''}
+                  >
+                    <option value="" ${observation==="" ? "selected" : ""}>—</option>
+                    <option ${observation==="Par Extension" ? "selected" : ""}>Par Extension</option>
+                    <option ${observation==="Element récent" ? "selected" : ""}>Élément récent</option>
+                    <option ${observation==="Hors d'atteinte >3m" ? "selected" : ""}>Hors d'atteinte >3m</option>
+                    <option ${observation==="Saisie libre" ? "selected" : ""}>Saisie libre</option>
+                  </select>
+                </div>
+              </div>
+              
+              ${isPE ? '<div class="muted small">Observation auto : Par Extension</div>' : ''}
+
+              <!-- Photo -->
+              ${!isPE ? `
+                <button 
+                  class="photo-btn-loc ${hasPhoto ? 'has-photo' : ''}" 
+                  onclick="takeLocalisationPhoto('${loc.replace(/'/g, "\\'")}')">
+                  📷 ${hasPhoto ? 'Photo ajoutée' : 'Ajouter photo'}
+                </button>
+              ` : ''}
             </div>
           `;
         }).join("")
@@ -609,7 +733,14 @@ function plombEnsureByLoc(ur) {
   ur.plombByLoc = ur.plombByLoc && typeof ur.plombByLoc === "object" ? ur.plombByLoc : {};
   const locs = Array.isArray(ur.localisation?.items) ? ur.localisation.items : [];
   locs.forEach(loc => {
-    ur.plombByLoc[loc] = ur.plombByLoc[loc] || { mesure: null, degradation: null };
+    ur.plombByLoc[loc] = ur.plombByLoc[loc] || { 
+      mesures: [], 
+      degradation: null, 
+      photoId: null,
+      isDeclenchante: false,
+      observation: "",
+      isPE: false
+    };
   });
   return locs;
 }
@@ -640,43 +771,131 @@ function plombApplyModeToAll(mode) {
   const ur = getEditingUR();
   if (!ur) return;
 
+  const piece = getCurrentDescriptionPiece();
+  const modeCREP = piece.modeCREP !== false;
   const locs = plombEnsureByLoc(ur);
 
   locs.forEach(loc => {
-    const entry = ur.plombByLoc[loc] || { mesure: null, degradation: null };
+    const entry = ur.plombByLoc[loc] || { 
+      mesures: [], 
+      degradation: null, 
+      photoId: null,
+      isDeclenchante: false,
+      observation: "",
+      isPE: false
+    };
+    
+    // Skip PE localisations (Mode Avant Travaux)
+    if (entry.isPE) return;
 
     if (mode === "NM") {
-      entry.mesure = "NM";
+      entry.mesures = ["NM"];
       entry.degradation = null;
+      entry.isDeclenchante = false;
     }
 
     if (mode === "DASH") {
-      entry.mesure = "-";
+      entry.mesures = ["-"];
       entry.degradation = null;
+      entry.isDeclenchante = false;
     }
 
     if (mode === "ZERO") {
-      entry.mesure = 0;
+      // CREP: 2 mesures | Avant Travaux: 1 mesure
+      entry.mesures = modeCREP ? [0, 0] : [0];
       entry.degradation = null;
+      entry.isDeclenchante = false;
     }
 
     if (mode === "LT_03") {
-      entry.mesure = randomBetween(0.11, 0.29);
-      // Dégradation non obligatoire, mais si tu veux forcer vide :
-      // entry.degradation = null;
+      // CREP: 2 mesures | Avant Travaux: 1 mesure
+      if (modeCREP) {
+        entry.mesures = [randomBetween(0.11, 0.29), randomBetween(0.11, 0.29)];
+      } else {
+        entry.mesures = [randomBetween(0.11, 0.29)];
+      }
+      entry.isDeclenchante = false;
     }
 
     if (mode === "LT_1") {
-      entry.mesure = randomBetween(0.31, 0.99);
-      // entry.degradation = null;
+      // CREP: 2 mesures | Avant Travaux: 1 mesure
+      if (modeCREP) {
+        entry.mesures = [randomBetween(0.31, 0.99), randomBetween(0.31, 0.99)];
+      } else {
+        entry.mesures = [randomBetween(0.31, 0.99)];
+      }
+      entry.isDeclenchante = false;
     }
 
     ur.plombByLoc[loc] = entry;
   });
 
+  // Vérifier déclenchante (Mode CREP uniquement)
+  if (modeCREP) {
+    checkAndAddTroisiemeMesure(ur);
+  }
+
   saveMission();
   renderUREditForm(ur);
 }
+
+/**
+ * Détecte si une mesure ≥ 1 et ajoute 3ème mesure (Mode CREP)
+ */
+function checkAndAddTroisiemeMesure(ur) {
+  if (!ur.plombByLoc) return;
+  
+  const locs = Object.keys(ur.plombByLoc);
+  
+  // 1. Chercher les localisations déclenchantes (≥ 1)
+  const declenchantes = [];
+  locs.forEach(loc => {
+    const entry = ur.plombByLoc[loc];
+    if (!entry.mesures || !Array.isArray(entry.mesures)) return;
+    
+    // Chercher si UNE mesure ≥ 1
+    const hasMesureGTE1 = entry.mesures.some(m => {
+      const val = parseFloat(m);
+      return !isNaN(val) && val >= 1;
+    });
+    
+    if (hasMesureGTE1) {
+      declenchantes.push(loc);
+      entry.isDeclenchante = true;
+      
+      // Garder SEULEMENT la mesure ≥ 1
+      const mesureGTE1 = entry.mesures.find(m => parseFloat(m) >= 1);
+      entry.mesures = [mesureGTE1];
+    } else {
+      entry.isDeclenchante = false;
+    }
+  });
+  
+  // 2. Si déclenchante détectée, ajouter 3ème mesure aux AUTRES
+  if (declenchantes.length > 0) {
+    locs.forEach(loc => {
+      if (declenchantes.includes(loc)) return; // Skip déclenchante
+      
+      const entry = ur.plombByLoc[loc];
+      if (!entry.mesures || !Array.isArray(entry.mesures)) return;
+      
+      // Ignorer NM, -, etc.
+      if (typeof entry.mesures[0] === 'string') return;
+      
+      // Ajouter 3ème mesure si seulement 2 présentes
+      if (entry.mesures.length === 2) {
+        // Déterminer la plage des 2 premières
+        const avg = (entry.mesures[0] + entry.mesures[1]) / 2;
+        const min = avg < 0.3 ? 0.11 : 0.31;
+        const max = avg < 0.3 ? 0.29 : 0.99;
+        
+        entry.mesures.push(randomBetween(min, max));
+      }
+    });
+  }
+}
+
+window.checkAndAddTroisiemeMesure = checkAndAddTroisiemeMesure;
 
 // Pour onclick=""
 window.plombApplyModeToAll = plombApplyModeToAll;
@@ -810,6 +1029,65 @@ async function toggleDefaultDescriptions() {
 
 window.toggleDefaultDescriptions = toggleDefaultDescriptions;
 
+/**
+ * Active/désactive le mode CREP
+ */
+function toggleModeCREP() {
+  const piece = getCurrentDescriptionPiece();
+  if (!piece) return;
+  
+  const checkbox = document.getElementById('mode-crep');
+  piece.modeCREP = checkbox ? checkbox.checked : true;
+  
+  saveMission();
+  renderDescriptionScreen();
+}
+
+window.toggleModeCREP = toggleModeCREP;
+
+/**
+ * Active/désactive Par Extension sur une localisation (Mode Avant Travaux)
+ */
+function togglePE(localisation, isPE) {
+  const ur = getEditingUR();
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  
+  const entry = ur.plombByLoc[localisation];
+  entry.isPE = isPE;
+  
+  if (isPE) {
+    // Si PE activé → Observation auto + vider mesures
+    entry.observation = "Par Extension";
+    entry.mesures = [];
+    entry.degradation = null;
+  } else {
+    // Si PE désactivé → Vider observation si c'était "Par Extension"
+    if (entry.observation === "Par Extension") {
+      entry.observation = "";
+    }
+  }
+  
+  saveMission();
+  renderUREditForm(ur);
+}
+
+/**
+ * Définit l'observation pour une localisation
+ */
+function plombSetObservationForLoc(localisation, value) {
+  const ur = getEditingUR();
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  
+  ur.plombByLoc[localisation].observation = value;
+  saveMission();
+  renderUREditForm(ur);
+}
+
+window.togglePE = togglePE;
+window.plombSetObservationForLoc = plombSetObservationForLoc;
+
+
+
 // =====================================================
 // PAVÉ NUMÉRIQUE ET BOUTONS RAPIDES MESURES
 // =====================================================
@@ -834,60 +1112,6 @@ function setPlombMesure(localisation, valeur) {
 /**
  * Ouvre le pavé numérique géant
  */
-function openNumericKeypad(localisation) {
-  const ur = getEditingUR();
-  if (!ur) return;
-  
-  const currentValue = ur.plombByLoc?.[localisation]?.mesure || '';
-  
-  closeDescOverlay();
-  
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.innerHTML = `
-    <div class="overlay-content numeric-keypad">
-      <h3>Saisie mesure</h3>
-      <div class="keypad-location">${localisation}</div>
-      
-      <div class="keypad-display">
-        <input type="text" id="keypad-input" value="${currentValue}" readonly />
-      </div>
-      
-      <div class="keypad-special-buttons">
-        <button onclick="keypadSetValue('NM')">NM</button>
-        <button onclick="keypadSetValue('-')">-</button>
-        <button onclick="keypadSetValue('=0')">=0</button>
-        <button onclick="keypadSetValue('<0,3')">&lt;0,3</button>
-        <button onclick="keypadSetValue('<1')">&lt;1</button>
-      </div>
-      
-      <div class="keypad-grid">
-        <button onclick="keypadAppend('7')">7</button>
-        <button onclick="keypadAppend('8')">8</button>
-        <button onclick="keypadAppend('9')">9</button>
-        
-        <button onclick="keypadAppend('4')">4</button>
-        <button onclick="keypadAppend('5')">5</button>
-        <button onclick="keypadAppend('6')">6</button>
-        
-        <button onclick="keypadAppend('1')">1</button>
-        <button onclick="keypadAppend('2')">2</button>
-        <button onclick="keypadAppend('3')">3</button>
-        
-        <button onclick="keypadAppend('0')">0</button>
-        <button onclick="keypadAppend(',')">,</button>
-        <button onclick="keypadBackspace()">⌫</button>
-      </div>
-      
-      <div class="keypad-actions">
-        <button class="primary" onclick="keypadConfirm('${localisation.replace(/'/g, "\\'")}')">✓ Valider</button>
-        <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
-      </div>
-    </div>
-  `;
-  
-  document.body.appendChild(overlay);
-}
 
 /**
  * Ajoute un caractère au pavé numérique
@@ -946,3 +1170,117 @@ window.keypadSetValue = keypadSetValue;
 window.keypadBackspace = keypadBackspace;
 window.keypadConfirm = keypadConfirm;
 
+
+/**
+ * Ouvre le pavé numérique pour une mesure spécifique
+ */
+function openMesureKeypad(localisation, index) {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  const entry = ur.plombByLoc?.[localisation];
+  if (!entry) return;
+  
+  const currentValue = entry.mesures?.[index] || '';
+  
+  closeDescOverlay();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content numeric-keypad">
+      <h3>Saisie mesure ${index + 1}</h3>
+      <div class="keypad-location">${localisation}</div>
+      
+      <div class="keypad-display">
+        <input type="text" id="keypad-input" value="${currentValue}" readonly />
+      </div>
+      
+      <div class="keypad-special-buttons">
+        <button onclick="keypadSetValue('NM')">NM</button>
+        <button onclick="keypadSetValue('-')">-</button>
+        <button onclick="keypadSetValue('=0')">=0</button>
+        <button onclick="keypadSetValue('<0,3')">&lt;0,3</button>
+        <button onclick="keypadSetValue('<1')">&lt;1</button>
+      </div>
+      
+      <div class="keypad-grid">
+        <button onclick="keypadAppend('7')">7</button>
+        <button onclick="keypadAppend('8')">8</button>
+        <button onclick="keypadAppend('9')">9</button>
+        
+        <button onclick="keypadAppend('4')">4</button>
+        <button onclick="keypadAppend('5')">5</button>
+        <button onclick="keypadAppend('6')">6</button>
+        
+        <button onclick="keypadAppend('1')">1</button>
+        <button onclick="keypadAppend('2')">2</button>
+        <button onclick="keypadAppend('3')">3</button>
+        
+        <button onclick="keypadAppend('0')">0</button>
+        <button onclick="keypadAppend(',')">,</button>
+        <button onclick="keypadBackspace()">⌫</button>
+      </div>
+      
+      <div class="keypad-actions">
+        <button class="primary" onclick="keypadConfirmMesure('${localisation.replace(/'/g, "\\'")}', ${index})">✓ Valider</button>
+        <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+}
+
+/**
+ * Validation pavé numérique avec recalcul 3ème mesure
+ */
+function keypadConfirmMesure(localisation, index) {
+  const input = document.getElementById('keypad-input');
+  if (!input) return;
+  
+  const value = input.value;
+  const ur = getEditingUR();
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  
+  const entry = ur.plombByLoc[localisation];
+  
+  // Mettre à jour la mesure à l'index donné
+  if (!Array.isArray(entry.mesures)) entry.mesures = [];
+  entry.mesures[index] = value;
+  
+  // Vérifier déclenchante (Mode CREP)
+  const piece = getCurrentDescriptionPiece();
+  if (piece.modeCREP !== false) {
+    checkAndAddTroisiemeMesure(ur);
+  }
+  
+  saveMission();
+  closeDescOverlay();
+  renderUREditForm(ur);
+}
+
+window.openMesureKeypad = openMesureKeypad;
+window.keypadConfirmMesure = keypadConfirmMesure;
+
+/**
+ * Ajoute une mesure manuelle vide
+ */
+function addMesureManuelle(localisation) {
+  const ur = getEditingUR();
+  if (!ur || !ur.plombByLoc || !ur.plombByLoc[localisation]) return;
+  
+  const entry = ur.plombByLoc[localisation];
+  if (!Array.isArray(entry.mesures)) entry.mesures = [];
+  
+  const newIndex = entry.mesures.length;
+  entry.mesures.push("");
+  
+  saveMission();
+  renderUREditForm(ur);
+  
+  // Ouvrir pavé immédiatement
+  setTimeout(() => openMesureKeypad(localisation, newIndex), 100);
+}
+
+window.addMesureManuelle = addMesureManuelle;

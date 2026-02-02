@@ -165,49 +165,8 @@
 }
 
 .plomb-loc-list { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
-.plomb-loc-row {
-  display: grid;
-  grid-template-columns: 52px 1fr 160px 60px;
-  gap: 8px;
-  align-items: center;
+  font-size: 13px;
 }
-.plomb-loc-tag {
-  font-weight: 600;
-  text-align: center;
-  border: 1px solid #e5e7eb;
-  background: #f3f4f6;
-  border-radius: 8px;
-  padding: 8px 6px;
-}
-.plomb-loc-input, .plomb-loc-select { height: 40px; }
-.plomb-empty { padding: 10px 0; }
-
-/* Bouton photo par localisation */
-.photo-btn-loc {
-  min-width: 50px;
-  height: 40px;
-  padding: 0 10px;
-  font-size: 16px;
-  border-radius: 6px;
-  background: #e5e7eb;
-  border: 2px solid transparent;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.photo-btn-loc:hover {
-  background: #d1d5db;
-}
-
-.photo-btn-loc.has-photo {
-  background: #d1fae5;
-  border-color: #10b981;
-  color: #065f46;
-  font-weight: 500;
-}
-
-.photo-btn-loc.has-photo:hover {
-  background: #a7f3d0;
 }
 
 /* ===============================
@@ -228,87 +187,349 @@
   font-weight: 500;
 }
 
+.keypad-special-buttons button:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 1px 2px rgba(245, 158, 11, 0.3),
+    inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* =====================================================
+   V4.0 - MODE CREP / AVANT TRAVAUX
+   ===================================================== */
+
+/* Mode CREP selector */
+.plomb-mode-selector {
+  background: #f0f9ff;
+  border: 2px solid #0284c7;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+/* Header localisation avec coche PE */
+.plomb-loc-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.checkbox-pe {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-pe input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Grille mesures (2-3 par localisation) */
+.plomb-mesures-grid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.mesure-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mesure-cell label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.mesure-cell input {
+  width: 80px;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mesure-cell input:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+/* Badge déclenchante */
+.badge-declenchante {
+  background: #fee2e2;
+  border: 2px solid #dc2626;
+  color: #991b1b;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* Localisation déclenchante */
+.plomb-loc-row.is-declenchante {
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+  padding-left: 12px;
+}
+
+/* Bouton ajouter mesure */
+.btn-add-mesure {
+  width: 60px;
+  padding: 6px;
+  background: #dbeafe;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  color: #1e40af;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-add-mesure:hover {
+  background: #bfdbfe;
+}
+
+/* ===============================
+   LOCALISATION - COMPACT V4.1
+================================ */
+
+.plomb-loc-row {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+
+.plomb-loc-row.is-declenchante {
+  background: #fef2f2;
+  border-left: 3px solid #dc2626;
+}
+
+.plomb-loc-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.plomb-loc-tag {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111;
+}
+
+.checkbox-pe {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.checkbox-pe input {
+  width: 14px;
+  height: 14px;
+}
+
+.badge-declenchante {
+  background: #fee2e2;
+  border: 1px solid #dc2626;
+  color: #991b1b;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.plomb-loc-type {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.plomb-mesures-grid {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.mesure-cell input {
+  width: 50px;
+  padding: 4px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mesure-cell input:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.plomb-loc-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.plomb-loc-fields label {
+  font-size: 9px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.plomb-loc-select {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.photo-btn-loc {
+  width: 100%;
+  padding: 5px;
+  font-size: 11px;
+  border-radius: 4px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+}
+
+.photo-btn-loc.has-photo {
+  background: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.btn-add-mesure {
+  width: 50px;
+  padding: 4px;
+  background: #dbeafe;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  color: #1e40af;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ===============================
+   PAVÉ NUMÉRIQUE
+================================ */
+
+.numeric-keypad {
+  max-width: 350px;
+}
+
+.keypad-location {
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
 .keypad-display {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .keypad-display input {
   width: 100%;
-  font-size: 32px;
+  font-size: 28px;
   text-align: center;
-  padding: 16px;
+  padding: 12px;
   border: 2px solid #2563eb;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
   font-weight: 600;
   color: #111;
 }
 
-.keypad-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.keypad-grid button {
-  height: 70px;
-  font-size: 28px;
-  font-weight: 600;
-  background: linear-gradient(145deg, #ffffff, #f3f4f6);
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  color: #111;
-}
-
-.keypad-grid button:active {
-  transform: translateY(2px);
-  box-shadow: 
-    0 1px 2px rgba(0, 0, 0, 0.1),
-    inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.keypad-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.keypad-actions button {
-  flex: 1;
-  font-size: 18px;
-  padding: 14px;
-}
-
-
-/* Boutons spéciaux dans le pavé numérique */
 .keypad-special-buttons {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
 .keypad-special-buttons button {
   flex: 1;
   min-width: 55px;
-  height: 50px;
-  font-size: 16px;
+  height: 40px;
+  font-size: 14px;
   font-weight: 600;
   background: linear-gradient(145deg, #fef3c7, #fde68a);
   border: 1px solid #f59e0b;
-  border-radius: 10px;
+  border-radius: 6px;
   color: #92400e;
-  box-shadow: 
-    0 2px 4px rgba(245, 158, 11, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: pointer;
 }
 
 .keypad-special-buttons button:active {
   transform: translateY(1px);
-  box-shadow: 
-    0 1px 2px rgba(245, 158, 11, 0.3),
-    inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.keypad-grid button {
+  height: 60px;
+  font-size: 24px;
+  font-weight: 600;
+  background: linear-gradient(145deg, #ffffff, #f3f4f6);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #111;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.keypad-grid button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.keypad-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.keypad-actions button {
+  flex: 1;
+  font-size: 16px;
+  padding: 12px;
 }
