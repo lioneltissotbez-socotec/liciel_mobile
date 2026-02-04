@@ -9,21 +9,28 @@ function renderPlombSummary(ur) {
 
   const badges = Object.entries(ur.plombByLoc)
     .map(([loc, v]) => {
-      if (!v || !v.mesures || v.mesures.length === 0) return null;
+  // Afficher si mesures présentes OU si PE actif
+  if (!v || (!v.mesures && !v.isPE) || (v.mesures && v.mesures.length === 0 && !v.isPE)) return null;
       
-      // Calculer la moyenne des mesures numériques
-      const numericMesures = v.mesures
-        .map(m => parseFloat(String(m).replace(',', '.')))
-        .filter(m => !isNaN(m) && m >= 0);
-      
-      const hasMesures = numericMesures.length > 0;
-      const moyenne = hasMesures 
-        ? numericMesures.reduce((a, b) => a + b, 0) / numericMesures.length 
-        : null;
-      
-      // Déterminer la couleur selon la moyenne
-      let borderColor, bgColor;
-      if (!hasMesures) {
+// Calculer la moyenne des mesures numériques
+const numericMesures = v.mesures
+  ? v.mesures
+      .map(m => parseFloat(String(m).replace(',', '.')))
+      .filter(m => !isNaN(m) && m >= 0)
+  : [];
+
+const hasMesures = numericMesures.length > 0;
+const moyenne = hasMesures 
+  ? numericMesures.reduce((a, b) => a + b, 0) / numericMesures.length 
+  : null;
+
+// Déterminer la couleur selon la moyenne
+let borderColor, bgColor;
+if (v.isPE) {
+  // Bleu : PE (Par Extension)
+  borderColor = '#3b82f6';
+  bgColor = '#dbeafe';
+} else if (!hasMesures) {
         // Bleu : NM ou pas de mesure
         borderColor = '#3b82f6';
         bgColor = '#dbeafe';
@@ -41,12 +48,14 @@ function renderPlombSummary(ur) {
         bgColor = '#fecaca';
       }
       
-      const mesuresStr = v.mesures.join(" | ");
-      const declBadge = v.isDeclenchante ? " ⚠️" : "";
-      const peBadge = v.isPE ? " (PE)" : "";
-      const degradationStr = v.degradation ? ` – ${v.degradation}` : "";
-      
-      return `<span style="
+// Affichage différent selon PE ou mesures normales
+const mesuresStr = v.isPE 
+  ? "PE" 
+  : (v.mesures ? v.mesures.join(" | ") : "");
+const declBadge = v.isDeclenchante ? " ⚠️" : "";
+const degradationStr = v.degradation ? ` – ${v.degradation}` : "";
+
+return `<span style="
   display: inline-block;
   padding: 2px 6px;
   margin: 2px 3px 2px 0;
@@ -57,7 +66,7 @@ function renderPlombSummary(ur) {
   white-space: nowrap;
   line-height: 1.3;
 ">
-        <strong>${loc}</strong> : ${mesuresStr}${declBadge}${peBadge}${degradationStr}
+        <strong>${loc}</strong> : ${mesuresStr}${declBadge}${degradationStr}
       </span>`;
     })
     .filter(Boolean);
@@ -265,7 +274,7 @@ function renderUREditForm(ur) {
 
     <label>Repère</label>
 <div class="letters">
-  ${["A","B","C","D","E"].map(l => `
+  ${["A","B","C","D","Sol","Plaf"].map(l => `
     <button
       class="${(ur.localisation && ur.localisation.items && ur.localisation.items.includes(l)) ? "active" : ""}"
       onclick="toggleLocalisationItem('${l}')">
@@ -812,7 +821,7 @@ function toggleLocalisationItem(value) {
 
 function getAdvancedrepèreOptions() {
   const letters = Array.from({ length: 20 }, (_, i) =>
-    String.fromCharCode(71 + i) // G → Z
+    String.fromCharCode(69 + i) // G → Z
   );
 
   const p = Array.from({ length: 20 }, (_, i) =>
