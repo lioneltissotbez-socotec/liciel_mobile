@@ -25,14 +25,14 @@ function renderPiecesScreen() {
   let html = `<button class="primary" onclick="addPiece()">➕ Ajouter une pièce</button>`;
   html += `<button class="secondary" onclick="go(\x27settings\x27)" style="margin-top: 10px;">⚙️ Paramètres Mission</button>`;
   
-  // 🆕 Info template si utilisé
-if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
-  html += `
-    <div class="template-info">
-      <p>📋 Modèle : <strong>${store.mission.contexte.label}</strong></p>
-    </div>
-  `;
-}
+  // Info template si utilisé
+  if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
+    html += `
+      <div class="template-info">
+        <p>📋 Modèle : <strong>${store.mission.contexte.label}</strong></p>
+      </div>
+    `;
+  }
 
   Object.keys(byBatiment).forEach(batiment => {
     const pieces = byBatiment[batiment];
@@ -44,6 +44,7 @@ if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
           ${open ? "▾" : "▸"} ${batiment}
         </span>
         <span class="count">(${pieces.length})</span>
+        <span onclick="addPieceInSameBatiment('${encodeURIComponent(batiment)}')" title="Ajouter une pièce">➕</span>
         <span onclick="renameBatiment('${encodeURIComponent(batiment)}')">✏️</span>
         <span onclick="deleteBatiment('${encodeURIComponent(batiment)}')">🗑</span>
       </div>
@@ -55,20 +56,18 @@ if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
 
         html += `
           <div class="card piece-card">
-
             <div class="piece-left">
-  <span
-    class="piece-desc-btn"
-    title="Description de la pièce"
-    onclick="openPieceDescription('${p.id}')"
-  >
-    🧱
-    <span class="piece-desc-count">
-      ${p.descriptions ? p.descriptions.length : 0}
-    </span>
-  </span>
-</div>
-
+              <span
+                class="piece-desc-btn"
+                title="Description de la pièce"
+                onclick="openPieceDescription('${p.id}')"
+              >
+                🧱
+                <span class="piece-desc-count">
+                  ${p.descriptions ? p.descriptions.length : 0}
+                </span>
+              </span>
+            </div>
 
             <div class="piece-center" onclick="editPiece('${p.id}')">
               <div class="piece-text">${p.nom || "Nouvelle pièce"}</div>
@@ -87,7 +86,6 @@ if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
               ${nbPhotos ? `<span title="${nbPhotos} photo(s)">📷</span>` : ""}
               <span title="Supprimer" onclick="deletePiece('${p.id}')">🗑</span>
             </div>
-
           </div>
         `;
       });
@@ -114,14 +112,19 @@ function addPiece() {
       : "";
 
   const p = createPiece(lastBatiment);
+  p._isNew = true; // ✅ Marquer comme nouvelle
+  
   store.mission.pieces.push(p);
   saveMission();
+  
   editPiece(p.id);
 }
 
 function editPiece(id) {
   const p = store.mission.pieces.find(x => x.id === id);
   window.currentPiece = p;
+
+  if (!p) return;
 
   const photos = getPhotosForComponent(p.id);
   const screen = document.getElementById("screen-pieces");
@@ -141,26 +144,24 @@ function editPiece(id) {
 
     <label>Visite</label>
     <div class="input-row">
-  <select onchange="pVisite(this.value)">
-    <option value="oui" ${p.visite ? "selected" : ""}>Visitée</option>
-    <option value="non" ${!p.visite ? "selected" : ""}>Non visitée</option>
-  </select>
-  </div>
+      <select onchange="pVisite(this.value)">
+        <option value="oui" ${p.visite ? "selected" : ""}>Visitée</option>
+        <option value="non" ${!p.visite ? "selected" : ""}>Non visitée</option>
+      </select>
+    </div>
 
     ${!p.visite ? `
       <label>Justification</label>
-  <div class="input-row">
-  <textarea oninput="pJustif(this.value)">${p.justification || ""}</textarea>
-  <button class="icon" onclick="openPieceList('justification')">📋</button>
-</div>
+      <div class="input-row">
+        <textarea oninput="pJustif(this.value)">${p.justification || ""}</textarea>
+        <button class="icon" onclick="openPieceList('justification')">📋</button>
+      </div>
 
-
-<label>Moyens à mettre en œuvre</label>
-<div class="input-row">
-  <textarea oninput="pMoyens(this.value)">${p.moyens || ""}</textarea>
-  <button class="icon" onclick="openPieceList('moyens')">📋</button>
-</div>
-
+      <label>Moyens à mettre en œuvre</label>
+      <div class="input-row">
+        <textarea oninput="pMoyens(this.value)">${p.moyens || ""}</textarea>
+        <button class="icon" onclick="openPieceList('moyens')">📋</button>
+      </div>
     ` : ""}
 
     <label>Photo</label>
@@ -182,8 +183,8 @@ function editPiece(id) {
       `).join("")}
     </div>
 
-    <button class="primary" onclick="addAnotherPiece()">➕ Ajouter une pièce</button>
-    <button class="secondary" onclick="renderPiecesScreen()">✅ Finaliser</button>
+    <button class="primary" onclick="validatePiece('${p.id}')">✅ Valider</button>
+    <button class="secondary" onclick="cancelPieceEdit('${p.id}')">⬅ Annuler</button>
   `;
 }
 
@@ -191,8 +192,19 @@ function editPiece(id) {
 // MUTATEURS PIÈCE
 // ======================================================
 
-function pBat(v){ currentPiece.batiment=v; saveMission(); }
-function pNom(v){ currentPiece.nom=v; saveMission(); }
+function pBat(v){ 
+  currentPiece.batiment = v; 
+  if (!currentPiece._isNew) {
+    saveMission(); 
+  }
+}
+
+function pNom(v){ 
+  currentPiece.nom = v; 
+  if (!currentPiece._isNew) {
+    saveMission(); 
+  }
+}
 
 function pVisite(v){
   currentPiece.visite = v === "oui";
@@ -200,12 +212,27 @@ function pVisite(v){
     currentPiece.justification = "";
     currentPiece.moyens = "";
   }
-  saveMission();
+  
+  if (!currentPiece._isNew) {
+    saveMission();
+  }
+  
   editPiece(currentPiece.id);
 }
 
-function pJustif(v){ currentPiece.justification=v; saveMission(); }
-function pMoyens(v){ currentPiece.moyens=v; saveMission(); }
+function pJustif(v){ 
+  currentPiece.justification = v; 
+  if (!currentPiece._isNew) {
+    saveMission(); 
+  }
+}
+
+function pMoyens(v){ 
+  currentPiece.moyens = v; 
+  if (!currentPiece._isNew) {
+    saveMission(); 
+  }
+}
 
 // ======================================================
 // PHOTOS — MODE GLOBAL
@@ -223,14 +250,12 @@ async function pPhoto(file) {
     store.mission.photos.push({
       id: crypto.randomUUID(),
       name: file.name,
-      blob: compressed, // 🔥 Version compressée
-
+      blob: compressed,
       domaine: "piece",
       clefComposant: currentPiece.id,
       localisation: `${currentPiece.batiment || "?"} – ${currentPiece.nom || "?"}`
     });
 
-    // Message de confirmation
     if (saved) {
       console.log('✅ Photo ajoutée (photo compressée et sauvegardée)');
     }
@@ -295,22 +320,11 @@ function openPhotoPreview(photoId) {
 // DIVERS
 // ======================================================
 
-function addAnotherPiece(){
-  const p = createPiece(currentPiece.batiment);
-  store.mission.pieces.push(p);
-  saveMission();
-  editPiece(p.id);
-}
-
 function deletePiece(id) {
   if (!confirm("Supprimer cette pièce ?")) return;
 
-  store.mission.pieces =
-    store.mission.pieces.filter(p => p.id !== id);
-
-  // supprimer les photos liées
-  store.mission.photos =
-    store.mission.photos.filter(ph => ph.clefComposant !== id);
+  store.mission.pieces = store.mission.pieces.filter(p => p.id !== id);
+  store.mission.photos = store.mission.photos.filter(ph => ph.clefComposant !== id);
 
   saveMission();
   renderPiecesScreen();
@@ -325,11 +339,8 @@ function deleteBatiment(encodedBatiment) {
     .filter(p => p.batiment === batiment)
     .map(p => p.id);
 
-  store.mission.pieces =
-    store.mission.pieces.filter(p => p.batiment !== batiment);
-
-  store.mission.photos =
-    store.mission.photos.filter(ph => !pieceIds.includes(ph.clefComposant));
+  store.mission.pieces = store.mission.pieces.filter(p => p.batiment !== batiment);
+  store.mission.photos = store.mission.photos.filter(ph => !pieceIds.includes(ph.clefComposant));
 
   saveMission();
   renderPiecesScreen();
@@ -362,6 +373,7 @@ function openPieceDescription(pieceId) {
   store.ui.currentDescriptionPieceId = pieceId;
   go("description");
 }
+
 // ======================================================
 // BIBLIOTHÈQUES (LISTES DICTIONNAIRES)
 // ======================================================
@@ -419,7 +431,6 @@ function openPieceList(type) {
   document.body.appendChild(overlay);
 }
 
-// Fonction plus robuste pour échapper le HTML
 function escapeForHTML(str) {
   return (str || "")
     .replace(/&/g, '&amp;')
@@ -433,16 +444,7 @@ function escapeForHTML(str) {
 // SÉLECTION MULTIPLE DE PIÈCES
 // ======================================================
 
-/**
- * Affiche l'interface de sélection multiple de pièces
- * Logique des compteurs :
- * - État initial : vide (rien n'est affiché)
- * - 1er clic sur + : affiche "0" = 1 pièce SANS index
- * - 2ème clic sur + : affiche "1" = 1 pièce AVEC index "01"
- * - 3ème clic sur + : affiche "2" = 2 pièces avec index "01", "02"
- */
 function openMultiPieceSelector(dict) {
-  // Initialisation du compteur de pièces
   window.pieceCounter = window.pieceCounter || {};
   window.pieceListAlphabeticalSort = window.pieceListAlphabeticalSort || false;
   
@@ -454,7 +456,6 @@ function openMultiPieceSelector(dict) {
   const content = document.createElement("div");
   content.className = "overlay-content multi-piece-selector";
   
-  // En-tête avec titre et bouton de tri
   const header = document.createElement("div");
   header.style.display = "flex";
   header.style.justifyContent = "space-between";
@@ -482,7 +483,6 @@ function openMultiPieceSelector(dict) {
   header.appendChild(sortBtn);
   content.appendChild(header);
   
-  // Instructions
   const instructions = document.createElement("p");
   instructions.className = "small muted";
   instructions.innerHTML = `
@@ -492,12 +492,10 @@ function openMultiPieceSelector(dict) {
   `;
   content.appendChild(instructions);
   
-  // Liste des pièces (triée ou non)
   const listContainer = document.createElement("div");
   listContainer.className = "multi-piece-list";
   listContainer.id = "multi-piece-list";
   
-  // Trier si demandé
   let itemsToDisplay = [...dict.items];
   if (window.pieceListAlphabeticalSort) {
     itemsToDisplay.sort((a, b) => a.label.localeCompare(b.label, 'fr'));
@@ -512,25 +510,20 @@ function openMultiPieceSelector(dict) {
     row.dataset.piece = item.label;
     if (hasValue && count >= 0) row.classList.add("selected");
     
-    // Nom de la pièce
     const nameDiv = document.createElement("div");
     nameDiv.className = "multi-piece-name";
     nameDiv.textContent = item.label;
     
-    // Contrôles (boutons + et -)
     const controlsDiv = document.createElement("div");
     controlsDiv.className = "multi-piece-controls";
     
-    // 🆕 Vérifier si on doit masquer les boutons +/- (UNICIL et ODHAC = noms imposés)
     const listePieces = store.mission?.contexte?.listePieces || 'standard';
     const hideIndexation = (listePieces === 'unicil' || listePieces === 'odhac87');
     
-    // 🆕 Pour UNICIL/ODHAC : clic direct sur le nom = toggle sélection
     if (hideIndexation) {
       nameDiv.style.cursor = "pointer";
-      nameDiv.style.userSelect = "none"; // Évite la sélection de texte
+      nameDiv.style.userSelect = "none";
       
-      // Ajouter un effet hover
       nameDiv.addEventListener("mouseenter", () => {
         if (!row.classList.contains("selected")) {
           nameDiv.style.backgroundColor = "#f0f0f0";
@@ -541,23 +534,17 @@ function openMultiPieceSelector(dict) {
       });
       
       nameDiv.addEventListener("click", (e) => {
-        e.stopPropagation(); // Éviter la propagation
-        console.log(`🖱️ Clic sur pièce: ${item.label}`);
+        e.stopPropagation();
         
-        // Toggle : si la pièce est sélectionnée, la déselectionner, sinon la sélectionner
         const currentCount = window.pieceCounter[item.label];
         const isSelected = (currentCount !== undefined && currentCount !== null);
         
         if (isSelected) {
-          // Désélectionner
           delete window.pieceCounter[item.label];
           row.classList.remove("selected");
-          console.log(`❌ Pièce désélectionnée: ${item.label}`);
         } else {
-          // Sélectionner : count = 0 pour UNICIL/ODHAC (pas d'indexation)
           window.pieceCounter[item.label] = 0;
           row.classList.add("selected");
-          console.log(`✅ Pièce sélectionnée: ${item.label}`);
         }
         updateMultiPieceSummary();
       });
@@ -572,7 +559,6 @@ function openMultiPieceSelector(dict) {
     const counterSpan = document.createElement("span");
     counterSpan.className = "counter-value";
     counterSpan.id = `counter-${item.id}`;
-    // Afficher seulement si une valeur existe
     counterSpan.textContent = hasValue ? count : "";
     counterSpan.style.minWidth = "30px";
     if (hideIndexation) counterSpan.style.display = "none";
@@ -594,14 +580,12 @@ function openMultiPieceSelector(dict) {
   
   content.appendChild(listContainer);
   
-  // Résumé
   const summary = document.createElement("div");
   summary.className = "multi-piece-summary";
   summary.id = "multi-piece-summary";
   summary.innerHTML = `<strong>Total :</strong> <span id="total-pieces-count">0</span> pièce(s) à ajouter`;
   content.appendChild(summary);
   
-  // Boutons d'action
   const btnAdd = document.createElement("button");
   btnAdd.className = "primary";
   btnAdd.textContent = "✅ Ajouter les pièces";
@@ -621,20 +605,14 @@ function openMultiPieceSelector(dict) {
   updateMultiPieceSummary();
 }
 
-/**
- * Incrémente le compteur d'un type de pièce
- * Logique : vide → 0 → 1 → 2 → ...
- */
 function incrementPiece(pieceName) {
   window.pieceCounter = window.pieceCounter || {};
   
   const current = window.pieceCounter[pieceName];
   
   if (current === undefined || current === null) {
-    // Premier clic : passer à 0
     window.pieceCounter[pieceName] = 0;
   } else {
-    // Clics suivants : incrémenter
     window.pieceCounter[pieceName] = current + 1;
   }
   
@@ -642,25 +620,18 @@ function incrementPiece(pieceName) {
   updateMultiPieceSummary();
 }
 
-/**
- * Décrémente le compteur d'un type de pièce
- * Logique : ... → 2 → 1 → 0 → vide
- */
 function decrementPiece(pieceName) {
   window.pieceCounter = window.pieceCounter || {};
   
   const current = window.pieceCounter[pieceName];
   
   if (current === undefined || current === null) {
-    // Rien à faire si déjà vide
     return;
   }
   
   if (current === 0) {
-    // Retour à l'état vide
     delete window.pieceCounter[pieceName];
   } else {
-    // Décrémenter
     window.pieceCounter[pieceName] = current - 1;
   }
   
@@ -668,9 +639,6 @@ function decrementPiece(pieceName) {
   updateMultiPieceSummary();
 }
 
-/**
- * Met à jour l'affichage du compteur pour un type de pièce
- */
 function updateMultiPieceDisplay(pieceName) {
   const row = document.querySelector(`[data-piece="${pieceName}"]`);
   if (!row) return;
@@ -680,10 +648,8 @@ function updateMultiPieceDisplay(pieceName) {
     const count = window.pieceCounter[pieceName];
     const hasValue = count !== undefined && count !== null;
     
-    // Afficher le compteur seulement s'il a une valeur
     counter.textContent = hasValue ? count : "";
     
-    // Mise en évidence visuelle si une valeur existe (même 0)
     if (hasValue) {
       row.classList.add('selected');
     } else {
@@ -692,9 +658,6 @@ function updateMultiPieceDisplay(pieceName) {
   }
 }
 
-/**
- * Met à jour le résumé du nombre total de pièces
- */
 function updateMultiPieceSummary() {
   const totalElement = document.getElementById('total-pieces-count');
   if (!totalElement) return;
@@ -702,14 +665,10 @@ function updateMultiPieceSummary() {
   let total = 0;
   Object.entries(window.pieceCounter || {}).forEach(([name, count]) => {
     if (count !== undefined && count !== null) {
-      // Chaque valeur représente le nombre de pièces
-      // 0 = 1 pièce sans index
-      // 1 = 1 pièce avec index
-      // 2 = 2 pièces avec index, etc.
       if (count === 0) {
-        total += 1; // 1 pièce sans index
+        total += 1;
       } else {
-        total += count; // N pièces avec index
+        total += count;
       }
     }
   });
@@ -717,13 +676,6 @@ function updateMultiPieceSummary() {
   totalElement.textContent = total;
 }
 
-/**
- * Ajoute toutes les pièces sélectionnées avec ou sans indexation
- * Logique :
- * - count === 0 : 1 pièce SANS index
- * - count === 1 : 1 pièce AVEC index "01"
- * - count >= 2 : N pièces avec index "01", "02", ...
- */
 function addMultiplePieces() {
   const p = getCurrentPiece();
   if (!p) return;
@@ -731,20 +683,26 @@ function addMultiplePieces() {
   const batiment = p.batiment;
   const pieceCounter = window.pieceCounter || {};
   
+  // ✅ Supprimer la pièce temporaire si elle existe et est vide
+  if (p._isNew) {
+    const isEmpty = !p.nom || p.nom.trim() === "" || p.nom === "Nouvelle pièce";
+    if (isEmpty) {
+      store.mission.pieces = store.mission.pieces.filter(piece => piece.id !== p.id);
+      console.log('🗑️ Pièce temporaire supprimée');
+    }
+  }
+  
   let totalAdded = 0;
   
-  // Pour chaque type de pièce avec un compteur défini
   Object.entries(pieceCounter).forEach(([pieceName, count]) => {
     if (count === undefined || count === null) return;
     
     if (count === 0) {
-      // count = 0 : 1 pièce SANS index
       const newPiece = createPiece(batiment);
       newPiece.nom = pieceName;
       store.mission.pieces.push(newPiece);
       totalAdded++;
     } else {
-      // count >= 1 : N pièces AVEC index
       for (let i = 1; i <= count; i++) {
         const indexedName = `${pieceName} ${String(i).padStart(2, '0')}`;
         const newPiece = createPiece(batiment);
@@ -755,29 +713,22 @@ function addMultiplePieces() {
     }
   });
   
-  // Réinitialiser le compteur
   window.pieceCounter = {};
+  window.currentPiece = null; // ✅ Nettoyer la référence
   
-  // Sauvegarder et retourner à l'écran principal
   saveMission();
   closeOverlay();
   renderPiecesScreen();
   
-  // Message de confirmation (optionnel)
   if (totalAdded > 0) {
     console.log(`✅ ${totalAdded} pièce(s) ajoutée(s)`);
   }
 }
 
-/**
- * Annule la sélection multiple et ferme l'overlay
- */
 function cancelMultiPieceSelection() {
   window.pieceCounter = {};
   closeOverlay();
 }
-
-// ======================================================
 
 function selectFromPieceList(type, value) {
   const p = getCurrentPiece();
@@ -793,42 +744,73 @@ function selectFromPieceList(type, value) {
   editPiece(p.id);
 }
 
-function escapeQuotes(s) {
-  return (s || "").replace(/'/g, "\\'");
-}
-
 function closeOverlay() {
   document.querySelector(".overlay")?.remove();
 }
 
-/**
- * Change le template de pièces
- */
-async function changeTemplate() {
-  if (!confirm('Changer de modèle ? Les pièces actuelles seront remplacées.')) {
+// ======================================================
+// GESTION NOUVELLE PIÈCE
+// ======================================================
+
+function addPieceInSameBatiment(encodedBatiment) {
+  const batiment = decodeURIComponent(encodedBatiment);
+  
+  const p = createPiece(batiment);
+  p._isNew = true;
+  
+  store.mission.pieces.push(p);
+  saveMission();
+  
+  editPiece(p.id);
+}
+
+function validatePiece(pieceId) {
+  const piece = window.currentPiece;
+  
+  if (!piece) {
+    renderPiecesScreen();
     return;
   }
   
-  // Supprimer les pièces et le contexte
-  store.mission.pieces = [];
-  store.mission.contexte = null;
-  await saveMission();
+  if (piece._isNew) {
+    const hasValidName = piece.nom && piece.nom.trim() !== "" && piece.nom !== "Nouvelle pièce";
+    
+    if (!hasValidName) {
+      store.mission.pieces = store.mission.pieces.filter(p => p.id !== piece.id);
+      store.mission.photos = store.mission.photos.filter(ph => ph.clefComposant !== piece.id);
+      
+      saveMission();
+      alert("Veuillez saisir un nom de pièce");
+      renderPiecesScreen();
+      return;
+    }
+    
+    delete piece._isNew;
+    saveMission();
+  } else {
+    saveMission();
+  }
   
-  // Revenir à l'écran de démarrage
-  go('start');
-  
-  // Réafficher le contenu (pas le loader)
-  setTimeout(() => {
-    document.getElementById('loading-bar').style.display = 'none';
-    document.getElementById('start-content').style.display = 'block';
-  }, 100);
+  window.currentPiece = null;
+  renderPiecesScreen();
 }
 
-window.changeTemplate = changeTemplate;
+function cancelPieceEdit(pieceId) {
+  const piece = window.currentPiece;
+  
+  if (piece && piece._isNew) {
+    store.mission.pieces = store.mission.pieces.filter(p => p.id !== piece.id);
+    store.mission.photos = store.mission.photos.filter(ph => ph.clefComposant !== piece.id);
+    
+    saveMission();
+    window.currentPiece = null;
+  } else {
+    saveMission();
+  }
+  
+  renderPiecesScreen();
+}
 
-/**
- * Marque une pièce comme visitée (via clic sur ⚠️)
- */
 function markPieceAsVisited(pieceId) {
   const piece = store.mission?.pieces.find(p => p.id === pieceId);
   if (!piece) return;
@@ -838,5 +820,8 @@ function markPieceAsVisited(pieceId) {
   renderPiecesScreen();
 }
 
+// Exposer les fonctions
+window.validatePiece = validatePiece;
+window.cancelPieceEdit = cancelPieceEdit;
+window.addPieceInSameBatiment = addPieceInSameBatiment;
 window.markPieceAsVisited = markPieceAsVisited;
-
