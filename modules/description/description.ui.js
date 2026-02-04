@@ -496,7 +496,7 @@ function renderUREditForm(ur) {
                 ` : ''}
                 
                 ${(() => {
-                  const isSaisieLibre = observation && !['', 'Par Extension', 'Element récent', 'Hors d\'atteinte >3m'].includes(observation);
+                  const isSaisieLibre = observation && !['', 'Par Extension', 'Element récent', 'Non visé par la réglementation', 'Hors d\'atteinte >3m'].includes(observation);
                   return !isPE ? `
                     <select
                       id="obs-select-${loc.replace(/\s/g, '_')}"
@@ -508,6 +508,7 @@ function renderUREditForm(ur) {
                       <option value="" ${observation==="" ? "selected" : ""}>—</option>
                       <option ${observation==="Par Extension" ? "selected" : ""}>Par Extension</option>
                       <option ${observation==="Element récent" ? "selected" : ""}>Élément récent</option>
+                      <option ${observation==="Non visé par la réglementation" ? "selected" : ""}>Non visé par la réglementation</option>
                       <option ${observation==="Hors d'atteinte >3m" ? "selected" : ""}>Hors d'atteinte >3m</option>
                       <option value="__LIBRE__">✏️ Saisie libre</option>
                     </select>
