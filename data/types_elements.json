@@ -8,21 +8,45 @@
     { "id": "plinthe", "label": "Plinthe" },
 
     { "id": "fenetre", "label": "Fenêtre" },
+    { "id": "embrasure_fenetre", "label": "Embrasure fenêtre" },
+    { "id": "huisserie_fenetre", "label": "Huisserie fenêtre" },
+    { "id": "moulure_fenetre", "label": "Moulure fenêtre" },
+    { "id": "volet", "label": "Volet" },
+
     { "id": "porte", "label": "Porte" },
     { "id": "embrasure_porte", "label": "Embrasure porte" },
+    { "id": "huisserie_porte", "label": "Huisserie porte" },
     { "id": "moulure_porte", "label": "Moulure porte" },
-    { "id": "embrasure_fenetre", "label": "Embrasure fenêtre" },
-    { "id": "moulure_fenetre", "label": "Moulure fenêtre" },
+        
     { "id": "allege", "label": "Allège" },
     { "id": "soubassement_mur", "label": "Soubassement de mur" },
+     
+    { "id": "radiateur", "label": "Radiateur" },
 
-    { "id": "volet", "label": "Volet" },
-    { "id": "huisserie_porte", "label": "Huisserie porte" },
-    { "id": "huisserie_fenetre", "label": "Huisserie fenêtre" },
     { "id": "linteau_porte", "label": "Linteau porte" },
     { "id": "linteau_fenetre", "label": "Linteau fenêtre" },
 
     { "id": "moulure_plafond", "label": "Moulure plafond" },
+
+    { "id": "escalier", "label": "Escalier" },
+    { "id": "marche", "label": "Marche" },
+    { "id": "contre_marche", "label": "Contre-marche" },
+    { "id": "limon", "label": "Limon" },
+    { "id": "faux_limon", "label": "Faux-limon" },
+    { "id": "cremaillere", "label": "Crémaillère" },
+    { "id": "balustre", "label": "Balustre" },
+    { "id": "main_courante", "label": "Main-courante" },
+    { "id": "garde_corps", "label": "Garde-corps" },
+
+    { "id": "cheminee", "label": "Cheminée" },
+    { "id": "hotte_cheminee", "label": "Hotte cheminée" },
+    { "id": "jambage_cheminee", "label": "Jambage cheminée" },
+    { "id": "linteau_cheminee", "label": "Linteau cheminée" },
+
+    { "id": "poteau", "label": "Poteau" },
+    { "id": "poutre", "label": "Poutre" },
+    { "id": "solivage", "label": "Solivage" },
+    { "id": "lambourdes", "label": "Lambourdes" },
 
     { "id": "charpente", "label": "Charpente" },
     { "id": "ferme", "label": "Ferme" },
@@ -37,27 +61,7 @@
     { "id": "panne_sabliere", "label": "Panne sablière" },
     { "id": "chevrons", "label": "Chevrons" },
     { "id": "voligeage", "label": "Voligeage" },
-    { "id": "liteaunage", "label": "Liteaunage" },
+    { "id": "liteaunage", "label": "Liteaunage" }
 
-    { "id": "poteau", "label": "Poteau" },
-    { "id": "poutre", "label": "Poutre" },
-    { "id": "solivage", "label": "Solivage" },
-    { "id": "lambourdes", "label": "Lambourdes" },
-
-    { "id": "escalier", "label": "Escalier" },
-    { "id": "marche", "label": "Marche" },
-    { "id": "contre_marche", "label": "Contre-marche" },
-    { "id": "limon", "label": "Limon" },
-    { "id": "faux_limon", "label": "Faux-limon" },
-    { "id": "cremaillere", "label": "Crémaillère" },
-    { "id": "balustre", "label": "Balustre" },
-    { "id": "main_courante", "label": "Main-courante" },
-    { "id": "garde_corps", "label": "Garde-corps" },
-
-    { "id": "radiateur", "label": "Radiateur" },
-    { "id": "cheminee", "label": "Cheminée" },
-    { "id": "hotte_cheminee", "label": "Hotte cheminée" },
-    { "id": "jambage_cheminee", "label": "Jambage cheminée" },
-    { "id": "linteau_cheminee", "label": "Linteau cheminée" }
   ]
 }

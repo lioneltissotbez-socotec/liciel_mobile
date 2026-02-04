@@ -10,6 +10,8 @@
     { "id": "ciment", "label": "Ciment" },
     { "id": "bois", "label": "Bois" },
     { "id": "pvc", "label": "PVC" },
+    { "id": "fonte", "label": "Fonte" },
+    { "id": "metal", "label": "Métal" },
     { "id": "pierres", "label": "Pierres" },
     { "id": "parpaings", "label": "Parpaings" },
     { "id": "vitrage", "label": "Vitrage" },
