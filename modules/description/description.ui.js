@@ -62,7 +62,7 @@ return `<span style="
   border: 2px solid ${borderColor};
   background: ${bgColor};
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 09px;
   white-space: nowrap;
   line-height: 1.3;
 ">
