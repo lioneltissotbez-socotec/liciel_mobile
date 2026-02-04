@@ -31,12 +31,17 @@ function render() {
   renderDescriptionScreen();
 }
 
+  if (store.ui.screen === "settings" && typeof renderSettingsScreen === "function") {
+    renderSettingsScreen();
+  }
+
   // Titre
   const titles = {
     start: "Démarrage mission",
     pieces: "Pièces",
     photos: "Photos",
     description: "Description de la pièce",
+    settings: "Paramètres Mission",
     resume: "Résumé de la mission",
   };
 
@@ -637,8 +642,7 @@ async function deleteMission(numero) {
 function ensureMissionSettings(mission) {
   if (!mission.settings) {
     mission.settings = {
-      mode: "CREP",
-
+      mode: "CREP", // Défaut uniquement si settings n'existe pas
       plomb: {
         crep: {
           autoBelowOne: true,
@@ -651,6 +655,22 @@ function ensureMissionSettings(mission) {
         }
       }
     };
+  } else {
+    // S'assurer que les sous-objets existent sans écraser le mode
+    if (!mission.settings.plomb) {
+      mission.settings.plomb = {
+        crep: {
+          autoBelowOne: true,
+          randomMin: 0.05,
+          randomMax: 0.95
+        },
+        avantTravaux: {
+          autoUncertainty: true,
+          uncertaintyRatio: 0.10
+        }
+      };
+    }
+    // Garder le mode existant, ne pas le forcer
   }
 }
 
@@ -736,6 +756,63 @@ async function init() {
   }
 }
 
+// =====================================================
+// MODAL CRÉATION MISSION
+// =====================================================
+
+let missionCoverPhotoBlob = null;
+
+function openNewMissionModal() {
+  document.getElementById("new-mission-modal").style.display = "flex";
+  missionCoverPhotoBlob = null;
+  document.getElementById("modal-photo-preview").style.display = "none";
+}
+
+function closeNewMissionModal() {
+  document.getElementById("new-mission-modal").style.display = "none";
+  missionCoverPhotoBlob = null;
+}
+
+async function takeMissionCoverPhoto() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.capture = "environment";
+  
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    try {
+      // Compresser la photo
+      const result = await PhotoCompressor.compressPhoto(file);
+      missionCoverPhotoBlob = result.compressed;
+      
+      // Afficher preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById("modal-photo-img").src = e.target.result;
+        document.getElementById("modal-photo-preview").style.display = "block";
+      };
+      reader.readAsDataURL(missionCoverPhotoBlob);
+      
+      console.log("✅ Photo de couverture prise");
+    } catch (err) {
+      console.error("❌ Erreur photo:", err);
+      alert("Erreur lors de la prise de photo");
+    }
+  };
+  
+  input.click();
+}
+
+function toggleModalPlombOptions() {
+  const checkbox = document.getElementById("modal-module-plomb");
+  const options = document.getElementById("modal-plomb-options");
+  options.style.display = checkbox.checked ? "flex" : "none";
+}
+
+
 init();
 // 🔥 Autosave global (mobile-like)
 window.addEventListener("visibilitychange", () => {
@@ -779,6 +856,22 @@ async function createNewMission() {
   const typeBien = document.getElementById('modal-type-bien').value;
   const listePieces = document.getElementById('modal-liste-pieces').value;
   
+  // 🆕 Récupérer le mode plomb sélectionné
+  const plombChecked = document.getElementById('modal-module-plomb').checked;
+  const plombModeRadio = document.querySelector('input[name="modal-plomb-mode"]:checked');
+  const plombMode = plombChecked && plombModeRadio ? plombModeRadio.value : 'CREP';
+  
+  // 🆕 Récupérer les modules cochés
+  const modules = {
+    plomb: plombChecked,
+    amiante: document.getElementById('modal-module-amiante').checked,
+    gaz: document.getElementById('modal-module-gaz').checked,
+    electricite: document.getElementById('modal-module-electricite').checked,
+    dpe: document.getElementById('modal-module-dpe').checked,
+    termites: document.getElementById('modal-module-termites').checked,
+    mesurages: document.getElementById('modal-module-mesurages').checked
+  };
+  
   mission = {
     numeroDossier: numero,
     dateCreation: new Date().toISOString(),
@@ -797,7 +890,7 @@ async function createNewMission() {
     },
 
     settings: {
-      mode: "CREP",
+      mode: plombMode, // CREP ou AVANT_TRAVAUX selon sélection
       plomb: {
         crep: {
           autoBelowOne: true,
@@ -811,16 +904,27 @@ async function createNewMission() {
       }
     },
 
-    modules: {
-      plombTravaux: false,
-      amiante: false,
-      gaz: false,
-      electricite: false,
-      mesurages: false,
-      termites: false,
-      dpe: false
-    }
+    modules: modules,
+    
+    // 🆕 Photo de couverture
+    coverPhoto: null
   };
+  
+  // 🆕 Ajouter la photo de couverture si elle existe
+  if (missionCoverPhotoBlob) {
+    const photoId = crypto.randomUUID();
+    const reader = new FileReader();
+    reader.onload = async () => {
+      mission.coverPhoto = {
+        id: photoId,
+        data: reader.result,
+        date: new Date().toISOString()
+      };
+      await saveMission();
+      console.log('✅ Photo de couverture sauvegardée');
+    };
+    reader.readAsDataURL(missionCoverPhotoBlob);
+  }
   
   // Appliquer le template si sélectionné
   const templateData = await getSelectedTemplateFromModal();

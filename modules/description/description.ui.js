@@ -1,25 +1,82 @@
 console.log("✅ description.ui.js chargé");
 
+// Variables globales pour la fonction secrète (5 clics)
+let clickCount = 0;
+let clickTimer = null;
+
 function renderPlombSummary(ur) {
   if (!ur.plombByLoc || Object.keys(ur.plombByLoc).length === 0) return "";
 
-  const entries = Object.entries(ur.plombByLoc)
+  const badges = Object.entries(ur.plombByLoc)
     .map(([loc, v]) => {
       if (!v || !v.mesures || v.mesures.length === 0) return null;
+      
+      // Calculer la moyenne des mesures numériques
+      const numericMesures = v.mesures
+        .map(m => parseFloat(String(m).replace(',', '.')))
+        .filter(m => !isNaN(m) && m >= 0);
+      
+      const hasMesures = numericMesures.length > 0;
+      const moyenne = hasMesures 
+        ? numericMesures.reduce((a, b) => a + b, 0) / numericMesures.length 
+        : null;
+      
+      // Déterminer la couleur selon la moyenne
+      let borderColor, bgColor;
+      if (!hasMesures) {
+        // Bleu : NM ou pas de mesure
+        borderColor = '#3b82f6';
+        bgColor = '#dbeafe';
+      } else if (moyenne < 0.3) {
+        // Vert : < 0.3
+        borderColor = '#10b981';
+        bgColor = '#d1fae5';
+      } else if (moyenne < 1) {
+        // Orange : >= 0.3 et < 1
+        borderColor = '#f59e0b';
+        bgColor = '#fed7aa';
+      } else {
+        // Rouge : >= 1
+        borderColor = '#ef4444';
+        bgColor = '#fecaca';
+      }
       
       const mesuresStr = v.mesures.join(" | ");
       const declBadge = v.isDeclenchante ? " ⚠️" : "";
       const peBadge = v.isPE ? " (PE)" : "";
+      const degradationStr = v.degradation ? ` – ${v.degradation}` : "";
       
-      return `${loc} : ${mesuresStr}${declBadge}${peBadge}${v.degradation ? " – " + v.degradation : ""}`;
+      return `<span style="
+  display: inline-block;
+  padding: 2px 6px;
+  margin: 2px 3px 2px 0;
+  border: 2px solid ${borderColor};
+  background: ${bgColor};
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  line-height: 1.3;
+">
+        <strong>${loc}</strong> : ${mesuresStr}${declBadge}${peBadge}${degradationStr}
+      </span>`;
     })
     .filter(Boolean);
 
-  if (!entries.length) return "";
+  if (!badges.length) return "";
 
   return `
-    <div class="plomb-summary warn">
-      Plomb : ${entries.join(" | ")}
+    <div style="
+    margin-top: 8px;
+    padding: 6px;
+    background: #f9fafb;
+    border-radius: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    line-height: 1.2;
+  ">
+      ${badges.join('')}
     </div>
   `;
 }
@@ -37,10 +94,6 @@ function renderDescriptionScreen() {
 
   piece.descriptions = piece.descriptions || [];
   
-  // Initialiser modeCREP par défaut
-  if (piece.modeCREP === undefined) {
-    piece.modeCREP = true;
-  }
 
   // 🆕 Migration V3 → V4 : mesure unique → mesures[]
   piece.descriptions.forEach(ur => {
@@ -78,18 +131,6 @@ function renderDescriptionScreen() {
     <h2>${piece.nom || "Pièce sans nom"}</h2>
     <p><strong>Bâtiment :</strong> ${piece.batiment || "-"}</p>
     
-    <!-- Mode diagnostic plomb -->
-    <div class="plomb-mode-selector">
-      <label class="checkbox-label">
-        <input type="checkbox" id="mode-crep" ${piece.modeCREP !== false ? 'checked' : ''} onchange="toggleModeCREP()">
-        <span><strong>Mode CREP</strong> (règle 2-3 mesures par repère)</span>
-      </label>
-      <div class="small muted" style="margin-top:4px">
-        ${piece.modeCREP !== false 
-          ? '✅ Actif : 2 mesures minimum, 3ème si une repère ≥ 1 mg/cm²' 
-          : '⚠️ Désactivé : Mode Plomb Avant Travaux (1 mesure par repère)'}
-      </div>
-    </div>
     
     <!-- 🆕 Checkbox liste par défaut -->
     ${piece.descriptions.length === 0 ? `
@@ -257,9 +298,9 @@ function renderUREditForm(ur) {
   <button class="icon" onclick="openDescList('revetements')">📋</button>
 </div>
 
-<h3>Mesures plomb (par repère)</h3>
+<h3 id="plomb-title" onclick="handlePlombTitleClick()" style="cursor: pointer; user-select: none;">Mesures plomb (par repère)</h3>
 
-<div class="plomb-actions compact">
+<div id="quick-buttons-container" class="plomb-actions compact" style="display: ${isModeCREP() || store.ui.expertMode ? 'flex' : 'none'}">
   <button onclick="plombApplyModeToAll('NM')">NM</button>
   <button onclick="plombApplyModeToAll('DASH')">-</button>
   <button onclick="plombApplyModeToAll('ZERO')">=0</button>
@@ -268,7 +309,7 @@ function renderUREditForm(ur) {
 </div>
 
 <div class="small muted" style="margin-top:6px">
-  ${getCurrentDescriptionPiece().modeCREP 
+  ${isModeCREP() 
     ? "Mode CREP : 2 mesures minimum par repère" 
     : "Mode Avant Travaux : Cocher PE pour Par Extension"}
 </div>
@@ -301,51 +342,134 @@ function renderUREditForm(ur) {
           const degrVal = entry.degradation ?? "";
           const photoId = entry.photoId;
           const hasPhoto = photoId && store.mission.photos.find(p => p.id === photoId);
-          const modeCREP = getCurrentDescriptionPiece().modeCREP;
+          const modeCREP = isModeCREP();
           const isPE = entry.isPE || false;
           const observation = entry.observation || "";
           
           return `
             <div class="plomb-loc-row ${entry.isDeclenchante ? 'is-declenchante' : ''}">
               
-              <!-- LIGNE 1 : Repère + PE + Badge + Mesures -->
-              <div class="plomb-ligne-1">
-                <div class="plomb-loc-tag">${loc}</div>
-                
-                ${!modeCREP ? `
-                  <label class="checkbox-pe">
-                    <input type="checkbox" 
-                           ${isPE ? 'checked' : ''} 
-                           onchange="togglePE('${loc.replace(/'/g, "\\'")}', this.checked)">
-                    <span>PE</span>
-                  </label>
-                ` : ''}
+               <!-- LIGNE 1 : Repère + PE + Badge + Mesures -->
+              <div style="
+                display: flex;
+                align-items: stretch;
+                gap: 8px;
+                margin-bottom: 8px;
+              ">
+                <!-- Repère -->
+                <div style="
+                  display: flex;
+                  align-items: center;
+                  min-width: 30px;
+                  font-weight: bold;
+                  font-size: 14px;
+                ">${loc}</div>
                 
                 ${entry.isDeclenchante ? `
-                  <span class="badge-declenchante">⚠️</span>
+                  <span style="
+                    display: flex;
+                    align-items: center;
+                    font-size: 18px;
+                  ">⚠️</span>
                 ` : ''}
                 
                 ${!isPE ? `
-                  <div class="plomb-mesures-inline">
+                  <!-- Zone mesures + bouton + -->
+                  <div style="
+                    display: flex;
+                    align-items: stretch;
+                    gap: 6px;
+                    flex: 1;
+                  ">
                     ${entry.mesures && entry.mesures.length > 0 ? entry.mesures.map((m, idx) => `
                       <input
-                        class="mesure-input"
+                        type="text"
                         value="${m}"
                         onclick="openMesureKeypad('${loc.replace(/'/g, "\\'")}', ${idx})"
                         readonly
-                        title="Mesure ${idx + 1}"
-                      />
+                        style="
+                          width: 70px;
+                          height: 40px;
+                          padding: 0;
+                          margin: 0;
+                          border: 2px solid #d1d5db;
+                          border-radius: 6px;
+                          font-size: 14px;
+                          text-align: center;
+                          background: white;
+                          cursor: pointer;
+                          box-sizing: border-box;
+                          vertical-align: middle;
+                          line-height: 36px;
+                        ">
                     `).join('') : ''}
                     
                     ${!entry.isDeclenchante && Array.isArray(entry.mesures) ? `
-                      <button class="btn-add-mesure-inline" onclick="addMesureManuelle('${loc.replace(/'/g, "\\'")}')">+</button>
+                      <button 
+                        onclick="addMesureManuelle('${loc.replace(/'/g, "\\'")}')"
+                        style="
+                          width: 40px;
+                          height: 40px;
+                          padding: 0;
+                          margin: 0;
+                          border: none;
+                          background: #3b82f6;
+                          color: white;
+                          border-radius: 6px;
+                          font-size: 20px;
+                          font-weight: bold;
+                          cursor: pointer;
+                          box-sizing: border-box;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          vertical-align: middle;
+                        ">+</button>
                     ` : ''}
                   </div>
                 ` : `
-                  <span class="muted small">PE</span>
+                  <span style="
+                    display: flex;
+                    align-items: center;
+                    flex: 1;
+                    color: #9ca3af;
+                    font-size: 13px;
+                  ">Par Extension</span>
                 `}
+                
+                <!-- Checkbox PE à droite -->
+                ${!modeCREP ? `
+                  <label style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 54px;
+                    height: 40px;
+                    padding: 0 12px;
+                    margin: 0;
+                    border: 2px solid ${isPE ? '#10b981' : '#d1d5db'};
+                    background: ${isPE ? '#d1fae5' : '#f3f4f6'};
+                    border-radius: 6px;
+                    cursor: pointer;
+                    user-select: none;
+                    box-sizing: border-box;
+                    vertical-align: middle;
+                  ">
+                    <input 
+                      type="checkbox" 
+                      ${isPE ? 'checked' : ''}
+                      onchange="togglePE('${loc.replace(/'/g, "\\'")}', this.checked)"
+                      style="display: none;">
+                    <span style="
+                      font-weight: ${isPE ? 'bold' : 'normal'};
+                      font-size: 13px;
+                      color: #111;
+                      line-height: 1;
+                    ">PE</span>
+                  </label>
+                ` : ''}
               </div>
-              
+
               <!-- LIGNE 2 : Dégradation + Observation + Photo -->
               <div class="plomb-ligne-2">
                 ${!isPE ? `
@@ -792,7 +916,7 @@ function plombApplyModeToAll(mode) {
   if (!ur) return;
 
   const piece = getCurrentDescriptionPiece();
-  const modeCREP = piece.modeCREP !== false;
+  const modeCREP = isModeCREP();
   const locs = plombEnsureByLoc(ur);
 
   locs.forEach(loc => {
@@ -1053,18 +1177,6 @@ window.toggleDefaultDescriptions = toggleDefaultDescriptions;
 /**
  * Active/désactive le mode CREP
  */
-function toggleModeCREP() {
-  const piece = getCurrentDescriptionPiece();
-  if (!piece) return;
-  
-  const checkbox = document.getElementById('mode-crep');
-  piece.modeCREP = checkbox ? checkbox.checked : true;
-  
-  saveMission();
-  renderDescriptionScreen();
-}
-
-window.toggleModeCREP = toggleModeCREP;
 
 /**
  * Active/désactive Par Extension sur une repère (Mode Avant Travaux)
@@ -1272,7 +1384,7 @@ function keypadConfirmMesure(repère, index) {
   
   // Vérifier déclenchante (Mode CREP)
   const piece = getCurrentDescriptionPiece();
-  if (piece.modeCREP !== false) {
+  if (isModeCREP()) {
     checkAndAddTroisiemeMesure(ur);
   }
   
@@ -1377,3 +1489,93 @@ function openRepereManuel() {
 }
 
 window.openRepereManuel = openRepereManuel;
+
+/**
+ * Retourne si le mode CREP est actif (sinon Avant Travaux)
+ */
+function isModeCREP() {
+  return store.mission?.settings?.mode === "CREP";
+}
+
+/**
+ * Fonction secrète : 5 clics rapides sur le titre pour activer le mode expert
+ */
+
+function handlePlombTitleClick() {
+  clickCount++;
+  
+  // Premier clic : démarrer le timer
+  if (clickCount === 1) {
+    clickTimer = setTimeout(() => {
+      clickCount = 0;
+    }, 3000); // Reset après 3 secondes
+  }
+  
+  // 5 clics atteints : activer mode expert
+  if (clickCount === 5) {
+    clearTimeout(clickTimer);
+    clickCount = 0;
+    
+    // Toggle mode expert
+    if (!store.ui.expertMode) {
+      store.ui.expertMode = true;
+      
+      // Animation titre
+      const title = document.getElementById('plomb-title');
+      title.style.transition = 'all 0.3s';
+      title.style.background = 'linear-gradient(90deg, #3b82f6, #8b5cf6)';
+      title.style.color = 'white';
+      title.style.padding = '8px 12px';
+      title.style.borderRadius = '8px';
+      
+      setTimeout(() => {
+        title.style.background = '';
+        title.style.color = '';
+        title.style.padding = '';
+      }, 2000);
+      
+      // Toast notification
+      showToast("🔓 Mode expert activé ! Boutons rapides affichés");
+      
+    } else {
+      store.ui.expertMode = false;
+      showToast("🔒 Mode expert désactivé");
+    }
+    
+    // Réafficher l'écran pour appliquer les changements
+    renderDescriptionScreen();
+  }
+}
+
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.style.cssText = `
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #111;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease;
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideUp 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Initialiser expertMode dans store
+if (!store.ui.expertMode) {
+  store.ui.expertMode = false;
+}
+
+window.handlePlombTitleClick = handlePlombTitleClick;

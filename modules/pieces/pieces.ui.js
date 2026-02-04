@@ -23,16 +23,16 @@ function renderPiecesScreen() {
   });
 
   let html = `<button class="primary" onclick="addPiece()">➕ Ajouter une pièce</button>`;
+  html += `<button class="secondary" onclick="go(\x27settings\x27)" style="margin-top: 10px;">⚙️ Paramètres Mission</button>`;
   
   // 🆕 Info template si utilisé
-  if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
-    html += `
-      <div class="template-info">
-        <p>📋 Modèle appliqué : <strong>${store.mission.contexte.label}</strong></p>
-        <button class="secondary" onclick="changeTemplate()">🔄 Changer de modèle</button>
-      </div>
-    `;
-  }
+if (store.mission.contexte && store.mission.contexte.templatesUtilises) {
+  html += `
+    <div class="template-info">
+      <p>📋 Modèle : <strong>${store.mission.contexte.label}</strong></p>
+    </div>
+  `;
+}
 
   Object.keys(byBatiment).forEach(batiment => {
     const pieces = byBatiment[batiment];

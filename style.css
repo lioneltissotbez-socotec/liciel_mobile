@@ -780,3 +780,138 @@ footer > div {
   margin: 0 0 20px 0;
   color: #1f2937;
 }
+
+/* =====================================================
+   MODAL CRÉATION/ÉDITION MISSION
+   ===================================================== */
+
+.mission-modal {
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.mission-photo-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.mission-info-section {
+  margin-bottom: 20px;
+}
+
+.mission-info-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #111;
+}
+
+.mission-modules-section {
+  margin-top: 20px;
+}
+
+.mission-modules-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #111;
+}
+
+.module-card {
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.module-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.module-header input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.module-header strong {
+  font-size: 14px;
+  color: #111;
+}
+
+.module-options {
+  margin-top: 12px;
+  padding-left: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.radio-card:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.radio-card input[type="radio"] {
+  margin-top: 2px;
+  cursor: pointer;
+}
+
+.radio-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radio-card strong {
+  font-size: 14px;
+  color: #111;
+}
+
+.radio-card span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* =====================================================
+   ANIMATIONS TOAST
+   ===================================================== */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}

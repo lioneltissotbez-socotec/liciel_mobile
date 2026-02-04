@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="modules/pieces/pieces.css">
   <link rel="stylesheet" href="modules/photos/photos.css">
   <link rel="stylesheet" href="modules/description/description.css">
+  <link rel="stylesheet" href="modules/settings/settings.css">
 
 </head>
 
@@ -60,26 +61,42 @@
     
     <!-- Modal nouvelle mission -->
     <div id="new-mission-modal" class="modal" style="display: none;">
-      <div class="modal-content">
+      <div class="modal-content mission-modal">
         <h2>✨ Nouvelle mission</h2>
         
-        <label>Numéro de dossier</label>
-        <input id="modal-input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
+        <!-- Photo de couverture -->
+        <div class="mission-photo-section">
+          <label>📷 Photo de couverture</label>
+          <div id="modal-photo-preview" style="display: none; margin-top: 8px;">
+            <img id="modal-photo-img" style="max-width: 100%; max-height: 150px; border-radius: 8px;">
+          </div>
+          <button type="button" class="secondary" onclick="takeMissionCoverPhoto()" style="margin-top: 8px;">
+            📸 Prendre une photo
+          </button>
+        </div>
         
-        <label>Type de bien</label>
-        <select id="modal-type-bien" onchange="updateModalTemplateVisibility()">
-          <option value="">-- Sélectionner --</option>
-          <option value="habitation">Habitation</option>
-          <option value="tertiaire">Tertiaire</option>
-          <option value="industrie">Industrie</option>
-        </select>
-        
-        <label>Liste des pièces</label>
-        <select id="modal-liste-pieces" onchange="updateModalTemplateVisibility()">
-          <option value="standard">Standard</option>
-          <option value="unicil">UNICIL</option>
-          <option value="odhac87">ODHAC 87</option>
-        </select>
+        <!-- Informations mission -->
+        <div class="mission-info-section">
+          <h3>📋 Informations mission</h3>
+          
+          <label>Numéro de dossier *</label>
+          <input id="modal-input-dossier" placeholder="Ex : 2512CGEDI" autocomplete="off">
+          
+          <label>Type de bien</label>
+          <select id="modal-type-bien" onchange="updateModalTemplateVisibility()">
+            <option value="">-- Sélectionner --</option>
+            <option value="habitation">Habitation</option>
+            <option value="tertiaire">Tertiaire</option>
+            <option value="industrie">Industrie</option>
+          </select>
+          
+          <label>Liste des pièces</label>
+          <select id="modal-liste-pieces" onchange="updateModalTemplateVisibility()">
+            <option value="standard">Standard</option>
+            <option value="unicil">UNICIL</option>
+            <option value="odhac87">ODHAC 87</option>
+          </select>
+        </div>
         
         <!-- Saisie assistée (conditionnelle) -->
         <div id="modal-template-section" style="display: none;">
@@ -98,8 +115,80 @@
           </div>
         </div>
         
-        <div style="display: flex; gap: 12px; margin-top: 20px;">
-          <button class="primary" onclick="createNewMission()">Créer</button>
+        <!-- Modules -->
+        <div class="mission-modules-section">
+          <h3>🔬 Modules de diagnostic</h3>
+          
+          <!-- Module Plomb -->
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-plomb" checked onchange="toggleModalPlombOptions()">
+              <strong>Plomb</strong>
+            </label>
+            <div id="modal-plomb-options" class="module-options">
+              <label class="radio-card">
+                <input type="radio" name="modal-plomb-mode" value="CREP" checked>
+                <div>
+                  <strong>CREP</strong>
+                  <span>Constat de Risque d'Exposition au Plomb</span>
+                </div>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="modal-plomb-mode" value="AVANT_TRAVAUX">
+                <div>
+                  <strong>Avant Travaux</strong>
+                  <span>Repérage avant travaux/démolition</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Autres modules (préparés pour le futur) -->
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-amiante">
+              <strong>Amiante</strong>
+            </label>
+          </div>
+          
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-gaz">
+              <strong>Gaz</strong>
+            </label>
+          </div>
+          
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-electricite">
+              <strong>Électricité</strong>
+            </label>
+          </div>
+          
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-dpe">
+              <strong>DPE</strong>
+            </label>
+          </div>
+          
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-termites">
+              <strong>Termites</strong>
+            </label>
+          </div>
+          
+          <div class="module-card">
+            <label class="module-header">
+              <input type="checkbox" id="modal-module-mesurages">
+              <strong>Mesurages</strong>
+            </label>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button class="primary" onclick="createNewMission()">Créer la mission</button>
           <button class="secondary" onclick="closeNewMissionModal()">Annuler</button>
         </div>
       </div>
@@ -108,6 +197,7 @@
 
   <!-- Écran pièces -->
   <section class="screen" id="screen-pieces"></section>
+  <section class="screen" id="screen-settings"></section>
 
   <!-- Écran résumé mission -->
   <section class="screen" id="screen-resume">
@@ -157,6 +247,7 @@
 <script src="modules/pieces/pieces.ui.js"></script>
 
 <script src="modules/description/description.ui.js"></script>
+<script src="modules/settings/settings.ui.js"></script>
 
 <script src="modules/photos/photos.ui.js"></script>
 

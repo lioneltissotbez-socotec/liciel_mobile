@@ -44,6 +44,7 @@ function getPrecisionMesure(mesure) {
 
 /**
  * Échappe les caractères XML
+ * Note : &apos; n'est pas valide en Windows-1252, on ne l'échappe pas
  */
 function escapeXML(str) {
   if (!str) return "";
@@ -51,8 +52,7 @@ function escapeXML(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+    .replace(/"/g, '&quot;');
 }
 
 /**
@@ -124,7 +124,32 @@ function generateCREPXML() {
       if (!ur.plombByLoc) return;
 
       Object.entries(ur.plombByLoc).forEach(([repere, entry]) => {
-        if (!entry.mesures || entry.mesures.length === 0) return;
+        // Si pas de mesures MAIS observation présente → Exporter avec NM
+        if (!entry.mesures || entry.mesures.length === 0) {
+          if (entry.observation) {
+            const item = generateCREPItem({
+              idClassement: String(idClassement).padStart(5, '0'),
+              clefComposant: generateClefComposant(),
+              numMesure: String(numMesureGlobal).padStart(2, '0'),
+              piece: pieceLabel,
+              repere: repere,
+              numUD: numUD,
+              nomUD: ur.type || "—",
+              substrat: ur.substrat || "—",
+              revetement: ur.revetement || "—",
+              hauteur: "",
+              mesure: "NM",
+              degradation: entry.degradation || "",
+              observation: entry.observation || "",
+              partieMesuree: ""
+            });
+
+            xmlItems.push(item);
+            idClassement++;
+            numMesureGlobal++;
+          }
+          return;
+        }
 
         // Générer une ligne XML par mesure
         entry.mesures.forEach((mesure, idx) => {

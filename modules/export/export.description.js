@@ -125,10 +125,15 @@ function celfComposantForItem(urId, item) {
             ? ur.plombByLoc[item]
             : null;
 
-          const mesureLoc = formatMesure(entry?.mesure);
+
+          // V4 : mesures est un tableau, prendre la première mesure
+          const premiereMesure = Array.isArray(entry?.mesures) && entry.mesures.length > 0
+            ? entry.mesures[0]
+            : null;
+          const mesureLoc = formatMesure(premiereMesure);
           const degrLoc = (entry?.degradation ?? "").toString().trim();
 const localisationPiece = `${piece?.batiment || ""} - ${piece?.nom || ""}`.trim();
-          const incertLoc = computeIncertitude10(entry?.mesure); // 10%
+          const incertLoc = computeIncertitude10(premiereMesure); // 10%
 
           xml += `  <LiItem_table_General_Desciption_Pieces>\n`;
           xml += `    <LiColonne_id_classement_champs>${pad5(idx++)}</LiColonne_id_classement_champs>\n`;
