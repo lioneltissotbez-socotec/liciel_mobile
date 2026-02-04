@@ -4,7 +4,7 @@
  */
 
 const CACHE_NAME = 'liciel-mobile-v470';
-const CACHE_VERSION = '4.7.0';
+const CACHE_VERSION = '4.7.1';
 
 // Fichiers à mettre en cache pour le mode offline
 const FILES_TO_CACHE = [
