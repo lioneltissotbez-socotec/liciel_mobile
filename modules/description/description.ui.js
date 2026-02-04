@@ -62,7 +62,7 @@ return `<span style="
   border: 2px solid ${borderColor};
   background: ${bgColor};
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 11px;
   white-space: nowrap;
   line-height: 1.3;
 ">
@@ -158,40 +158,41 @@ function renderDescriptionScreen() {
         piece.descriptions.length === 0
           ? "<p class='muted'>Aucun élément décrit</p>"
           : piece.descriptions.map(ur => `
-              <div class="card ur-card">
-                <div>
-                  <strong>${ur.type}</strong>
-– ${formatURrepère(ur)}
-                </div>
-                <div class="small">
-  ${ur.substrat || "—"} / ${ur.revetement || "—"}
-</div>
-
-                <div class="small">
-  📷 ${(() => {
-    // Compter photos liées à cet UR
-    let count = (ur.photos || []).length; // Photos anciennes
-    if (ur.plombByLoc) {
-      Object.values(ur.plombByLoc).forEach(entry => {
-        if (entry.photoId && store.mission.photos.find(p => p.id === entry.photoId)) {
-          count++;
-        }
-      });
-    }
-    return count;
-  })()}
-</div>
-
-${renderPlombSummary(ur)}
-
-
-                <div class="card-icons">
-                  <span onclick="editUR('${ur.id}')">✏️</span>
-                  <span onclick="deleteUR('${ur.id}')">🗑</span>
-                </div>
-              </div>
-            `).join("")
+  <div class="card ur-card">
+    <div class="ur-card-header">
+      <div class="ur-info-left">
+        <strong>${ur.type}</strong>
+        <span class="ur-substrat-revetement">${ur.substrat || "—"} / ${ur.revetement || "—"}</span>
+      </div>
+      
+      <div class="card-icons">
+        <span onclick="editUR('${ur.id}')">✏️</span>
+        ${(() => {
+          let count = (ur.photos || []).length;
+          if (ur.plombByLoc) {
+            Object.values(ur.plombByLoc).forEach(entry => {
+              if (entry.photoId && store.mission.photos.find(p => p.id === entry.photoId)) {
+                count++;
+              }
+            });
+          }
+          const hasPhotos = count > 0;
+          const iconClass = hasPhotos ? 'photo-icon has-photo' : 'photo-icon no-photo';
+          return `<span class="${iconClass}" onclick="editUR('${ur.id}')" title="${count} photo(s)">📷</span>`;
+        })()}
+        <span onclick="deleteUR('${ur.id}')">🗑</span>
+      </div>
+    </div>
+    
+    ${renderPlombSummary(ur)}
+  </div>
+`).join("")
       }
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-top: 16px;">
+      <button class="action-btn" onclick="openExtendPiece()">📤 Étendre à</button>
+      <button class="action-btn" onclick="openImportPiece()">📥 Importer de</button>
     </div>
 
     <button class="secondary" onclick="go('pieces')">⬅ Retour aux pièces</button>
@@ -541,6 +542,11 @@ function renderUREditForm(ur) {
 
 </div>
 
+
+    <div style="display: flex; gap: 8px; margin-top: 16px;">
+      <button class="action-btn" onclick="openExtendElement()">📤 Étendre à</button>
+      <button class="action-btn" onclick="openImportElement()">📥 Importer de</button>
+    </div>
 
     <button class="primary" onclick="renderDescriptionScreen()">✅ Valider</button>
     <button class="secondary" onclick="renderDescriptionScreen()">⬅ Annuler</button>
@@ -1589,3 +1595,585 @@ if (!store.ui.expertMode) {
 }
 
 window.handlePlombTitleClick = handlePlombTitleClick;
+
+// ======================================================
+// ÉTENDRE À / IMPORTER DE
+// ======================================================
+
+/**
+ * Ouvre la liste pour étendre l'élément actuel vers d'autres pièces/éléments
+ */
+function openExtendElement() {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  const elementType = ur.type;
+  const currentPieceId = store.ui?.currentDescriptionPieceId;
+  
+  // Construire la liste arborescente : toutes les pièces
+  const targets = [];
+  
+  store.mission.pieces.forEach(piece => {
+    // Exclure la pièce actuelle
+    if (piece.id === currentPieceId) return;
+    
+    piece.descriptions = piece.descriptions || [];
+    
+    // Chercher si un élément du même type existe dans cette pièce
+    const existingElement = piece.descriptions.find(d => d.type === elementType);
+    
+    if (existingElement) {
+      // Élément existe → Afficher en enfant
+      targets.push({
+        type: 'existing',
+        pieceId: piece.id,
+        pieceName: `${piece.batiment || "?"} - ${piece.nom || "?"}`,
+        elementId: existingElement.id,
+        elementName: existingElement.type,
+        reperes: formatURrepère(existingElement)
+      });
+    } else {
+      // Élément n'existe pas → Afficher "Créer nouveau"
+      targets.push({
+        type: 'create',
+        pieceId: piece.id,
+        pieceName: `${piece.batiment || "?"} - ${piece.nom || "?"}`,
+        elementName: elementType
+      });
+    }
+  });
+  
+  if (targets.length === 0) {
+    alert('Aucune autre pièce disponible.');
+    return;
+  }
+  
+  // Afficher l'overlay de sélection arborescente
+  closeDescOverlay();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content extend-import-selector">
+      <h3>📤 Étendre "${elementType}" à :</h3>
+      <p class="small muted">Cochez les pièces/éléments cibles</p>
+      
+      <div class="extend-tree" id="extend-tree">
+        ${targets.map((target, idx) => {
+          if (target.type === 'existing') {
+            return `
+              <div class="tree-piece">
+                <div class="tree-piece-name">${target.pieceName}</div>
+                <label class="tree-element">
+                  <input type="checkbox" value="${idx}" class="extend-checkbox">
+                  <div class="tree-element-info">
+                    <strong>${target.elementName}</strong>
+                    <span class="small">${target.reperes} [existe]</span>
+                  </div>
+                </label>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="tree-piece">
+                <div class="tree-piece-name">${target.pieceName}</div>
+                <label class="tree-element">
+                  <input type="checkbox" value="${idx}" class="extend-checkbox">
+                  <div class="tree-element-info">
+                    <strong>Créer "${target.elementName}"</strong>
+                    <span class="small muted">Nouvel élément</span>
+                  </div>
+                </label>
+              </div>
+            `;
+          }
+        }).join('')}
+      </div>
+      
+      <div class="extend-summary">
+        <strong>Total :</strong> <span id="extend-count">0</span> élément(s) sélectionné(s)
+      </div>
+      
+      <button class="primary" onclick="confirmExtendElementV2(${JSON.stringify(targets).replace(/"/g, '&quot;')})">
+        ✅ Copier vers les éléments sélectionnés
+      </button>
+      <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  // Ajouter écouteurs pour mettre à jour le compteur
+  document.querySelectorAll('.extend-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateExtendCount);
+  });
+}
+
+/**
+ * Confirme et exécute l'extension (version arborescente)
+ */
+function confirmExtendElementV2(targets) {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  // Récupérer les indices cochés
+  const selectedIndices = Array.from(document.querySelectorAll('.extend-checkbox:checked'))
+    .map(cb => parseInt(cb.value));
+  
+  if (selectedIndices.length === 0) {
+    alert('Aucun élément sélectionné');
+    return;
+  }
+  
+  let copiedCount = 0;
+  let createdCount = 0;
+  
+  selectedIndices.forEach(idx => {
+    const target = targets[idx];
+    const piece = store.mission.pieces.find(p => p.id === target.pieceId);
+    if (!piece) return;
+    
+    if (target.type === 'existing') {
+      // Élément existe → Copier
+      const targetElement = piece.descriptions.find(d => d.id === target.elementId);
+      if (targetElement) {
+        copyElementData(ur, targetElement);
+        copiedCount++;
+      }
+    } else {
+      // Élément n'existe pas → Créer
+      piece.descriptions = piece.descriptions || [];
+      const newElement = {
+        id: crypto.randomUUID(),
+        photos: []
+      };
+      copyElementData(ur, newElement);
+      piece.descriptions.push(newElement);
+      createdCount++;
+    }
+  });
+  
+  saveMission();
+  closeDescOverlay();
+  
+  const message = [];
+  if (copiedCount > 0) message.push(`✅ ${copiedCount} élément(s) mis à jour`);
+  if (createdCount > 0) message.push(`✨ ${createdCount} élément(s) créé(s)`);
+  
+  alert(message.join('\n'));
+}
+
+// Exposer la nouvelle fonction
+window.confirmExtendElementV2 = confirmExtendElementV2;
+/**
+ * Met à jour le compteur d'éléments sélectionnés
+ */
+function updateExtendCount() {
+  const count = document.querySelectorAll('.extend-checkbox:checked').length;
+  const countElem = document.getElementById('extend-count');
+  if (countElem) countElem.textContent = count;
+}
+
+/**
+ * Confirme et exécute l'extension vers les éléments sélectionnés
+ */
+function confirmExtendElement(targets) {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  // Récupérer les indices cochés
+  const selectedIndices = Array.from(document.querySelectorAll('.extend-checkbox:checked'))
+    .map(cb => parseInt(cb.value));
+  
+  if (selectedIndices.length === 0) {
+    alert('Aucun élément sélectionné');
+    return;
+  }
+  
+  // Copier vers chaque élément sélectionné
+  let copiedCount = 0;
+  
+  selectedIndices.forEach(idx => {
+    const target = targets[idx];
+    const piece = store.mission.pieces.find(p => p.id === target.pieceId);
+    if (!piece) return;
+    
+    const targetElement = piece.descriptions.find(d => d.id === target.elementId);
+    if (!targetElement) return;
+    
+    // Copier toutes les données SAUF photos et id
+    copyElementData(ur, targetElement);
+    copiedCount++;
+  });
+  
+  saveMission();
+  closeDescOverlay();
+  
+  alert(`✅ Données copiées vers ${copiedCount} élément(s)`);
+}
+
+/**
+ * Ouvre la liste pour importer depuis un autre élément
+ */
+function openImportElement() {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  const elementType = ur.type;
+  
+  // Construire la liste des éléments du même type dans d'autres pièces
+  const sources = [];
+  
+  store.mission.pieces.forEach(piece => {
+    if (!piece.descriptions) return;
+    
+    piece.descriptions.forEach(desc => {
+      // Filtrer uniquement les éléments du même type
+      if (desc.type === elementType) {
+        // Exclure l'élément actuel
+        if (desc.id !== ur.id) {
+          sources.push({
+            pieceId: piece.id,
+            pieceName: `${piece.batiment || "?"} - ${piece.nom || "?"}`,
+            elementId: desc.id,
+            elementName: desc.type,
+            reperes: formatURrepère(desc)
+          });
+        }
+      }
+    });
+  });
+  
+  if (sources.length === 0) {
+    alert(`Aucun autre élément "${elementType}" trouvé dans les autres pièces.`);
+    return;
+  }
+  
+  // Afficher l'overlay de sélection
+  closeDescOverlay();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content extend-import-selector">
+      <h3>📥 Importer depuis un "${elementType}" :</h3>
+      <p class="small muted">Sélectionnez l'élément source à copier</p>
+      
+      <div class="import-list" id="import-list">
+        ${sources.map((source, idx) => `
+          <label class="import-item">
+            <input type="radio" name="import-source" value="${idx}" class="import-radio">
+            <div class="import-info">
+              <strong>${source.pieceName}</strong>
+              <span class="small">${source.elementName} (${source.reperes})</span>
+            </div>
+          </label>
+        `).join('')}
+      </div>
+      
+      <button class="primary" onclick="confirmImportElement(${JSON.stringify(sources).replace(/"/g, '&quot;')})">
+        ✅ Importer depuis l'élément sélectionné
+      </button>
+      <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+}
+
+/**
+ * Confirme et exécute l'import depuis l'élément sélectionné
+ */
+function confirmImportElement(sources) {
+  const ur = getEditingUR();
+  if (!ur) return;
+  
+  // Récupérer l'indice sélectionné
+  const selectedRadio = document.querySelector('input[name="import-source"]:checked');
+  
+  if (!selectedRadio) {
+    alert('Aucun élément sélectionné');
+    return;
+  }
+  
+  const idx = parseInt(selectedRadio.value);
+  const source = sources[idx];
+  
+  const piece = store.mission.pieces.find(p => p.id === source.pieceId);
+  if (!piece) return;
+  
+  const sourceElement = piece.descriptions.find(d => d.id === source.elementId);
+  if (!sourceElement) return;
+  
+  // Copier depuis la source vers l'élément actuel
+  copyElementData(sourceElement, ur);
+  
+  saveMission();
+  closeDescOverlay();
+  renderUREditForm(ur);
+  
+  alert(`✅ Données importées depuis "${source.pieceName} - ${source.elementName}"`);
+}
+
+/**
+ * Copie les données d'un élément source vers un élément cible
+ * (tout sauf photos et id)
+ */
+function copyElementData(source, target) {
+  // Copier les propriétés de base
+  target.type = source.type;
+  target.substrat = source.substrat;
+  target.revetement = source.revetement;
+  
+  // Copier la localisation (repères)
+  target.localisation = {
+    items: [...(source.localisation?.items || [])]
+  };
+  
+  // Copier plombByLoc (mesures, dégradations, observations, PE, déclenchante)
+  target.plombByLoc = {};
+  
+  if (source.plombByLoc) {
+    Object.keys(source.plombByLoc).forEach(loc => {
+      const sourceEntry = source.plombByLoc[loc];
+      
+      target.plombByLoc[loc] = {
+        mesures: [...(sourceEntry.mesures || [])],
+        degradation: sourceEntry.degradation,
+        observation: sourceEntry.observation || "",
+        isPE: sourceEntry.isPE || false,
+        isDeclenchante: sourceEntry.isDeclenchante || false,
+        photoId: null // Ne PAS copier les photos
+      };
+    });
+  }
+  
+  // Ne PAS copier : photos, id
+}
+
+/**
+ * Étendre toute la pièce vers d'autres pièces
+ */
+function openExtendPiece() {
+  const pieceId = store.ui?.currentDescriptionPieceId;
+  const piece = store.mission?.pieces.find(p => p.id === pieceId);
+  
+  if (!piece) return;
+  
+  // Liste des autres pièces
+  const otherPieces = store.mission.pieces.filter(p => p.id !== pieceId);
+  
+  if (otherPieces.length === 0) {
+    alert('Aucune autre pièce disponible.');
+    return;
+  }
+  
+  closeDescOverlay();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content extend-import-selector">
+      <h3>📤 Étendre "${piece.nom}" à :</h3>
+      <p class="small muted">Tous les éléments de cette pièce seront copiés</p>
+      
+      <div class="extend-list" id="extend-piece-list">
+        ${otherPieces.map((p, idx) => `
+          <label class="extend-item">
+            <input type="checkbox" value="${idx}" class="extend-piece-checkbox">
+            <div class="extend-info">
+              <strong>${p.batiment || "?"} - ${p.nom || "?"}</strong>
+              <span class="small">${p.descriptions?.length || 0} élément(s)</span>
+            </div>
+          </label>
+        `).join('')}
+      </div>
+      
+      <div class="extend-summary">
+        <strong>Total :</strong> <span id="extend-piece-count">0</span> pièce(s) sélectionnée(s)
+      </div>
+      
+      <button class="primary" onclick="confirmExtendPiece(${JSON.stringify(otherPieces.map(p => p.id)).replace(/"/g, '&quot;')})">
+        ✅ Copier vers les pièces sélectionnées
+      </button>
+      <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  
+  // Ajouter écouteurs
+  document.querySelectorAll('.extend-piece-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const count = document.querySelectorAll('.extend-piece-checkbox:checked').length;
+      document.getElementById('extend-piece-count').textContent = count;
+    });
+  });
+}
+
+/**
+ * Confirme l'extension de la pièce
+ */
+function confirmExtendPiece(pieceIds) {
+  const pieceId = store.ui?.currentDescriptionPieceId;
+  const sourcePiece = store.mission?.pieces.find(p => p.id === pieceId);
+  
+  if (!sourcePiece) return;
+  
+  // Récupérer les indices cochés
+  const selectedIndices = Array.from(document.querySelectorAll('.extend-piece-checkbox:checked'))
+    .map(cb => parseInt(cb.value));
+  
+  if (selectedIndices.length === 0) {
+    alert('Aucune pièce sélectionnée');
+    return;
+  }
+  
+  let totalCopied = 0;
+  
+  selectedIndices.forEach(idx => {
+    const targetPieceId = pieceIds[idx];
+    const targetPiece = store.mission.pieces.find(p => p.id === targetPieceId);
+    if (!targetPiece) return;
+    
+    // Pour chaque élément de la pièce source
+    (sourcePiece.descriptions || []).forEach(sourceElement => {
+      // Chercher élément du même type dans la cible
+      let targetElement = (targetPiece.descriptions || []).find(d => d.type === sourceElement.type);
+      
+      if (targetElement) {
+        // Existe → Copier
+        copyElementData(sourceElement, targetElement);
+        totalCopied++;
+      } else {
+        // N'existe pas → Créer
+        targetPiece.descriptions = targetPiece.descriptions || [];
+        const newElement = {
+          id: crypto.randomUUID(),
+          photos: []
+        };
+        copyElementData(sourceElement, newElement);
+        targetPiece.descriptions.push(newElement);
+        totalCopied++;
+      }
+    });
+  });
+  
+  saveMission();
+  closeDescOverlay();
+  
+  alert(`✅ ${totalCopied} élément(s) copié(s) vers ${selectedIndices.length} pièce(s)`);
+}
+
+/**
+ * Importer depuis une autre pièce
+ */
+function openImportPiece() {
+  const pieceId = store.ui?.currentDescriptionPieceId;
+  const piece = store.mission?.pieces.find(p => p.id === pieceId);
+  
+  if (!piece) return;
+  
+  // Liste des autres pièces
+  const otherPieces = store.mission.pieces.filter(p => p.id !== pieceId);
+  
+  if (otherPieces.length === 0) {
+    alert('Aucune autre pièce disponible.');
+    return;
+  }
+  
+  closeDescOverlay();
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="overlay-content extend-import-selector">
+      <h3>📥 Importer depuis une pièce :</h3>
+      <p class="small muted">Tous les éléments de la pièce source seront copiés</p>
+      
+      <div class="import-list" id="import-piece-list">
+        ${otherPieces.map((p, idx) => `
+          <label class="import-item">
+            <input type="radio" name="import-piece-source" value="${idx}" class="import-piece-radio">
+            <div class="import-info">
+              <strong>${p.batiment || "?"} - ${p.nom || "?"}</strong>
+              <span class="small">${p.descriptions?.length || 0} élément(s)</span>
+            </div>
+          </label>
+        `).join('')}
+      </div>
+      
+      <button class="primary" onclick="confirmImportPiece(${JSON.stringify(otherPieces.map(p => p.id)).replace(/"/g, '&quot;')})">
+        ✅ Importer depuis la pièce sélectionnée
+      </button>
+      <button class="secondary" onclick="closeDescOverlay()">Annuler</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+}
+
+/**
+ * Confirme l'import depuis une pièce
+ */
+function confirmImportPiece(pieceIds) {
+  const pieceId = store.ui?.currentDescriptionPieceId;
+  const targetPiece = store.mission?.pieces.find(p => p.id === pieceId);
+  
+  if (!targetPiece) return;
+  
+  // Récupérer la pièce source sélectionnée
+  const selectedRadio = document.querySelector('input[name="import-piece-source"]:checked');
+  
+  if (!selectedRadio) {
+    alert('Aucune pièce sélectionnée');
+    return;
+  }
+  
+  const idx = parseInt(selectedRadio.value);
+  const sourcePieceId = pieceIds[idx];
+  const sourcePiece = store.mission.pieces.find(p => p.id === sourcePieceId);
+  
+  if (!sourcePiece) return;
+  
+  let totalCopied = 0;
+  
+  // Pour chaque élément de la pièce source
+  (sourcePiece.descriptions || []).forEach(sourceElement => {
+    // Chercher élément du même type dans la cible
+    let targetElement = (targetPiece.descriptions || []).find(d => d.type === sourceElement.type);
+    
+    if (targetElement) {
+      // Existe → Copier
+      copyElementData(sourceElement, targetElement);
+      totalCopied++;
+    } else {
+      // N'existe pas → Créer
+      targetPiece.descriptions = targetPiece.descriptions || [];
+      const newElement = {
+        id: crypto.randomUUID(),
+        photos: []
+      };
+      copyElementData(sourceElement, newElement);
+      targetPiece.descriptions.push(newElement);
+      totalCopied++;
+    }
+  });
+  
+  saveMission();
+  closeDescOverlay();
+  renderDescriptionScreen();
+  
+  alert(`✅ ${totalCopied} élément(s) importé(s) depuis "${sourcePiece.batiment} - ${sourcePiece.nom}"`);
+}
+
+// Exposer les fonctions
+window.openExtendElement = openExtendElement;
+window.confirmExtendElement = confirmExtendElement;
+window.openImportElement = openImportElement;
+window.confirmImportElement = confirmImportElement;
+window.openExtendPiece = openExtendPiece;
+window.confirmExtendPiece = confirmExtendPiece;
+window.openImportPiece = openImportPiece;
+window.confirmImportPiece = confirmImportPiece;
+
